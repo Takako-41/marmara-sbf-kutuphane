@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Marmara Üniversitesi SBF Kütüphanesi</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
+
+  <!-- Üst Başlık (Header) -->
+  <header class="bg-gradient-to-r from-blue-950 via-indigo-900 to-blue-900 text-white shadow-lg sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        <!-- Logo ve Başlık -->
+        <div class="flex items-center space-x-3">
+          <div class="w-12 h-12 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-amber-300 shadow-inner">
+            <i data-lucide="landmark" class="w-7 h-7"></i>
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <h1 class="text-lg sm:text-xl font-bold tracking-tight" id="headerFacultyName">
+                Marmara Üniversitesi
+              </h1>
+              <span class="text-xs bg-amber-400 text-slate-900 font-semibold px-2 py-0.5 rounded-full">SBF</span>
+            </div>
+            <p class="text-xs text-blue-200" id="headerLibSubtitle">
+              Siyasal Bilgiler Fakültesi Kütüphanesi
+            </p>
+          </div>
+        </div>
+
+        <!-- Sağ Taraf: Dil Seçici & Kullanıcı Giriş Durumu -->
+        <div class="flex items-center space-x-2 sm:space-x-4">
+          <!-- Dil Seçici (TR / FR / EN) -->
+          <div class="flex items-center bg-white/10 rounded-lg p-1 border border-white/15 backdrop-blur-sm">
+            <button onclick="setLanguage('tr')" id="btnLangTR" class="px-2 py-1 text-xs font-medium rounded-md transition-all flex items-center space-x-1 bg-white text-blue-950 shadow-sm">
+              <span>🇹🇷</span>
+              <span class="hidden md:inline">TR</span>
+            </button>
+            <button onclick="setLanguage('fr')" id="btnLangFR" class="px-2 py-1 text-xs font-medium rounded-md transition-all flex items-center space-x-1 text-white hover:bg-white/15">
+              <span>🇫🇷</span>
+              <span class="hidden md:inline">FR</span>
+            </button>
+            <button onclick="setLanguage('en')" id="btnLangEN" class="px-2 py-1 text-xs font-medium rounded-md transition-all flex items-center space-x-1 text-white hover:bg-white/15">
+              <span>🇬🇧</span>
+              <span class="hidden md:inline">EN</span>
+            </button>
+          </div>
+
+          <!-- Kullanıcı Durum Alanı (Giriş Yapılmamışsa / Giriş Yapılmışsa) -->
+          <div id="authHeaderArea" class="flex items-center space-x-2">
+            <!-- JavaScript ile dolacak: ya Giriş Yap/Kayıt Ol butonları ya da Kullanıcı Profil Kartı -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigasyon Sekmeleri (Yetkiye Göre Değişir) -->
+      <nav id="mainNav" class="flex space-x-1 sm:space-x-3 border-t border-white/10 pt-2 pb-2 overflow-x-auto text-sm">
+        <!-- JavaScript ile yetkiye göre dinamik oluşturulur -->
+      </nav>
+    </div>
+  </header>
+
+  <!-- Ana İçerik -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
+
+    <!-- ZİYARETÇİ / HERKESE AÇIK BİLGİLENDİRME ÇUBUĞU (Giriş Yapılmamışsa Görünür) -->
+    <div id="guestNoticeBar" class="hidden mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-blue-900">
+      <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0">
+          <i data-lucide="info" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <p class="font-bold" data-i18n="guestNoticeTitle">Katalog Arama Modundasınız (Açık Erişim)</p>
+          <p class="text-xs text-blue-700" data-i18n="guestNoticeDesc">Kitapları tarayabilir ve raf numaralarını görebilirsiniz. Ödünç alma geçmişi ve işlemler için lütfen giriş yapınız.</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2 shrink-0">
+        <button onclick="openModal('modal-login')" class="px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg text-xs font-bold transition-all shadow-sm flex items-center">
+          <i data-lucide="log-in" class="w-4 h-4 mr-1.5"></i>
+          <span data-i18n="btnLogin">Giriş Yap</span>
+        </button>
+        <button onclick="openModal('modal-register')" class="px-3.5 py-2 bg-white hover:bg-blue-50 text-blue-900 border border-blue-300 rounded-lg text-xs font-semibold transition-all">
+          <span data-i18n="btnRegister">Öğrenci Kayıt</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 1. PANO (DASHBOARD) - SADECE ADMİN -->
+    <section id="tab-content-dashboard" class="tab-pane hidden space-y-6">
+      <!-- Özet Kartları -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex items-center justify-between">
+          <div>
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider" data-i18n="statTotalBooks">Toplam Kitap</p>
+            <h3 class="text-2xl font-bold text-slate-900 mt-1" id="stat-total-books">0</h3>
+            <p class="text-xs text-slate-400 mt-0.5"><span id="stat-total-titles">0</span> <span data-i18n="statDistinctTitles">farklı eser</span></p>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+            <i data-lucide="books" class="w-6 h-6"></i>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex items-center justify-between">
+          <div>
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider" data-i18n="statAvailableBooks">Rafta Mevcut</p>
+            <h3 class="text-2xl font-bold text-emerald-600 mt-1" id="stat-available-books">0</h3>
+            <p class="text-xs text-slate-400 mt-0.5" data-i18n="statReadyToBorrow">Ödünç verilmeye hazır</p>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <i data-lucide="check-circle" class="w-6 h-6"></i>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex items-center justify-between">
+          <div>
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider" data-i18n="statActiveLoans">Ödünçte</p>
+            <h3 class="text-2xl font-bold text-amber-600 mt-1" id="stat-active-loans">0</h3>
+            <p class="text-xs text-slate-400 mt-0.5" data-i18n="statCurrentlyReading">Öğrencilerde</p>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+            <i data-lucide="clock" class="w-6 h-6"></i>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex items-center justify-between">
+          <div>
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider" data-i18n="statOverdueLoans">Gecikmiş İadeler</p>
+            <h3 class="text-2xl font-bold text-rose-600 mt-1" id="stat-overdue-loans">0</h3>
+            <p class="text-xs text-rose-500 mt-0.5" data-i18n="statNeedsReturn">Süresi dolan</p>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
+            <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hızlı Eylemler ve Gecikme Listesi -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 lg:col-span-1">
+          <h2 class="text-base font-bold text-slate-900 mb-4 flex items-center">
+            <i data-lucide="zap" class="w-5 h-5 text-amber-500 mr-2"></i>
+            <span data-i18n="quickActionsTitle">Hızlı İşlemler</span>
+          </h2>
+          <div class="space-y-3">
+            <button onclick="openIssueModal()" class="w-full flex items-center justify-between p-3 rounded-lg bg-blue-50 text-blue-900 hover:bg-blue-100 transition-colors font-medium border border-blue-200/60">
+              <span class="flex items-center">
+                <i data-lucide="arrow-right-circle" class="w-5 h-5 mr-3 text-blue-700"></i>
+                <span data-i18n="actionQuickLoan">Hızlı Kitap Ödünç Ver</span>
+              </span>
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+            <button onclick="openBookModal()" class="w-full flex items-center justify-between p-3 rounded-lg bg-slate-50 text-slate-800 hover:bg-slate-100 transition-colors font-medium border border-slate-200">
+              <span class="flex items-center">
+                <i data-lucide="plus-circle" class="w-5 h-5 mr-3 text-emerald-600"></i>
+                <span data-i18n="actionAddBook">Yeni Kitap Ekle</span>
+              </span>
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+            <button onclick="switchTab('approvals')" class="w-full flex items-center justify-between p-3 rounded-lg bg-amber-50 text-amber-900 hover:bg-amber-100 transition-colors font-medium border border-amber-200/60">
+              <span class="flex items-center">
+                <i data-lucide="user-check" class="w-5 h-5 mr-3 text-amber-700"></i>
+                <span data-i18n="tabApprovals">Onay Bekleyenler</span>
+              </span>
+              <span id="stat-pending-badge" class="px-2 py-0.5 text-xs bg-amber-600 text-white font-bold rounded-full">0</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 lg:col-span-2">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-base font-bold text-slate-900 flex items-center">
+              <i data-lucide="activity" class="w-5 h-5 text-blue-600 mr-2"></i>
+              <span data-i18n="recentLoansTitle">Son Ödünç ve Geciken Kitaplar</span>
+            </h2>
+            <button onclick="switchTab('loans')" class="text-xs text-blue-600 hover:underline font-medium" data-i18n="viewAll">
+              Tümünü Gör →
+            </button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left">
+              <thead class="text-xs text-slate-500 uppercase bg-slate-50 border-y border-slate-200">
+                <tr>
+                  <th class="py-2.5 px-3" data-i18n="colBook">Kitap</th>
+                  <th class="py-2.5 px-3" data-i18n="colMember">Öğrenci / Üye</th>
+                  <th class="py-2.5 px-3" data-i18n="colDueDate">Teslim Tarihi</th>
+                  <th class="py-2.5 px-3 text-right" data-i18n="colAction">İşlem</th>
+                </tr>
+              </thead>
+              <tbody id="dashboard-loans-tbody" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. KİTAP KATALOĞU (HERKESE AÇIK - ANCAK EKLEME/SİLME SADECE ADMİN) -->
+    <section id="tab-content-books" class="tab-pane space-y-4">
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+        <div class="flex flex-col sm:flex-row gap-3 items-center justify-between">
+          <div class="relative w-full sm:w-96">
+            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-3"></i>
+            <input type="text" id="bookSearchInput" oninput="filterBooks()" placeholder="Kitap adı, yazar, raf veya kategori ara..." class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          </div>
+          <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+            <select id="bookLangFilter" onchange="filterBooks()" class="text-sm border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-none">
+              <option value="ALL" data-i18n="optAllLanguages">Tüm Diller</option>
+              <option value="Français">Français 🇫🇷</option>
+              <option value="Türkçe">Türkçe 🇹🇷</option>
+              <option value="English">English 🇬🇧</option>
+            </select>
+            <!-- Kitap Ekle Butonu SADECE ADMİNDE görünür -->
+            <button id="btnAdminAddBook" onclick="openBookModal()" class="hidden flex items-center px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg text-sm font-medium transition-colors shadow-sm">
+              <i data-lucide="plus" class="w-4 h-4 mr-1.5"></i>
+              <span data-i18n="btnAddBook">Kitap Ekle</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-left">
+            <thead class="text-xs text-slate-600 uppercase bg-slate-50 border-b border-slate-200">
+              <tr>
+                <th class="py-3 px-4" data-i18n="colBookTitle">Eser Adı</th>
+                <th class="py-3 px-4" data-i18n="colAuthor">Yazar</th>
+                <th class="py-3 px-4" data-i18n="colCategory">Disiplin / Tür</th>
+                <th class="py-3 px-4" data-i18n="colLanguage">Dil</th>
+                <th class="py-3 px-4" data-i18n="colShelf">Raf / Yer No</th>
+                <th class="py-3 px-4 text-center" data-i18n="colCopies">Mevcut / Toplam</th>
+                <th class="py-3 px-4 text-right admin-col-action hidden" data-i18n="colActions">İşlemler</th>
+              </tr>
+            </thead>
+            <tbody id="books-table-tbody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. ÖĞRENCİNİN KENDİ KİTAPLARI (SADECE GİRİŞ YAPMIŞ ÖĞRENCİ GÖRÜR) -->
+    <section id="tab-content-my-books" class="tab-pane hidden space-y-4">
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <div class="flex items-center space-x-3 text-blue-950 mb-2">
+          <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-700">
+            <i data-lucide="book-open-check" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h2 class="text-lg font-bold text-slate-900" data-i18n="myBooksTitle">Ödünç Aldığım Kitaplar</h2>
+            <p class="text-xs text-slate-500" data-i18n="myBooksSubtitle">Elinizdeki kitaplar ve son teslim tarihleri</p>
+          </div>
+        </div>
+        <div class="mt-4 overflow-x-auto">
+          <table class="w-full text-sm text-left">
+            <thead class="text-xs text-slate-600 uppercase bg-slate-50 border-b border-slate-200">
+              <tr>
+                <th class="py-3 px-4" data-i18n="colBook">Kitap Adı</th>
+                <th class="py-3 px-4" data-i18n="colIssueDate">Alış Tarihi</th>
+                <th class="py-3 px-4" data-i18n="colDueDate">Son Teslim Tarihi</th>
+                <th class="py-3 px-4 text-center" data-i18n="colStatus">Kalan Süre / Durum</th>
+              </tr>
+            </thead>
+            <tbody id="my-books-table-tbody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. ÖDÜNÇ & İADE - SADECE ADMİN -->
+    <section id="tab-content-loans" class="tab-pane hidden space-y-4">
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+        <div class="flex flex-col sm:flex-row gap-3 items-center justify-between">
+          <div class="relative w-full sm:w-96">
+            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-3"></i>
+            <input type="text" id="loanSearchInput" oninput="filterLoans()" placeholder="Öğrenci adı, no veya kitap ara..." class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          </div>
+          <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+            <select id="loanStatusFilter" onchange="filterLoans()" class="text-sm border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-none">
+              <option value="ACTIVE" data-i18n="optActiveLoans">Sadece Ödünçtekiler</option>
+              <option value="OVERDUE" data-i18n="optOverdueOnly">Sadece Gecikenler</option>
+              <option value="RETURNED" data-i18n="optReturnedOnly">İade Edilenler</option>
+              <option value="ALL" data-i18n="optAllLoans">Tüm Geçmiş</option>
+            </select>
+            <button onclick="openIssueModal()" class="flex items-center px-4 py-2 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg text-sm font-medium transition-colors shadow-sm">
+              <i data-lucide="arrow-right-circle" class="w-4 h-4 mr-1.5"></i>
+              <span data-i18n="btnIssueBook">Kitap Ödünç Ver</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-left">
+            <thead class="text-xs text-slate-600 uppercase bg-slate-50 border-b border-slate-200">
+              <tr>
+                <th class="py-3 px-4" data-i18n="colBook">Kitap</th>
+                <th class="py-3 px-4" data-i18n="colMember">Öğrenci / Üye</th>
+                <th class="py-3 px-4" data-i18n="colIssueDate">Veriliş Tarihi</th>
+                <th class="py-3 px-4" data-i18n="colDueDate">Son Teslim</th>
+                <th class="py-3 px-4 text-center" data-i18n="colStatus">Durum</th>
+                <th class="py-3 px-4 text-right" data-i18n="colAction">İşlem</th>
+              </tr>
+            </thead>
+            <tbody id="loans-table-tbody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. ÜYELER & ÖĞRENCİLER - SADECE ADMİN (KVKK KORUMASI) -->
+    <section id="tab-content-members" class="tab-pane hidden space-y-4">
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+        <div class="flex flex-col sm:flex-row gap-3 items-center justify-between">
+          <div class="relative w-full sm:w-96">
+            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-3"></i>
+            <input type="text" id="memberSearchInput" oninput="filterMembers()" placeholder="Öğrenci no, ad veya bölüm ara..." class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          </div>
+          <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+            <button onclick="openMemberModal()" class="flex items-center px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg text-sm font-medium transition-colors shadow-sm">
+              <i data-lucide="user-plus" class="w-4 h-4 mr-1.5"></i>
+              <span data-i18n="btnAddMember">Üye Ekle</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-left">
+            <thead class="text-xs text-slate-600 uppercase bg-slate-50 border-b border-slate-200">
+              <tr>
+                <th class="py-3 px-4" data-i18n="colMemberNumber">Öğrenci / Sicil No</th>
+                <th class="py-3 px-4" data-i18n="colFullName">Ad Soyad</th>
+                <th class="py-3 px-4" data-i18n="colDepartment">Bölüm / Birim</th>
+                <th class="py-3 px-4" data-i18n="colRole">Statü</th>
+                <th class="py-3 px-4" data-i18n="colContact">İletişim</th>
+                <th class="py-3 px-4 text-center" data-i18n="colActiveBookCount">Elindeki Kitap</th>
+                <th class="py-3 px-4 text-right" data-i18n="colActions">İşlemler</th>
+              </tr>
+            </thead>
+            <tbody id="members-table-tbody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. ONAY BEKLEYEN ÖĞRENCİLER (TROL KALKANI) - SADECE ADMİN -->
+    <section id="tab-content-approvals" class="tab-pane hidden space-y-4">
+      <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-lg bg-amber-600 text-white flex items-center justify-center shrink-0">
+            <i data-lucide="shield-alert" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-amber-900" data-i18n="approvalsTitle">Trol ve Sahte Hesap Kalkanı (Onay Bekleyenler)</h3>
+            <p class="text-xs text-amber-700" data-i18n="approvalsDesc">Öğrencilerin sisteme girebilmesi için burada öğrenci kimliklerini doğrulayıp onaylamanız gerekir.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-left">
+            <thead class="text-xs text-slate-600 uppercase bg-slate-50 border-b border-slate-200">
+              <tr>
+                <th class="py-3 px-4" data-i18n="colMemberNumber">Öğrenci No</th>
+                <th class="py-3 px-4" data-i18n="colFullName">Ad Soyad</th>
+                <th class="py-3 px-4" data-i18n="colDepartment">Bölüm</th>
+                <th class="py-3 px-4">Okul E-Posta (@marun)</th>
+                <th class="py-3 px-4">Başvuru Tarihi</th>
+                <th class="py-3 px-4 text-right" data-i18n="colAction">Doğrulama İşlemi</th>
+              </tr>
+            </thead>
+            <tbody id="approvals-table-tbody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. YEDEKLEME & AĞ AYARLARI - SADECE ADMİN -->
+    <section id="tab-content-backup" class="tab-pane hidden space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+          <div class="flex items-center space-x-3 text-blue-950">
+            <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-900">
+              <i data-lucide="server" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h2 class="text-base font-bold text-slate-900" data-i18n="serverInfoTitle">Kampüs ve Yerel Ağ Yayını</h2>
+              <p class="text-xs text-slate-500" data-i18n="serverInfoSubtitle">RTE-SBF-S1-1K.01.RC Switch Bağlantısı</p>
+            </div>
+          </div>
+          <p class="text-sm text-slate-600 leading-relaxed" data-i18n="serverInfoDesc">
+            Bu uygulama okulun yerel ağında (Intranet / eduroam) çalışacak şekilde yapılandırılmıştır.
+          </p>
+          <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200 text-xs font-mono space-y-1.5">
+            <div class="flex justify-between">
+              <span class="text-slate-500">Yerel Erişim:</span>
+              <span class="text-blue-700 font-bold">http://localhost:3000</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-500">Ağ Dinleme Portu:</span>
+              <span class="text-slate-800 font-bold">0.0.0.0:3000</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+          <div class="flex items-center space-x-3 text-emerald-900">
+            <div class="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-700">
+              <i data-lucide="shield-check" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h2 class="text-base font-bold text-slate-900" data-i18n="backupTitle">Tek Tıkla Veritabanı Yedeği</h2>
+              <p class="text-xs text-slate-500" data-i18n="backupSubtitle">Kayıp yaşamamak için anlık dışa aktarma</p>
+            </div>
+          </div>
+          <p class="text-sm text-slate-600 leading-relaxed" data-i18n="backupDesc">
+            Kütüphanedeki tüm kitap kataloğunu, öğrenci kayıtlarını ve ödünç geçmişini tek bir JSON dosyası halinde indirebilirsiniz.
+          </p>
+          <div class="pt-2">
+            <button onclick="downloadBackup()" class="inline-flex items-center px-4 py-2.5 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg text-sm font-medium transition-colors shadow-sm">
+              <i data-lucide="download" class="w-4 h-4 mr-2"></i>
+              <span data-i18n="btnDownloadBackup">Tüm Kütüphane Verisini İndir (.JSON)</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= MODALLAR ================= -->
+
+  <!-- MODAL: GİRİŞ YAP (LOGIN) -->
+  <div id="modal-login" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden border border-slate-200">
+      <div class="bg-gradient-to-r from-blue-900 to-indigo-900 px-6 py-4 text-white flex justify-between items-center">
+        <h3 class="text-base font-bold flex items-center">
+          <i data-lucide="log-in" class="w-5 h-5 mr-2 text-amber-300"></i>
+          <span data-i18n="modalLoginTitle">Sisteme Giriş Yap</span>
+        </h3>
+        <button onclick="closeModal('modal-login')" class="text-white/80 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <form id="form-login" onsubmit="submitLogin(event)" class="p-6 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1" data-i18n="lblLoginUsername">
+            Öğrenci No veya Yönetici Adı *
+          </label>
+          <input type="text" id="login-username" required placeholder="admin veya 1202..." class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1" data-i18n="lblLoginPassword">
+            Şifre *
+          </label>
+          <input type="password" id="login-password" required placeholder="••••••" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+
+        <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200 text-[11px] text-slate-500">
+          <span class="font-bold text-slate-700">Admin Girişi:</span> admin / sbf<br>
+          <span class="font-bold text-slate-700">Öğrenci Girişi:</span> 120210045 / 123
+        </div>
+
+        <div class="pt-2 flex flex-col gap-2">
+          <button type="submit" class="w-full py-2.5 bg-blue-900 hover:bg-blue-800 text-white rounded-lg text-sm font-bold transition-colors shadow-sm" data-i18n="btnLoginSubmit">
+            Giriş Yap
+          </button>
+          <button type="button" onclick="closeModal('modal-login'); openModal('modal-register');" class="text-xs text-blue-700 hover:underline text-center" data-i18n="btnGoRegister">
+            Öğrenci hesabınız yok mu? Kayıt Olun →
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ÖĞRENCİ KAYIT OL (REGISTER - TROL KALKANI) -->
+  <div id="modal-register" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200">
+      <div class="bg-gradient-to-r from-blue-900 to-indigo-900 px-6 py-4 text-white flex justify-between items-center">
+        <h3 class="text-base font-bold flex items-center">
+          <i data-lucide="user-plus" class="w-5 h-5 mr-2 text-amber-300"></i>
+          <span data-i18n="modalRegisterTitle">Öğrenci Kütüphane Kaydı</span>
+        </h3>
+        <button onclick="closeModal('modal-register')" class="text-white/80 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <form id="form-register" onsubmit="submitRegister(event)" class="p-6 space-y-3.5 max-h-[85vh] overflow-y-auto">
+        <div class="bg-amber-50 border border-amber-200 rounded-lg p-2.5 text-xs text-amber-800 flex items-start space-x-2">
+          <i data-lucide="shield-check" class="w-4 h-4 text-amber-600 shrink-0 mt-0.5"></i>
+          <span data-i18n="regNotice">Trol ve sahte hesapları önlemek için yalnızca @marun.edu.tr e-posta adresi kabul edilir. Kaydınız kütüphane görevlisi onayından sonra açılır.</span>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1" data-i18n="lblRegNumber">Öğrenci Numarası *</label>
+          <input type="text" id="reg-number" required placeholder="1202..." class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1" data-i18n="lblRegFullName">Ad Soyad (Nom Prénom) *</label>
+          <input type="text" id="reg-fullname" required placeholder="Örn: Selin Aydın" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Marmara E-Posta (@marun.edu.tr) *</label>
+          <input type="email" id="reg-email" required placeholder="ad.soyad@marun.edu.tr" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1" data-i18n="lblDepartment">Bölüm / Département *</label>
+          <select id="reg-department" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 bg-white focus:outline-none">
+            <option value="Siyaset Bilimi ve Kamu Yönetimi (Fransızca)">Siyaset Bilimi ve Kamu Yönetimi (Fransızca)</option>
+            <option value="Uluslararası İlişkiler (İngilizce)">Uluslararası İlişkiler (İngilizce)</option>
+            <option value="Siyaset Bilimi ve Uluslararası İlişkiler">Siyaset Bilimi ve Uluslararası İlişkiler</option>
+            <option value="Yerel Yönetimler">Yerel Yönetimler</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1" data-i18n="lblRegPassword">Şifre Belirleyin *</label>
+          <input type="password" id="reg-password" required placeholder="En az 4 karakter" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+
+        <div class="pt-3 border-t border-slate-100 flex justify-end space-x-2">
+          <button type="button" onclick="closeModal('modal-register')" class="px-4 py-2 border border-slate-300 rounded-lg text-sm text-slate-700 hover:bg-slate-50" data-i18n="btnCancel">İptal</button>
+          <button type="submit" class="px-5 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg text-sm font-semibold transition-colors" data-i18n="btnRegisterSubmit">Başvuruyu Gönder</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: HIZLI ÖDÜNÇ VER (SADECE ADMİN) -->
+  <div id="modal-issue" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200">
+      <div class="bg-gradient-to-r from-blue-900 to-indigo-900 px-6 py-4 text-white flex justify-between items-center">
+        <h3 class="text-base font-bold flex items-center">
+          <i data-lucide="arrow-right-circle" class="w-5 h-5 mr-2 text-amber-300"></i>
+          <span data-i18n="modalIssueTitle">Kitap Ödünç Ver</span>
+        </h3>
+        <button onclick="closeModal('modal-issue')" class="text-white/80 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <form id="form-issue" onsubmit="submitIssueLoan(event)" class="p-6 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1" data-i18n="lblSelectMember">
+            Öğrenci / Akademisyen Seçin *
+          </label>
+          <select id="issue-member-select" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5 bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"></select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1" data-i18n="lblSelectBook">
+            Kitap Seçin (Yalnızca Rafta Olanlar) *
+          </label>
+          <select id="issue-book-select" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5 bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"></select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1" data-i18n="lblLoanDuration">
+            Ödünç Süresi (Gün)
+          </label>
+          <div class="flex gap-3">
+            <label class="flex items-center text-sm">
+              <input type="radio" name="loanDaysRadio" value="15" checked class="text-blue-600 focus:ring-blue-500 mr-1.5">
+              <span data-i18n="opt15Days">15 Gün (Öğrenci)</span>
+            </label>
+            <label class="flex items-center text-sm">
+              <input type="radio" name="loanDaysRadio" value="30" class="text-blue-600 focus:ring-blue-500 mr-1.5">
+              <span data-i18n="opt30Days">30 Gün (Akademisyen)</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-slate-100 flex justify-end space-x-2">
+          <button type="button" onclick="closeModal('modal-issue')" class="px-4 py-2 border border-slate-300 rounded-lg text-sm text-slate-700 hover:bg-slate-50" data-i18n="btnCancel">İptal</button>
+          <button type="submit" class="px-5 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg text-sm font-semibold transition-colors" data-i18n="btnConfirmIssue">Ödünç Ver</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: KİTAP EKLE / DÜZENLE (SADECE ADMİN) -->
+  <div id="modal-book" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200">
+      <div class="bg-gradient-to-r from-blue-900 to-indigo-900 px-6 py-4 text-white flex justify-between items-center">
+        <h3 class="text-base font-bold flex items-center">
+          <i data-lucide="book-marked" class="w-5 h-5 mr-2 text-amber-300"></i>
+          <span id="modal-book-title" data-i18n="modalAddBookTitle">Yeni Kitap Ekle</span>
+        </h3>
+        <button onclick="closeModal('modal-book')" class="text-white/80 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <form id="form-book" onsubmit="submitBookForm(event)" class="p-6 space-y-3.5 max-h-[85vh] overflow-y-auto">
+        <input type="hidden" id="book-form-id">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1" data-i18n="lblBookTitle">Eser Adı (Titre) *</label>
+          <input type="text" id="book-title" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1" data-i18n="lblAuthor">Yazar (Auteur) *</label>
+          <input type="text" id="book-author" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1" data-i18n="lblCategory">Disiplin / Tür</label>
+            <input type="text" id="book-category" placeholder="Politique, Hukuk..." class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1" data-i18n="lblLanguage">Kitabın Dili</label>
+            <select id="book-language" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 bg-white focus:outline-none">
+              <option value="Français">Français 🇫🇷</option>
+              <option value="Türkçe">Türkçe 🇹🇷</option>
+              <option value="English">English 🇬🇧</option>
+              <option value="Almanca">Deutsch 🇩🇪</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1" data-i18n="lblShelf">Raf / Yer No (Cote)</label>
+            <input type="text" id="book-shelf" placeholder="SBF-POL-101" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1" data-i18n="lblTotalCopies">Toplam Adet (Kopya)</label>
+            <input type="number" id="book-copies" min="1" value="1" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">ISBN (Opsiyonel)</label>
+          <input type="text" id="book-isbn" placeholder="978-..." class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1" data-i18n="lblNotes">Açıklama / Notlar</label>
+          <textarea id="book-notes" rows="2" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+        </div>
+
+        <div class="pt-4 border-t border-slate-100 flex justify-end space-x-2">
+          <button type="button" onclick="closeModal('modal-book')" class="px-4 py-2 border border-slate-300 rounded-lg text-sm text-slate-700 hover:bg-slate-50" data-i18n="btnCancel">İptal</button>
+          <button type="submit" class="px-5 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg text-sm font-semibold transition-colors" data-i18n="btnSave">Kaydet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ÜYE EKLE / DÜZENLE (SADECE ADMİN) -->
+  <div id="modal-member" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200">
+      <div class="bg-gradient-to-r from-blue-900 to-indigo-900 px-6 py-4 text-white flex justify-between items-center">
+        <h3 class="text-base font-bold flex items-center">
+          <i data-lucide="user-plus" class="w-5 h-5 mr-2 text-amber-300"></i>
+          <span id="modal-member-title" data-i18n="modalAddMemberTitle">Yeni Öğrenci / Üye Ekle</span>
+        </h3>
+        <button onclick="closeModal('modal-member')" class="text-white/80 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <form id="form-member" onsubmit="submitMemberForm(event)" class="p-6 space-y-3.5">
+        <input type="hidden" id="member-form-id">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1" data-i18n="lblMemberNumber">Öğrenci / Sicil No *</label>
+          <input type="text" id="member-number" required placeholder="1202..." class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1" data-i18n="lblFullName">Ad Soyad (Nom Prénom) *</label>
+          <input type="text" id="member-fullname" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1" data-i18n="lblDepartment">Bölüm / Département</label>
+            <select id="member-department" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 bg-white focus:outline-none">
+              <option value="Siyaset Bilimi ve Kamu Yönetimi (Fransızca)">Siyaset Bilimi (Fransızca)</option>
+              <option value="Uluslararası İlişkiler (İngilizce)">Uluslararası İlişkiler (İngilizce)</option>
+              <option value="Siyaset Bilimi ve Uluslararası İlişkiler">Siyaset Bilimi ve Uluslararası İl.</option>
+              <option value="Yerel Yönetimler">Yerel Yönetimler</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1" data-i18n="lblRole">Statü</label>
+            <select id="member-role" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 bg-white focus:outline-none">
+              <option value="Öğrenci" data-i18n="roleStudent">Öğrenci</option>
+              <option value="Öğretim Üyesi" data-i18n="roleFaculty">Öğretim Üyesi</option>
+              <option value="Araştırma Görevlisi" data-i18n="roleResearcher">Araştırma Görevlisi</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">E-Posta</label>
+            <input type="email" id="member-email" placeholder="@marun.edu.tr" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Telefon</label>
+            <input type="tel" id="member-phone" placeholder="05..." class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-slate-100 flex justify-end space-x-2">
+          <button type="button" onclick="closeModal('modal-member')" class="px-4 py-2 border border-slate-300 rounded-lg text-sm text-slate-700 hover:bg-slate-50" data-i18n="btnCancel">İptal</button>
+          <button type="submit" class="px-5 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg text-sm font-semibold transition-colors" data-i18n="btnSave">Kaydet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Bildirimi -->
+  <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl flex items-center space-x-2 transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+    <i id="toast-icon" data-lucide="check-circle" class="w-5 h-5 text-emerald-400"></i>
+    <span id="toast-message" class="text-sm font-medium">İşlem başarılı</span>
+  </div>
+
+  <!-- Uygulama JavaScript Dosyası -->
+  <script src="js/app.js"></script>
+</body>
+</html>

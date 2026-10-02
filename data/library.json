@@ -1,0 +1,200 @@
+{
+  "settings": {
+    "facultyName": "Marmara Üniversitesi Siyasal Bilgiler Fakültesi",
+    "libraryName": "SBF Kütüphanesi / Bibliothèque des Sciences Politiques",
+    "defaultLoanDays": 15,
+    "facultyLoanDays": 30
+  },
+  "users": [
+    {
+      "id": "u_admin",
+      "username": "admin",
+      "password": "sbf",
+      "fullName": "Kütüphane Yöneticisi (Admin)",
+      "role": "admin",
+      "email": "kutuphane.sbf@marmara.edu.tr",
+      "department": "Kütüphane ve Dokümantasyon Birimi",
+      "status": "approved"
+    },
+    {
+      "id": "u_selin",
+      "username": "120210045",
+      "password": "123",
+      "fullName": "Selin Aydın",
+      "role": "student",
+      "studentNumber": "120210045",
+      "email": "selin.aydin@marun.edu.tr",
+      "department": "Siyaset Bilimi ve Kamu Yönetimi (Fransızca)",
+      "status": "approved"
+    },
+    {
+      "id": "u_ac237d75",
+      "username": "139823048",
+      "studentNumber": "139823048",
+      "password": "1234",
+      "fullName": "Tarık Özşentürk",
+      "email": "tarikozsenturk@marun.edu.tr",
+      "department": "Siyaset Bilimi ve Kamu Yönetimi (Fransızca)",
+      "role": "student",
+      "status": "approved",
+      "registerDate": "2026-10-01"
+    }
+  ],
+  "books": [
+    {
+      "id": "b1",
+      "title": "Les Régimes Politiques",
+      "author": "Maurice Duverger",
+      "category": "Politique",
+      "language": "Français",
+      "shelf": "SBF-POL-101",
+      "isbn": "978-2130541249",
+      "totalCopies": 3,
+      "availableCopies": 2,
+      "notes": "Fransız siyaset bilimi klasik eseri."
+    },
+    {
+      "id": "b2",
+      "title": "De la Démocratie en Amérique",
+      "author": "Alexis de Tocqueville",
+      "category": "Politique",
+      "language": "Français",
+      "shelf": "SBF-POL-102",
+      "isbn": "978-2070381005",
+      "totalCopies": 2,
+      "availableCopies": 2,
+      "notes": "Siyaset sosyolojisi temel kaynağı."
+    },
+    {
+      "id": "b3",
+      "title": "Du Contrat Social",
+      "author": "Jean-Jacques Rousseau",
+      "category": "Philosophie Politique",
+      "language": "Français",
+      "shelf": "SBF-PHIL-204",
+      "isbn": "978-2081275324",
+      "totalCopies": 4,
+      "availableCopies": 3,
+      "notes": "Toplum sözleşmesi kuramı."
+    },
+    {
+      "id": "b4",
+      "title": "Türkiye'de Din ve Siyaset",
+      "author": "Şerif Mardin",
+      "category": "Sosyoloji",
+      "language": "Türkçe",
+      "shelf": "SBF-SOS-301",
+      "isbn": "978-9754702200",
+      "totalCopies": 3,
+      "availableCopies": 3,
+      "notes": "Türk siyasal hayatı ve merkez-çevre ilişkileri."
+    },
+    {
+      "id": "b5",
+      "title": "İmparatorluğun En Uzun Yüzyılı",
+      "author": "İlber Ortaylı",
+      "category": "Tarih",
+      "language": "Türkçe",
+      "shelf": "SBF-TAR-405",
+      "isbn": "978-9750501235",
+      "totalCopies": 2,
+      "availableCopies": 1,
+      "notes": "19. yüzyıl Osmanlı modernleşmesi."
+    },
+    {
+      "id": "b6",
+      "title": "Politics Among Nations",
+      "author": "Hans J. Morgenthau",
+      "category": "Uluslararası İlişkiler",
+      "language": "English",
+      "shelf": "SBF-IR-501",
+      "isbn": "978-0072895391",
+      "totalCopies": 2,
+      "availableCopies": 2,
+      "notes": "Realist teori temel metni."
+    },
+    {
+      "id": "b7",
+      "title": "Paix et Guerre entre les Nations",
+      "author": "Raymond Aron",
+      "category": "Relations Internationales",
+      "language": "Français",
+      "shelf": "SBF-IR-502",
+      "isbn": "978-2702134542",
+      "totalCopies": 2,
+      "availableCopies": 2,
+      "notes": "Fransız uluslararası ilişkiler klasiği."
+    }
+  ],
+  "members": [
+    {
+      "id": "m1",
+      "studentNumber": "120210045",
+      "fullName": "Selin Aydın",
+      "department": "Siyaset Bilimi ve Kamu Yönetimi (Fransızca)",
+      "role": "Öğrenci",
+      "email": "selin.aydin@marun.edu.tr",
+      "phone": "0532 100 00 01",
+      "status": "approved"
+    },
+    {
+      "id": "m3",
+      "studentNumber": "ACAD-402",
+      "fullName": "Prof. Dr. Ahmet Demir",
+      "department": "Siyaset Bilimi ve Kamu Yönetimi",
+      "role": "Öğretim Üyesi",
+      "email": "ahmet.demir@marmara.edu.tr",
+      "phone": "0535 300 00 03",
+      "status": "approved"
+    },
+    {
+      "id": "m_3ecf330b",
+      "studentNumber": "139823048",
+      "fullName": "Tarık Özşentürk",
+      "department": "Siyaset Bilimi ve Kamu Yönetimi (Fransızca)",
+      "role": "Öğrenci",
+      "email": "tarikozsenturk@marun.edu.tr",
+      "phone": "",
+      "status": "approved",
+      "registerDate": "2026-10-01"
+    }
+  ],
+  "loans": [
+    {
+      "id": "l1",
+      "bookId": "b1",
+      "bookTitle": "Les Régimes Politiques",
+      "memberId": "m1",
+      "memberName": "Selin Aydın",
+      "memberNumber": "120210045",
+      "issueDate": "2026-09-20",
+      "dueDate": "2026-10-05",
+      "status": "borrowed",
+      "returnDate": null
+    },
+    {
+      "id": "l2",
+      "bookId": "b2",
+      "bookTitle": "De la Démocratie en Amérique",
+      "memberId": "m2",
+      "memberName": "Kaan Yılmaz",
+      "memberNumber": "120220088",
+      "issueDate": "2026-09-10",
+      "dueDate": "2026-09-25",
+      "status": "returned",
+      "returnDate": "2026-10-01"
+    },
+    {
+      "id": "l3",
+      "bookId": "b5",
+      "bookTitle": "İmparatorluğun En Uzun Yüzyılı",
+      "memberId": "m3",
+      "memberName": "Prof. Dr. Ahmet Demir",
+      "memberNumber": "ACAD-402",
+      "issueDate": "2026-09-28",
+      "dueDate": "2026-10-28",
+      "status": "borrowed",
+      "returnDate": null
+    }
+  ]
+}
