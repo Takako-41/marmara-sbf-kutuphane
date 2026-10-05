@@ -196,5 +196,204 @@
       "status": "borrowed",
       "returnDate": null
     }
-  ]
+  ],
+  "articles": [
+    {
+      "id": "art_1",
+      "title": "Modern Uluslararası İlişkilerde Realizm ve Raymond Aron’un Barış & Savaş Kuramı",
+      "category": "Uluslararası İlişkiler",
+      "summary": "Klasik realizmin güç dengesi modeli ile Raymond Aron'un ideolojik ve nükleer çağ çözümlemesinin karşılaştırmalı bir incelemesi.",
+      "content": "Raymond Aron'un 1962 tarihli başyapıtı Paix et Guerre entre les Nations, Clausewitz ve Morgenthau'nun çizdiği katı askeri güç eksenini aşarak diplomasinin, sosyolojinin ve siyasal felsefenin kesişim noktasını aydınlatır.\n\nAron'a göre uluslararası ilişkileri yalnızca 'güç maksimizasyonu' ile açıklamak eksiktir; aktörlerin meşruiyet algısı, rejim biçimleri ve ideolojik çatışmalar diplomasinin yönünü tayin eder.\n\nSiyasal Bilgiler Fakültesi öğrencileri olarak kütüphanemizde bulunan Aron ve Duverger metinlerini yeniden incelerken, günümüzün çok kutuplu kriz ortamında diplomasinin dönüştürücü ve müzakereci gücünü hatırlamak her zamankinden daha hayatidir.",
+      "authorName": "Tarık Özşentürk",
+      "authorStudentNumber": "139823048",
+      "authorDepartment": "Siyaset Bilimi ve Kamu Yönetimi (Fransızca)",
+      "status": "published",
+      "rejectionReason": null,
+      "likes": [
+        "120210045"
+      ],
+      "comments": [
+        {
+          "id": "c_1",
+          "authorName": "Selin Aydın",
+          "authorStudentNumber": "120210045",
+          "authorDepartment": "Siyaset Bilimi ve Kamu Yönetimi (Fransızca)",
+          "text": "Harika bir değerlendirme olmuş Tarık. Özellikle Aron'un meşruiyet ve ideolojik çatışma vurgusu günümüz küresel siyasetinde realizmin salt askeri determinizmine çok dengeli bir panzehir sunuyor.",
+          "createdAt": "2026-10-04T09:20:00.000Z"
+        }
+      ],
+      "readCount": 29,
+      "createdAt": "2026-10-03T14:30:00.000Z"
+    },
+    {
+      "id": "art_2",
+      "title": "Siyasal Kurumlarda Bürokrasinin Evrimi ve Dijital Çağda Kamu Yönetimi",
+      "category": "Kamu Yönetimi",
+      "summary": "Weberian ideal tip bürokrasiden dijital yönetişime geçişte şeffaflık, liyakat ve hız ilkelerinin yeniden yorumlanması.",
+      "content": "Max Weber'in tanımladığı hiyerarşik ve kurala dayalı bürokrasi modeli, 20. yüzyılın sanayi toplumları için bir rasyonalite ve istikrar kalesiydi. Ancak dijital kamu hizmetleri ve açık veri çağında bürokrasinin hızı ve vatandaş odaklılığı temel öncelik haline gelmiştir.\n\nKamu yönetiminde algoritmik karar destek sistemlerinin ve e-devlet entegrasyonlarının artması, bürokratik hantallığı azaltırken liyakat ve şeffaflık denetimini daha da kritik kılmaktadır.",
+      "authorName": "Selin Aydın",
+      "authorStudentNumber": "120210045",
+      "authorDepartment": "Siyaset Bilimi ve Kamu Yönetimi (Fransızca)",
+      "status": "published",
+      "rejectionReason": null,
+      "likes": [
+        "139823048"
+      ],
+      "comments": [
+        {
+          "id": "c_2",
+          "authorName": "Tarık Özşentürk",
+          "authorStudentNumber": "139823048",
+          "authorDepartment": "Siyaset Bilimi ve Kamu Yönetimi (Fransızca)",
+          "text": "Weber'in rasyonel bürokrasisinin dijitalleşmeyle nasıl esnetilebileceğine dair çok yerinde bir analiz. Kamu politikası dersindeki tartışmayı güzel toparlamışsın.",
+          "createdAt": "2026-10-04T15:45:00.000Z"
+        }
+      ],
+      "readCount": 20,
+      "createdAt": "2026-10-04T11:15:00.000Z"
+    },
+    {
+      "id": "art_3",
+      "title": "Karşılaştırmalı Siyasal Sistemlerde Yarı-Başkanlık Modeli: Fransa 5. Cumhuriyet Örneği",
+      "category": "Siyaset Bilimi",
+      "summary": "Maurice Duverger'nin kavramsallaştırdığı yarı-başkanlık sisteminin yürütme organı üzerindeki çift başlılık (bicephalous) dinamikleri.",
+      "content": "Fransa'da 1958 Anayasası ile kurulan Beşinci Cumhuriyet, Charles de Gaulle'ün güçlü yürütme arayışının bir ürünüdür. Duverger'nin 'Les Régimes Politiques' eserinde işaret ettiği üzere cumhurbaşkanı ile başbakan arasındaki 'cohabitation' (birlikte yaşama) dönemleri sistemin krizlere karşı esnekliğini test etmiştir.",
+      "authorName": "Selin Aydın",
+      "authorStudentNumber": "120210045",
+      "authorDepartment": "Siyaset Bilimi ve Kamu Yönetimi (Fransızca)",
+      "status": "pending",
+      "rejectionReason": null,
+      "likes": [],
+      "comments": [],
+      "readCount": 4,
+      "createdAt": "2026-10-05T16:00:00.000Z"
+    }
+  ],
+  "bookRequests": [
+    {
+      "id": "req_1",
+      "title": "The Origins of Political Order",
+      "author": "Francis Fukuyama",
+      "publisher": "Farrar, Straus and Giroux",
+      "isbn": "978-0374533229",
+      "category": "Siyaset Bilimi",
+      "requestedBy": "Tarık Özşentürk",
+      "studentNumber": "139823048",
+      "note": "Devlet inşası, hukukun üstünlüğü ve hesap verebilirlik konularında temel başvuru kaynağı. Karşılaştırmalı siyaset dersleri için kütüphanemizde mutlaka bulunmalı.",
+      "votes": [
+        "139823048",
+        "120210045"
+      ],
+      "status": "approved",
+      "createdAt": "2026-10-02"
+    },
+    {
+      "id": "req_2",
+      "title": "Surveiller et punir: Naissance de la prison",
+      "author": "Michel Foucault",
+      "publisher": "Gallimard",
+      "isbn": "978-2070729685",
+      "category": "Felsefe & Sosyoloji",
+      "requestedBy": "Selin Aydın",
+      "studentNumber": "120210045",
+      "note": "İktidar, gözetim ve modern kurumların analizi için Fransızca orijinal baskısı kütüphanemiz Fransızca bölümüne çok yakışacaktır.",
+      "votes": [
+        "120210045",
+        "139823048"
+      ],
+      "status": "pending",
+      "createdAt": "2026-10-04"
+    },
+    {
+      "id": "req_3",
+      "title": "Why Nations Fail",
+      "author": "Daron Acemoğlu & James A. Robinson",
+      "publisher": "Crown Business",
+      "isbn": "978-0307719218",
+      "category": "Ekonomi-Politik",
+      "requestedBy": "Kaan Yılmaz",
+      "studentNumber": "120220088",
+      "note": "Kapsayıcı ve sömürücü kurumların ekonomik kalkınma üzerindeki etkisini anlatan temel referans eseri.",
+      "votes": [
+        "120220088"
+      ],
+      "status": "acquired",
+      "createdAt": "2026-09-25"
+    }
+  ],
+  "examNotes": [
+    {
+      "id": "note_1",
+      "title": "Siyasal Düşünceler Tarihi I - Vize Özeti (Platon, Aristo, Machiavelli)",
+      "courseName": "Siyasal Düşünceler Tarihi I",
+      "courseCode": "POL201",
+      "instructor": "Doç. Dr. Selami Kılıç",
+      "department": "Siyaset Bilimi ve Kamu Yönetimi",
+      "semester": "2. Sınıf (Güz)",
+      "type": "Vize Özeti",
+      "description": "Platon'un Devlet'i, Aristoteles'in Politika'sı ve Machiavelli'nin Prens eseri üzerine sınav öncesi hap notlar ve kavram tabloları.",
+      "content": "### 1. Platon - İdeal Devlet ve Adalet\n- Devlet ruhun büyütülmüş halidir. Ruhun 3 parçası = Devletin 3 sınıfı:\n  1. Akıl -> Yöneticiler (Filozof Krallar) -> Erdemi: Bilgelik\n  2. İrade/Cesaret -> Koruyucular/Askerler -> Erdemi: Cesaret\n  3. İştah/Arzu -> Üreticiler/Zanaatkarlar -> Erdemi: Ölçülülük\n- Adalet: Herkesin kendi işini yapması, başkasının işine karışmamasıdır.\n\n### 2. Aristoteles - Zoon Politikon ve Rejimler\n- İnsan doğası gereği siyasal bir varlıktır (Zoon Politikon). Polis dışında yaşayan ya hayvandır ya da tanrı.\n- Rejim Sınıflandırması:\n  - Bir Kişi: Monarşi (İyi) / Tiranlık (Bozuk)\n  - Azınlık: Aristokrasi (İyi) / Oligarşi (Bozuk)\n  - Çoğunluk: Politeia (İyi - Orta Sınıf) / Demokrasi (Bozuk - Yoksulların Çoğunluğu)\n\n### 3. Machiavelli - Politikanın Özerkliği\n- Politika ahlaktan ve dinden bağımsızdır. Gaye (iktidarın korunması) vasıtayı meşru kılar.\n- Prens hem aslan (kuvvet) hem tilki (kurnazlık) olmalıdır. Sevilen değil, korkulan olmak iktidar için daha güvenlidir.",
+      "driveUrl": "https://drive.google.com/open?id=sbf_pol201_ozet",
+      "authorName": "Tarık Özşentürk",
+      "authorStudentNumber": "139823048",
+      "isPseudonym": false,
+      "pseudonym": null,
+      "helpfulCount": 24,
+      "helpfulUsers": [
+        "120210045"
+      ],
+      "downloadsCount": 58,
+      "createdAt": "2026-10-02"
+    },
+    {
+      "id": "note_2",
+      "title": "Uluslararası Hukuk - Vize & Çıkmış Olay Soru Analizleri",
+      "courseName": "Uluslararası Hukuk",
+      "courseCode": "ULI305",
+      "instructor": "Prof. Dr. Berke Ceylan",
+      "department": "Uluslararası İlişkiler",
+      "semester": "3. Sınıf (Güz)",
+      "type": "Çıkmış Sorular",
+      "description": "Devletin kurucu unsurları, tanıma teorileri (bildirici vs. kurucu) ve Lotus Davası (Türkiye-Fransa) analiz metni.",
+      "content": "### 1. Uluslararası Adalet Divanı Statüsü Madde 38 (Hukukun Kaynakları):\n1. Uluslararası Andlaşmalar\n2. Uluslararası Teamül (Örf ve Adet Hukuku - Maddi unsur: Genel uygulama, Manevi unsur: Opinio Juris)\n3. Hukukun Genel İlkeleri\n4. Yardımcı Kaynaklar (Yargı kararları ve doktrin)\n\n### 2. Lotus Davası (1927 - PCIJ / Türkiye - Fransa):\n- Temel İlke: Egemen devletler açıkça yasaklanmadıkça serbesttir (Lotus Prensibi).\n- Olay: Bozkurt ve Lotus gemilerinin açık denizde çarpışması sonrası Türkiye'nin yargı yetkisi kullanması kabul edilmiştir.",
+      "driveUrl": "https://drive.google.com/open?id=sbf_uli305_lotus",
+      "authorName": "Selin Aydın",
+      "authorStudentNumber": "120210045",
+      "isPseudonym": false,
+      "pseudonym": null,
+      "helpfulCount": 19,
+      "helpfulUsers": [
+        "139823048"
+      ],
+      "downloadsCount": 43,
+      "createdAt": "2026-10-03"
+    },
+    {
+      "id": "note_3",
+      "title": "İdare Hukuku - İdari İşlemin Unsurları ve İptal Davaları Şeması",
+      "courseName": "İdare Hukuku I",
+      "courseCode": "KAM203",
+      "instructor": "Dr. Öğr. Üyesi Kerem Aslan",
+      "department": "Siyaset Bilimi ve Kamu Yönetimi",
+      "semester": "2. Sınıf (Güz)",
+      "type": "Ders Notu",
+      "description": "Yetki, şekil, sebep, konu ve maksat unsurları; sakatlık halleri ve iptal davası açma süreleri özeti.",
+      "content": "### İdari İşlemin 5 Temel Unsuru:\n1. Yetki: Kişi, konu, yer ve zaman yönünden yetkili makam.\n2. Şekil/Usul: Yazılılık, gerekçe, savunma hakkı.\n3. Sebep: İşlemi doğuran fiili veya hukuki durum.\n4. Konu: İşlemin doğurduğu hukuki sonuç.\n5. Maksat: Her idari işlem mutlaka 'kamu yararı' amacıyla yapılmalıdır. Başka bir saikle yapılırsa yetki saptırması oluşur.\n\n### İptal Davası Süresi:\n- Danıştay ve İdare Mahkemelerinde genel dava açma süresi 60 gündür (Vergi mahkemelerinde 30 gün).",
+      "driveUrl": "https://drive.google.com/open?id=sbf_kam203_idare",
+      "authorName": "Mülkiyeli 2024",
+      "authorStudentNumber": "120220088",
+      "isPseudonym": true,
+      "pseudonym": "Mülkiyeli 2024",
+      "helpfulCount": 12,
+      "helpfulUsers": [],
+      "downloadsCount": 31,
+      "createdAt": "2026-10-04"
+    }
+  ],
+  "monthlyTopic": {
+    "title": "Cemil Meriç - Bu Ülke",
+    "theme": "Doğu-Batı Sentezi, Entelektüel Sorumluluk ve Türk Düşüncesi",
+    "badge": "Ekim Ayı Kulüp Münazarası",
+    "question": "Türk aydını Batı düşüncesini taklit mi etmeli yoksa kendi kökleriyle harmanlayıp yeni bir soluk mu kazandırmalı? Görüşlerini Öğrenci Yazıları kürsüsünde paylaş veya tartışmaya katıl!"
+  }
 }

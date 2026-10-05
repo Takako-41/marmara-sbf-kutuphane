@@ -243,6 +243,260 @@
       </div>
     </section>
 
+    <!-- İSTEK KİTAPLAR (HERKESE AÇIK) -->
+    <section id="tab-content-book-requests" class="tab-pane hidden space-y-6">
+      <div class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 rounded-2xl p-6 text-white shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-400 text-slate-900">Kütüphane & Kulüp Talep Havuzu</span>
+            <span class="text-xs text-blue-200">Desiderata</span>
+          </div>
+          <h2 class="text-2xl font-bold mt-1.5 flex items-center">
+            <i data-lucide="bookmark-plus" class="w-6 h-6 mr-2 text-emerald-300"></i>
+            <span data-i18n="tabBookRequests">İstek Kitaplar</span>
+          </h2>
+          <p class="text-xs text-blue-100 mt-1 max-w-2xl leading-relaxed" data-i18n="bookRequestsHeroDesc">
+            Kütüphanemizde veya kulüp kitaplığımızda görmek istediğiniz eserleri talep edin, diğer öğrencilerin isteklerini oylayarak önceliklendirin.
+          </p>
+        </div>
+        <div class="flex items-center space-x-3 shrink-0">
+          <button onclick="handleNewBookRequestBtnClick()" class="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-white rounded-xl text-xs sm:text-sm font-bold transition-all shadow-md flex items-center">
+            <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+            <span data-i18n="btnRequestBook">Yeni Kitap Talep Et</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- İstek İstatistikleri -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex items-center justify-between">
+          <div>
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider" data-i18n="statTotalRequests">Toplam Talep</p>
+            <h4 class="text-xl font-bold text-slate-900 mt-0.5" id="stat-total-requests">0</h4>
+          </div>
+          <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+            <i data-lucide="list-plus" class="w-5 h-5"></i>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex items-center justify-between">
+          <div>
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider" data-i18n="statPendingRequests">İnceleniyor</p>
+            <h4 class="text-xl font-bold text-amber-600 mt-0.5" id="stat-pending-requests">0</h4>
+          </div>
+          <div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+            <i data-lucide="clock" class="w-5 h-5"></i>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex items-center justify-between">
+          <div>
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider" data-i18n="statApprovedRequests">Temin Ediliyor</p>
+            <h4 class="text-xl font-bold text-indigo-600 mt-0.5" id="stat-approved-requests">0</h4>
+          </div>
+          <div class="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+            <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex items-center justify-between">
+          <div>
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider" data-i18n="statAcquiredRequests">Kütüphanede</p>
+            <h4 class="text-xl font-bold text-emerald-600 mt-0.5" id="stat-acquired-requests">0</h4>
+          </div>
+          <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <i data-lucide="check-check" class="w-5 h-5"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- İstek Kitaplar Tablosu -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-left">
+            <thead class="text-xs text-slate-600 uppercase bg-slate-50 border-b border-slate-200">
+              <tr>
+                <th class="py-3 px-4" data-i18n="colBookTitle">İstenen Eser & Yazar</th>
+                <th class="py-3 px-4" data-i18n="colCategory">Disiplin</th>
+                <th class="py-3 px-4" data-i18n="colRequestedBy">Talep Eden & Tarih</th>
+                <th class="py-3 px-4" data-i18n="colRequestNote">Gerekçe / Açıklama</th>
+                <th class="py-3 px-4 text-center whitespace-nowrap" data-i18n="colVotes">Destek (+1)</th>
+                <th class="py-3 px-4 text-center whitespace-nowrap min-w-[130px]" data-i18n="colStatus">Durum</th>
+                <th class="py-3 px-4 text-right whitespace-nowrap min-w-[140px]" data-i18n="colAction">İşlem</th>
+              </tr>
+            </thead>
+            <tbody id="book-requests-table-tbody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ÖĞRENCİ YAZILARI & DÜŞÜNCELER (HERKESE AÇIK) -->
+    <section id="tab-content-articles" class="tab-pane hidden space-y-6">
+      <div class="bg-gradient-to-r from-indigo-900 via-blue-900 to-slate-900 rounded-2xl p-6 text-white shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-400 text-slate-900">Marmara SBF Düşünce Kürsüsü</span>
+            <span class="text-xs text-blue-200">Öğrenci Yazıları & Acemi Eserler</span>
+          </div>
+          <h2 class="text-2xl font-bold mt-1.5 flex items-center">
+            <i data-lucide="feather" class="w-6 h-6 mr-2 text-amber-300"></i>
+            <span data-i18n="tabArticles">Öğrenci Yazıları & Düşünceler</span>
+          </h2>
+          <p class="text-xs text-blue-100 mt-1 max-w-2xl leading-relaxed" data-i18n="articlesHeroDesc">
+            Öğrencilerimizin siyaset bilimi, uluslararası ilişkiler, felsefe, kamu yönetimi ve kitap tahlilleri üzerine kaleme aldığı özgün düşünceler ve denemeler.
+          </p>
+        </div>
+        <div class="flex items-center space-x-3 shrink-0">
+          <button onclick="handleNewArticleBtnClick()" class="px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-900 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-md flex items-center">
+            <i data-lucide="pen-tool" class="w-4 h-4 mr-2"></i>
+            <span data-i18n="btnSubmitArticle">Yazı / Düşünce Gönder</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- AYIN KİTABI & KULÜP MÜNAZARASI BANNER'I -->
+      <div class="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 rounded-2xl p-5 text-white shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div class="space-y-1 max-w-3xl">
+          <div class="flex items-center space-x-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-white text-orange-950 shadow-2xs">📚 Ekim Ayı Kulüp Münazarası</span>
+            <span class="text-xs text-orange-100 font-medium">Ortak Okuma Çemberi</span>
+          </div>
+          <h3 class="text-lg font-bold">Cemil Meriç — "Bu Ülke"</h3>
+          <p class="text-xs text-orange-50 leading-relaxed">
+            <strong>Münazara Sorusu:</strong> Doğu ile Batı arasında Türk aydınının kimlik arayışı ve entelektüel sorumluluğu. Görüşlerini ve kitap tahlilini kürsüde paylaşarak tartışmaya sen de katıl!
+          </p>
+        </div>
+        <button onclick="handleNewArticleBtnClick('Kitap İncelemesi')" class="px-4 py-2 bg-white hover:bg-orange-50 text-orange-950 font-bold text-xs rounded-xl shadow-xs transition-all shrink-0 flex items-center">
+          <i data-lucide="message-circle" class="w-3.5 h-3.5 mr-1.5 text-orange-600"></i>
+          <span>Münazaraya Düşünce Yaz</span>
+        </button>
+      </div>
+
+      <!-- Filtreler ve Arama -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="flex items-center space-x-2 w-full sm:w-auto">
+          <label class="text-xs font-semibold text-slate-500 whitespace-nowrap" data-i18n="lblFilterCategory">Kategori:</label>
+          <select id="articleCategoryFilter" onchange="filterArticles()" class="text-xs border border-slate-300 rounded-lg px-3 py-2 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-auto">
+            <option value="all" data-i18n="optAllCategories">Tüm Kategoriler</option>
+            <option value="Siyaset Bilimi">Siyaset Bilimi</option>
+            <option value="Uluslararası İlişkiler">Uluslararası İlişkiler</option>
+            <option value="Kamu Yönetimi">Kamu Yönetimi</option>
+            <option value="Kitap İncelemesi">Kitap İncelemesi</option>
+            <option value="Felsefe & Sosyoloji">Felsefe & Sosyoloji</option>
+            <option value="Genel">Genel</option>
+          </select>
+        </div>
+        <div class="relative w-full sm:w-72">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
+          <input type="text" id="articleSearchInput" oninput="filterArticles()" placeholder="Başlık veya yazar ara..." class="w-full text-xs pl-9 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+      </div>
+
+      <!-- Moderasyon Uyarısı (Admin için bekleyen yazı varsa) -->
+      <div id="adminArticlesPendingAlert" class="hidden bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="w-9 h-9 rounded-lg bg-amber-500 text-white flex items-center justify-center shrink-0">
+            <i data-lucide="inbox" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h4 class="text-xs sm:text-sm font-bold text-amber-900" data-i18n="pendingArticlesNoticeTitle">Editör Masasında İncelenmeyi Bekleyen Yazılar Var</h4>
+            <p class="text-xs text-amber-700" id="pendingArticlesCountText">0 yazı değerlendirme bekliyor.</p>
+          </div>
+        </div>
+        <span class="px-3 py-1 bg-amber-200 text-amber-900 font-bold rounded-lg text-xs">Editör / Admin</span>
+      </div>
+
+      <!-- Makale Kartları Grid -->
+      <div id="articlesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- JS ile dolacak -->
+      </div>
+    </section>
+
+    <!-- 8. SINAV NOTLARI & DERS KAYNAK HAVUZU (HERKESE AÇIK) -->
+    <section id="tab-content-exam-notes" class="tab-pane hidden space-y-6">
+      <div class="bg-gradient-to-r from-emerald-900 via-teal-900 to-slate-900 rounded-2xl p-6 text-white shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-400 text-slate-900">SBF Sınav & Vize / Final Havuzu</span>
+            <span class="text-xs text-emerald-200">Kollektif Öğrenci Arşivi</span>
+          </div>
+          <h2 class="text-2xl font-bold mt-1.5 flex items-center">
+            <i data-lucide="graduation-cap" class="w-6 h-6 mr-2 text-emerald-300"></i>
+            <span data-i18n="tabExamNotes">Ders Notları & Sınav Kaynak Havuzu</span>
+          </h2>
+          <p class="text-xs text-emerald-100 mt-1 max-w-2xl leading-relaxed">
+            Marmara SBF dersleri, vize-final özetleri, hoca okuma listeleri ve çıkmış sınav soruları arşivi. Notunu paylaş, kampüse katkı sağla!
+          </p>
+        </div>
+        <div class="flex items-center space-x-3 shrink-0">
+          <button onclick="handleNewExamNoteBtnClick()" class="px-4 py-2.5 bg-emerald-400 hover:bg-emerald-300 text-slate-900 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-md flex items-center">
+            <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+            <span data-i18n="btnShareExamNote">Ders Notu / Kaynak Paylaş</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- SBF VİZE & FİNAL GERİ SAYIM VE DAYANIŞMA KARTI -->
+      <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-emerald-900">
+        <div class="flex items-center space-x-3">
+          <div class="w-9 h-9 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0">
+            <i data-lucide="calendar" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <p class="font-bold">📚 SBF Vize & Final Hazırlık Dönemi Dayanışması</p>
+            <p class="text-[11px] text-emerald-700">Ders notu ve çıkmış soru havuzu tüm SBF öğrencilerine açıktır. Paylaştığın notlar arkadaşlarına ışık tutsun, profilinde <strong>Not Kahramanı</strong> rozeti parıldasın!</p>
+          </div>
+        </div>
+        <div class="flex items-center space-x-2 shrink-0">
+          <span class="px-2.5 py-1 bg-white border border-emerald-300 font-bold rounded-lg text-emerald-800 text-[11px] shadow-2xs">
+            <span id="stat-total-notes-count">0</span> Aktif Kaynak
+          </span>
+        </div>
+      </div>
+
+      <!-- Filtreler ve Arama Çubuğu -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-col lg:flex-row items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+          <!-- Bölüm Filtresi -->
+          <select id="examNoteDeptFilter" onchange="filterExamNotes()" class="text-xs border border-slate-300 rounded-lg px-2.5 py-2 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            <option value="all">Tüm Bölümler</option>
+            <option value="Siyaset Bilimi ve Kamu Yönetimi">Siyaset Bilimi & Kamu Yön.</option>
+            <option value="Uluslararası İlişkiler">Uluslararası İlişkiler</option>
+            <option value="İktisat">İktisat</option>
+            <option value="Yerel Yönetimler">Yerel Yönetimler</option>
+            <option value="Genel">Ortak / Genel Dersler</option>
+          </select>
+
+          <!-- Tür Filtresi -->
+          <select id="examNoteTypeFilter" onchange="filterExamNotes()" class="text-xs border border-slate-300 rounded-lg px-2.5 py-2 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            <option value="all">Tüm Kaynak Türleri</option>
+            <option value="Vize Özeti">Vize Özeti</option>
+            <option value="Final Özeti">Final Özeti</option>
+            <option value="Çıkmış Sorular">Çıkmış Sorular</option>
+            <option value="Ders Notu">Ders Notu</option>
+            <option value="Okuma Listesi">Okuma Listesi / Syllabus</option>
+          </select>
+
+          <!-- Sınıf Filtresi -->
+          <select id="examNoteSemesterFilter" onchange="filterExamNotes()" class="text-xs border border-slate-300 rounded-lg px-2.5 py-2 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            <option value="all">Tüm Sınıflar</option>
+            <option value="1">1. Sınıf</option>
+            <option value="2">2. Sınıf</option>
+            <option value="3">3. Sınıf</option>
+            <option value="4">4. Sınıf</option>
+          </select>
+        </div>
+
+        <div class="relative w-full lg:w-80">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
+          <input type="text" id="examNoteSearchInput" oninput="filterExamNotes()" placeholder="Ders adı, hoca adı veya konu ara..." class="w-full text-xs pl-9 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+        </div>
+      </div>
+
+      <!-- Ders Notları Kartları Grid -->
+      <div id="examNotesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- JS ile doldurulacak -->
+      </div>
+    </section>
+
     <!-- 3. ÖĞRENCİNİN KENDİ KİTAPLARI (SADECE GİRİŞ YAPMIŞ ÖĞRENCİ GÖRÜR) -->
     <section id="tab-content-my-books" class="tab-pane hidden space-y-4">
       <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
@@ -703,6 +957,444 @@
           <button type="submit" class="px-5 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg text-sm font-semibold transition-colors" data-i18n="btnSave">Kaydet</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- MODAL: YAZI GÖNDER (KULÜP KÖŞESİ) -->
+  <div id="modal-article-add" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden border border-slate-200">
+      <div class="bg-gradient-to-r from-indigo-900 to-blue-900 px-6 py-4 text-white flex justify-between items-center">
+        <h3 class="text-base font-bold flex items-center">
+          <i data-lucide="feather" class="w-5 h-5 mr-2 text-amber-300"></i>
+          <span data-i18n="modalAddArticleTitle">Kulüp Köşesine Yazı Gönder</span>
+        </h3>
+        <button onclick="closeModal('modal-article-add')" class="text-white/80 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <form id="form-article-add" onsubmit="submitArticleForm(event)" class="p-6 space-y-4 max-h-[85vh] overflow-y-auto">
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800 flex items-start space-x-2.5">
+          <i data-lucide="shield-check" class="w-5 h-5 text-amber-600 shrink-0 mt-0.5"></i>
+          <div>
+            <p class="font-bold">Editör İncelemesi ve Kalite Filtresi</p>
+            <p class="text-[11px] text-amber-700 mt-0.5">
+              Akademik ve kulüp ciddiyetini korumak, gereksiz ve trol yazıları engellemek adına öğrenci yazıları gönderildikten sonra Kulüp Editör Kurulu incelemesinden geçer ve onaylandığında herkes tarafından okunabilir.
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1" data-i18n="lblArticleTitle">Yazı Başlığı *</label>
+          <input type="text" id="article-title" required minlength="5" placeholder="Örn: 21. Yüzyılda Diplomasinin Dönüşümü" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1" data-i18n="lblArticleCategory">Disiplin / Kategori *</label>
+            <select id="article-category" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 bg-white focus:outline-none">
+              <option value="Siyaset Bilimi">Siyaset Bilimi</option>
+              <option value="Uluslararası İlişkiler">Uluslararası İlişkiler</option>
+              <option value="Kamu Yönetimi">Kamu Yönetimi</option>
+              <option value="Kitap İncelemesi">Kitap İncelemesi</option>
+              <option value="Felsefe & Sosyoloji">Felsefe & Sosyoloji</option>
+              <option value="Genel">Genel</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1" data-i18n="lblArticleSummary">Kısa Özet (1-2 Cümle)</label>
+            <input type="text" id="article-summary" placeholder="Yazının ana fikri veya spot cümlesi..." class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1" data-i18n="lblArticleContent">Yazı Metni *</label>
+          <textarea id="article-content" rows="7" required minlength="50" placeholder="Fikirlerinizi, argümanlarınızı ve analizlerinizi buraya yazın (En az 50 karakter)..." class="w-full text-sm border border-slate-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none leading-relaxed"></textarea>
+          <p class="text-[11px] text-slate-400 mt-1">Paragraflarınızı satır başlarıyla ayırabilirsiniz.</p>
+        </div>
+
+        <!-- Mahlas (Takma İsim) Seçeneği -->
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
+          <label class="flex items-center space-x-2 text-xs font-semibold text-slate-700 cursor-pointer">
+            <input type="checkbox" id="article-use-pseudonym" onchange="toggleArticlePseudonymInput()" class="rounded text-indigo-600 focus:ring-indigo-500">
+            <span>Yazımı gerçek adım yerine <strong>Mahlas (Takma İsim)</strong> ile yayınlamak istiyorum</span>
+          </label>
+          <div id="article-pseudonym-container" class="hidden pl-5">
+            <input type="text" id="article-pseudonym" placeholder="Örn: SBF'li Düşünür, Mülkiyeli 2024, Genç İktisatçı..." class="w-full text-xs border border-slate-300 rounded-md p-2 bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+            <p class="text-[10px] text-slate-400 mt-1">Mahlasınız okuyuculara gösterilir, gerçek adınız gizli kalır (güvenlik için admin panelinde kayıtlı tutulur).</p>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-slate-100 flex justify-end space-x-2">
+          <button type="button" onclick="closeModal('modal-article-add')" class="px-4 py-2 border border-slate-300 rounded-lg text-sm text-slate-700 hover:bg-slate-50" data-i18n="btnCancel">İptal</button>
+          <button type="submit" class="px-5 py-2 bg-indigo-900 hover:bg-indigo-800 text-white rounded-lg text-sm font-semibold transition-colors flex items-center">
+            <i data-lucide="send" class="w-4 h-4 mr-1.5"></i>
+            <span data-i18n="btnSubmitArticleConfirm">Yazıyı Editöre Gönder</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: YAZI OKUMA (DETAY GÖRÜNÜMÜ) -->
+  <div id="modal-article-read" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full overflow-hidden border border-slate-200 max-h-[90vh] flex flex-col">
+      <div class="bg-slate-900 px-6 py-4 text-white flex justify-between items-center shrink-0">
+        <div class="flex items-center space-x-2">
+          <span id="read-article-category-badge" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-400 text-slate-900">Kategori</span>
+          <span id="read-article-status-badge" class="px-2 py-0.5 rounded text-[11px] bg-slate-800 text-slate-300">Yayında</span>
+        </div>
+        <button onclick="closeModal('modal-article-read')" class="text-white/80 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div class="p-6 overflow-y-auto flex-1 space-y-4">
+        <div>
+          <h2 id="read-article-title" class="text-xl sm:text-2xl font-bold text-slate-900 leading-snug">Başlık</h2>
+          <div class="flex flex-wrap items-center gap-3 text-xs text-slate-500 mt-2 pb-3 border-b border-slate-100">
+            <span class="flex items-center text-slate-700 font-semibold">
+              <i data-lucide="user" class="w-3.5 h-3.5 mr-1 text-indigo-600"></i>
+              <span id="read-article-author">Yazar</span>
+            </span>
+            <span class="text-slate-400">•</span>
+            <span id="read-article-department">Bölüm</span>
+            <span class="text-slate-400">•</span>
+            <span id="read-article-date">Tarih</span>
+            <span class="text-slate-400">•</span>
+            <span class="flex items-center">
+              <i data-lucide="eye" class="w-3.5 h-3.5 mr-1 text-slate-400"></i>
+              <span id="read-article-views">0 okuma</span>
+            </span>
+          </div>
+        </div>
+
+        <div id="read-article-content" class="text-sm sm:text-base text-slate-800 leading-relaxed space-y-3 whitespace-pre-line py-2">
+          <!-- Metin -->
+        </div>
+
+        <div id="read-article-rejection" class="hidden bg-rose-50 border border-rose-200 rounded-xl p-3 text-xs text-rose-800">
+          <strong>Editör Gerekçesi:</strong> <span id="read-article-rejection-text"></span>
+        </div>
+
+        <!-- YORUMLAR VE TARTIŞMA BÖLÜMÜ -->
+        <div class="pt-6 border-t border-slate-200 space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-slate-900 flex items-center">
+              <i data-lucide="message-square" class="w-4 h-4 mr-2 text-indigo-600"></i>
+              <span id="read-article-comments-heading">Fikirler & Yorumlar (0)</span>
+            </h3>
+            <span class="text-[11px] text-slate-400">Akademik Nezaket Çerçevesinde</span>
+          </div>
+
+          <!-- Yorum Listesi -->
+          <div id="read-article-comments-list" class="space-y-3">
+            <!-- JavaScript ile dolacak -->
+          </div>
+
+          <!-- Yeni Yorum Formu -->
+          <div id="article-comment-form-container" class="pt-2">
+            <!-- JavaScript ile dolacak -->
+          </div>
+        </div>
+      </div>
+      <div class="bg-slate-50 px-6 py-3.5 border-t border-slate-200 flex items-center justify-between shrink-0">
+        <div class="flex items-center space-x-2">
+          <button id="btn-read-article-like" onclick="likeActiveArticle()" class="px-3.5 py-1.5 bg-white border border-slate-300 hover:border-rose-400 text-slate-700 hover:text-rose-600 rounded-lg text-xs font-semibold transition-all flex items-center shadow-xs">
+            <i data-lucide="heart" class="w-4 h-4 mr-1.5 text-rose-500"></i>
+            <span id="read-article-like-text">0 Beğeni</span>
+          </button>
+        </div>
+        <div class="flex items-center space-x-2" id="read-article-admin-actions">
+          <button onclick="closeModal('modal-article-read')" class="px-4 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100">Kapat</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: YENİ KİTAP TALEP ET (DESIDERATA) -->
+  <div id="modal-book-request-add" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200">
+      <div class="bg-gradient-to-r from-emerald-900 to-teal-900 px-6 py-4 text-white flex justify-between items-center">
+        <h3 class="text-base font-bold flex items-center">
+          <i data-lucide="bookmark-plus" class="w-5 h-5 mr-2 text-emerald-300"></i>
+          <span data-i18n="modalRequestBookTitle">Yeni Kitap Talep Et</span>
+        </h3>
+        <button onclick="closeModal('modal-book-request-add')" class="text-white/80 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <form id="form-book-request-add" onsubmit="submitBookRequestForm(event)" class="p-6 space-y-3.5 max-h-[85vh] overflow-y-auto">
+        <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs text-emerald-800 flex items-start space-x-2.5">
+          <i data-lucide="info" class="w-5 h-5 text-emerald-600 shrink-0 mt-0.5"></i>
+          <div>
+            <p class="font-bold">Kütüphane & Kulüp Kitaplığı Talebi</p>
+            <p class="text-[11px] text-emerald-700 mt-0.5">
+              Kütüphanemizde bulunmasını istediğiniz eseri bildirin. Diğer arkadaşlar da isteğinize oy vererek eserin temin edilmesini hızlandırabilir!
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1" data-i18n="lblBookTitle">Kitap Adı *</label>
+          <input type="text" id="request-title" required placeholder="Örn: The Origins of Political Order" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1" data-i18n="lblAuthor">Yazar *</label>
+          <input type="text" id="request-author" required placeholder="Örn: Francis Fukuyama" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1" data-i18n="lblCategory">Disiplin / Tür</label>
+            <select id="request-category" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 bg-white focus:outline-none">
+              <option value="Siyaset Bilimi">Siyaset Bilimi</option>
+              <option value="Uluslararası İlişkiler">Uluslararası İlişkiler</option>
+              <option value="Kamu Yönetimi">Kamu Yönetimi</option>
+              <option value="Felsefe & Sosyoloji">Felsefe & Sosyoloji</option>
+              <option value="Ekonomi-Politik">Ekonomi-Politik</option>
+              <option value="Tarih">Tarih</option>
+              <option value="Genel">Genel</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Yayınevi / Baskı</label>
+            <input type="text" id="request-publisher" placeholder="Örn: İletişim / Gallimard" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">ISBN (Biliyorsanız)</label>
+          <input type="text" id="request-isbn" placeholder="978-..." class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1" data-i18n="lblRequestReason">Talep Gerekçesi / Not</label>
+          <textarea id="request-note" rows="3" placeholder="Bu kitap neden kütüphanemizde bulunmalı? Hangi derse veya araştırma alanına katkı sağlar?" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none"></textarea>
+        </div>
+
+        <div class="pt-3 border-t border-slate-100 flex justify-end space-x-2">
+          <button type="button" onclick="closeModal('modal-book-request-add')" class="px-4 py-2 border border-slate-300 rounded-lg text-sm text-slate-700 hover:bg-slate-50" data-i18n="btnCancel">İptal</button>
+          <button type="submit" class="px-5 py-2 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg text-sm font-semibold transition-colors flex items-center">
+            <i data-lucide="send" class="w-4 h-4 mr-1.5"></i>
+            <span data-i18n="btnSendRequest">Talebi İlet</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: DERS NOTU / KAYNAK PAYLAŞ -->
+  <div id="modal-exam-note-add" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-xl w-full overflow-hidden border border-slate-200 max-h-[90vh] flex flex-col">
+      <div class="bg-gradient-to-r from-emerald-900 to-teal-900 px-6 py-4 text-white flex justify-between items-center shrink-0">
+        <h3 class="text-base font-bold flex items-center">
+          <i data-lucide="upload" class="w-5 h-5 mr-2 text-emerald-300"></i>
+          <span>Ders Notu & Sınav Kaynağı Paylaş</span>
+        </h3>
+        <button onclick="closeModal('modal-exam-note-add')" class="text-white/80 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-exam-note-add" onsubmit="submitExamNoteForm(event)" class="p-6 overflow-y-auto space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Kaynak Başlığı *</label>
+          <input type="text" id="note-title" required minlength="5" placeholder="Örn: Siyasal Düşünceler Tarihi I - Vize Kavram Haritası" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Ders Adı *</label>
+            <input type="text" id="note-course-name" required placeholder="Örn: Siyasal Düşünceler Tarihi" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Ders Kodu (Opsiyonel)</label>
+            <input type="text" id="note-course-code" placeholder="Örn: POL201, ULI305" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none uppercase">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Dersi Veren Hoca</label>
+            <input type="text" id="note-instructor" placeholder="Örn: Doç. Dr. ..." class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Bölüm</label>
+            <select id="note-department" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 bg-white focus:outline-none">
+              <option value="Siyaset Bilimi ve Kamu Yönetimi">Siyaset Bilimi & Kamu Yön.</option>
+              <option value="Uluslararası İlişkiler">Uluslararası İlişkiler</option>
+              <option value="İktisat">İktisat</option>
+              <option value="Yerel Yönetimler">Yerel Yönetimler</option>
+              <option value="Genel">Ortak / Genel</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Kaynak Türü *</label>
+            <select id="note-type" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 bg-white focus:outline-none">
+              <option value="Vize Özeti">Vize Özeti</option>
+              <option value="Final Özeti">Final Özeti</option>
+              <option value="Çıkmış Sorular">Çıkmış Sorular</option>
+              <option value="Ders Notu">Ders Notu</option>
+              <option value="Okuma Listesi">Okuma Listesi</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Kısa Açıklama (1-2 Cümle)</label>
+          <input type="text" id="note-description" placeholder="Örn: 1. ve 6. haftalar arası ders notları ve sınavda çıkabilecek klasik sorular..." class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Doğrudan Not / Özet Metni (Markdown / Metin)</label>
+          <textarea id="note-content" rows="5" placeholder="Öğrencilerin siteden doğrudan okuyabileceği önemli kavramlar, özet maddeleri veya çıkmış soru çözümleri..." class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Google Drive / OneDrive / PDF İndirme Bağlantısı</label>
+          <input type="url" id="note-drive-url" placeholder="https://drive.google.com/..." class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          <p class="text-[11px] text-slate-400 mt-0.5">Özet metni ya da indirme bağlantısından en az birini girmelisiniz.</p>
+        </div>
+
+        <!-- Mahlas Seçeneği -->
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
+          <label class="flex items-center space-x-2 text-xs font-semibold text-slate-700 cursor-pointer">
+            <input type="checkbox" id="note-use-pseudonym" onchange="toggleNotePseudonymInput()" class="rounded text-emerald-600 focus:ring-emerald-500">
+            <span>Notu gerçek adım yerine <strong>Mahlas (Takma İsim)</strong> ile paylaşmak istiyorum</span>
+          </label>
+          <div id="note-pseudonym-container" class="hidden pl-5">
+            <input type="text" id="note-pseudonym" placeholder="Örn: Mülkiyeli 2024, SBF Notçusu..." class="w-full text-xs border border-slate-300 rounded-md p-2 bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-slate-100 flex justify-end space-x-2">
+          <button type="button" onclick="closeModal('modal-exam-note-add')" class="px-4 py-2 border border-slate-300 rounded-lg text-sm text-slate-700 hover:bg-slate-50">İptal</button>
+          <button type="submit" class="px-5 py-2 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg text-sm font-semibold transition-colors flex items-center">
+            <i data-lucide="share-2" class="w-4 h-4 mr-1.5"></i>
+            <span>Notu Havuzda Paylaş</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: DERS NOTUNU OKU / İNCELE -->
+  <div id="modal-exam-note-read" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full overflow-hidden border border-slate-200 max-h-[90vh] flex flex-col">
+      <div class="bg-slate-900 px-6 py-4 text-white flex justify-between items-center shrink-0">
+        <div class="flex items-center space-x-2">
+          <span id="read-note-type-badge" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-400 text-slate-900">Vize Özeti</span>
+          <span id="read-note-course-code" class="px-2 py-0.5 rounded text-[11px] bg-slate-800 text-slate-300 font-mono">POL201</span>
+        </div>
+        <button onclick="closeModal('modal-exam-note-read')" class="text-white/80 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto flex-1 space-y-4">
+        <div>
+          <h2 id="read-note-title" class="text-xl sm:text-2xl font-bold text-slate-900 leading-snug">Başlık</h2>
+          <div class="flex flex-wrap items-center gap-3 text-xs text-slate-500 mt-2 pb-3 border-b border-slate-100">
+            <span class="flex items-center text-slate-800 font-semibold">
+              <i data-lucide="book-open" class="w-3.5 h-3.5 mr-1 text-emerald-600"></i>
+              <span id="read-note-course-name">Ders Adı</span>
+            </span>
+            <span class="text-slate-400">•</span>
+            <span class="text-slate-600" id="read-note-instructor">Hoca</span>
+            <span class="text-slate-400">•</span>
+            <span id="read-note-department">Bölüm</span>
+            <span class="text-slate-400">•</span>
+            <span class="flex items-center text-slate-700">
+              <i data-lucide="user" class="w-3.5 h-3.5 mr-1 text-emerald-600"></i>
+              <span id="read-note-author">Paylaşan</span>
+            </span>
+          </div>
+        </div>
+
+        <div id="read-note-description-box" class="p-3 bg-emerald-50/70 border border-emerald-100 rounded-xl text-xs text-emerald-900">
+          <p id="read-note-description"></p>
+        </div>
+
+        <div id="read-note-content-container" class="space-y-2">
+          <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Özet & Not İçeriği</h4>
+          <div id="read-note-content" class="p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 leading-relaxed font-sans whitespace-pre-line"></div>
+        </div>
+
+        <div id="read-note-download-box" class="pt-2">
+          <a id="read-note-drive-link" href="#" target="_blank" rel="noopener noreferrer" class="w-full inline-flex items-center justify-center px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold shadow-xs transition-colors">
+            <i data-lucide="external-link" class="w-4 h-4 mr-2"></i>
+            <span>Kaynağı Drive / Buluttan Aç & İndir</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="bg-slate-50 px-6 py-3 border-t border-slate-200 flex items-center justify-between shrink-0">
+        <button id="btn-read-note-helpful" onclick="voteActiveExamNoteHelpful()" class="px-3.5 py-1.5 bg-white border border-slate-300 text-slate-700 rounded-lg text-xs font-semibold transition-all flex items-center shadow-2xs hover:border-emerald-400">
+          <i data-lucide="thumbs-up" class="w-4 h-4 mr-1.5 text-emerald-600"></i>
+          <span id="read-note-helpful-text">0 Faydalı</span>
+        </button>
+
+        <div id="read-note-actions" class="flex items-center space-x-2">
+          <!-- Silme veya Kapat butonu -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ÖĞRENCİ PROFİLİ & BAŞARI ROZETLERİ -->
+  <div id="modal-user-profile" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200 max-h-[90vh] flex flex-col">
+      <div class="bg-gradient-to-r from-blue-950 via-indigo-900 to-slate-900 px-6 py-5 text-white flex justify-between items-center shrink-0">
+        <div class="flex items-center space-x-3">
+          <div class="w-12 h-12 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-amber-300 font-bold text-lg shadow-inner">
+            <i data-lucide="award" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white" id="profile-full-name">Öğrenci Adı</h3>
+            <p class="text-xs text-blue-200" id="profile-department">Marmara SBF</p>
+          </div>
+        </div>
+        <button onclick="closeModal('modal-user-profile')" class="text-white/80 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto space-y-5">
+        <!-- İstatistik Şeritleri -->
+        <div class="grid grid-cols-3 gap-2.5 text-center">
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+            <div class="text-lg font-bold text-slate-800" id="profile-stat-loans">0</div>
+            <div class="text-[10px] text-slate-500 font-medium">Ödünç Kitap</div>
+          </div>
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+            <div class="text-lg font-bold text-indigo-700" id="profile-stat-articles">0</div>
+            <div class="text-[10px] text-slate-500 font-medium">Öğrenci Yazısı</div>
+          </div>
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+            <div class="text-lg font-bold text-emerald-700" id="profile-stat-notes">0</div>
+            <div class="text-[10px] text-slate-500 font-medium">Paylaşılan Not</div>
+          </div>
+        </div>
+
+        <!-- Başarı Rozetleri Alanı -->
+        <div>
+          <div class="flex items-center justify-between mb-2.5">
+            <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5 mr-1 text-amber-500"></i>
+              <span>Kazanılan Başarı Rozetleri</span>
+            </h4>
+            <span class="text-[11px] text-slate-400 font-medium" id="profile-badge-summary">Rozetler</span>
+          </div>
+
+          <div id="profile-badges-grid" class="grid grid-cols-2 gap-2.5">
+            <!-- JS ile doldurulacak -->
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-slate-50 px-6 py-3 border-t border-slate-200 flex justify-end shrink-0">
+        <button onclick="closeModal('modal-user-profile')" class="px-4 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100">Kapat</button>
+      </div>
     </div>
   </div>
 

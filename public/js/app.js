@@ -122,7 +122,38 @@ const I18N = {
     msgIssued: "Kitap ödünç verildi.",
     msgReturned: "Kitap başarıyla iade alındı.",
     msgApproved: "Öğrenci başarıyla onaylandı ve sisteme dahil edildi.",
-    msgRejected: "Öğrenci başvurusu reddedildi ve silindi."
+    msgRejected: "Öğrenci başvurusu reddedildi ve silindi.",
+    tabArticles: "Öğrenci Yazıları",
+    tabBookRequests: "İstek Kitaplar",
+    btnSubmitArticle: "Yazı / Düşünce Gönder",
+    btnRequestBook: "Yeni Kitap Talep Et",
+    articlesHeroDesc: "Fakülte ve kulüp öğrencilerimizden denemeler, kitap incelemeleri ve acemi eserler.",
+    bookRequestsHeroDesc: "Kütüphanemizde veya kulüp kitaplığımızda görmek istediğiniz eserleri talep edin, diğer öğrencilerin isteklerini oylayarak önceliklendirin.",
+    lblFilterCategory: "Kategori:",
+    optAllCategories: "Tüm Kategoriler",
+    pendingArticlesNoticeTitle: "Editör Masasında İncelenmeyi Bekleyen Yazılar Var",
+    statTotalRequests: "Toplam Talep",
+    statPendingRequests: "İnceleniyor",
+    statApprovedRequests: "Temin Ediliyor",
+    statAcquiredRequests: "Kütüphanede",
+    colRequestedBy: "Talep Eden & Tarih",
+    colRequestNote: "Gerekçe / Açıklama",
+    colVotes: "Destek (+1)",
+    modalAddArticleTitle: "Öğrenci Kürsüsüne Yazı Gönder",
+    lblArticleTitle: "Yazı Başlığı *",
+    lblArticleCategory: "Disiplin / Kategori *",
+    lblArticleSummary: "Kısa Özet (1-2 Cümle)",
+    lblArticleContent: "Yazı Metni *",
+    btnSubmitArticleConfirm: "Yazıyı Editöre Gönder",
+    modalRequestBookTitle: "Yeni Kitap Talep Et",
+    lblRequestReason: "Talep Gerekçesi / Not",
+    btnSendRequest: "Talebi İlet",
+    statusAcquired: "Kütüphanede",
+    statusPending: "İnceleniyor",
+    statusApproved: "Temin Ediliyor",
+    statusRejected: "Temin Edilemedi",
+    tabExamNotes: "Sınav Notları & Havuz",
+    btnShareExamNote: "Ders Notu / Kaynak Paylaş"
   },
   fr: {
     facultyTitle: "Université de Marmara",
@@ -245,7 +276,38 @@ const I18N = {
     msgIssued: "L'emprunt a été enregistré.",
     msgReturned: "Le livre a été retourné en rayon.",
     msgApproved: "Étudiant validé et compte activé avec succès.",
-    msgRejected: "Demande refusée et supprimée."
+    msgRejected: "Demande refusée et supprimée.",
+    tabArticles: "Öğrenci Yazıları & Düşünceler",
+    tabBookRequests: "Livres Demandés",
+    btnSubmitArticle: "Rédiger un Texte / Réflexion",
+    btnRequestBook: "Demander un Livre",
+    articlesHeroDesc: "Textes et analyses rédigés par les étudiants en sciences politiques, relations internationales et administration.",
+    bookRequestsHeroDesc: "Suggérez les ouvrages que vous souhaitez voir dans notre bibliothèque et votez pour les demandes existantes.",
+    lblFilterCategory: "Catégorie :",
+    optAllCategories: "Toutes les Catégories",
+    pendingArticlesNoticeTitle: "Articles en Attente de Révision Éditoriale",
+    statTotalRequests: "Total Demandes",
+    statPendingRequests: "En Examen",
+    statApprovedRequests: "En Acquisition",
+    statAcquiredRequests: "En Rayon",
+    colRequestedBy: "Demandé Par & Date",
+    colRequestNote: "Motif / Remarque",
+    colVotes: "Soutiens (+1)",
+    modalAddArticleTitle: "Öğrenci Yazısı / Düşünce Gönder",
+    lblArticleTitle: "Titre de l'Article *",
+    lblArticleCategory: "Discipline / Catégorie *",
+    lblArticleSummary: "Court Résumé",
+    lblArticleContent: "Texte de l'Article *",
+    btnSubmitArticleConfirm: "Envoyer au Comité Éditorial",
+    modalRequestBookTitle: "Suggérer un Nouveau Livre",
+    lblRequestReason: "Motif de la Demande",
+    btnSendRequest: "Transmettre la Demande",
+    statusAcquired: "En Rayon",
+    statusPending: "En Examen",
+    statusApproved: "En Acquisition",
+    statusRejected: "Non Retenu",
+    tabExamNotes: "Notes de Cours & Examens",
+    btnShareExamNote: "Partager une Note de Cours"
   },
   en: {
     facultyTitle: "Marmara University",
@@ -368,7 +430,38 @@ const I18N = {
     msgIssued: "Book successfully checked out.",
     msgReturned: "Book successfully returned to shelf.",
     msgApproved: "Student verified and approved successfully.",
-    msgRejected: "Student application rejected."
+    msgRejected: "Student application rejected.",
+    tabArticles: "Öğrenci Yazıları & Düşünceler",
+    tabBookRequests: "Book Requests",
+    btnSubmitArticle: "Submit Essay / Thought",
+    btnRequestBook: "Request a Book",
+    articlesHeroDesc: "Original essays, book reviews, and student thoughts written by political science students.",
+    bookRequestsHeroDesc: "Request books you'd like to see in our library or club collection, and vote to prioritize requests.",
+    lblFilterCategory: "Category:",
+    optAllCategories: "All Categories",
+    pendingArticlesNoticeTitle: "Articles Pending Editorial Review",
+    statTotalRequests: "Total Requests",
+    statPendingRequests: "Under Review",
+    statApprovedRequests: "Ordering",
+    statAcquiredRequests: "In Library",
+    colRequestedBy: "Requested By & Date",
+    colRequestNote: "Rationale / Note",
+    colVotes: "Support (+1)",
+    modalAddArticleTitle: "Submit Student Essay / Thought",
+    lblArticleTitle: "Article Title *",
+    lblArticleCategory: "Discipline / Category *",
+    lblArticleSummary: "Short Summary",
+    lblArticleContent: "Article Body *",
+    btnSubmitArticleConfirm: "Submit to Editors",
+    modalRequestBookTitle: "Request a New Book",
+    lblRequestReason: "Reason / Note",
+    btnSendRequest: "Submit Request",
+    statusAcquired: "In Library",
+    statusPending: "Under Review",
+    statusApproved: "Acquiring",
+    statusRejected: "Declined",
+    tabExamNotes: "Exam Notes & Hub",
+    btnShareExamNote: "Share Lecture Note"
   }
 };
 
@@ -376,8 +469,9 @@ const I18N = {
 let currentLang = localStorage.getItem('sbf_lang') || 'tr';
 let currentUser = JSON.parse(localStorage.getItem('sbf_user') || 'null');
 let currentToken = localStorage.getItem('sbf_token') || null;
-let libraryData = { settings: {}, books: [], members: [], loans: [], pendingMembers: [] };
+let libraryData = { settings: {}, books: [], members: [], loans: [], pendingMembers: [], articles: [], bookRequests: [], pendingArticles: [] };
 let activeTab = 'books'; // Varsayılan olarak kitap kataloğu açık
+let activeArticleId = null;
 
 // DOM Yüklendiğinde
 document.addEventListener('DOMContentLoaded', () => {
@@ -422,6 +516,9 @@ function setLanguage(lang, reloadUI = true) {
   if (reloadUI) {
     if (currentUser && currentUser.role === 'admin') renderDashboard();
     renderBooks();
+    renderBookRequests();
+    renderArticles();
+    renderExamNotes();
     if (currentUser && currentUser.role === 'admin') {
       renderLoans();
       renderMembers();
@@ -464,13 +561,13 @@ function renderAuthHeader() {
       : '<span class="px-1.5 py-0.5 text-[10px] bg-blue-300 text-blue-950 font-bold rounded">Öğrenci</span>';
 
     container.innerHTML = `
-      <div class="flex items-center bg-white/10 rounded-lg px-2.5 py-1 border border-white/15 text-xs text-white">
-        <i data-lucide="${currentUser.role === 'admin' ? 'shield-check' : 'user'}" class="w-4 h-4 mr-1.5 text-amber-300"></i>
+      <div class="flex items-center bg-white/10 hover:bg-white/15 cursor-pointer rounded-lg px-2.5 py-1 border border-white/15 text-xs text-white transition-all group" onclick="openUserProfileModal()" title="Profilim & Başarı Rozetlerim">
+        <i data-lucide="${currentUser.role === 'admin' ? 'shield-check' : 'award'}" class="w-4 h-4 mr-1.5 text-amber-300 group-hover:scale-110 transition-transform"></i>
         <div class="mr-2 text-left">
           <div class="font-bold truncate max-w-[110px] sm:max-w-[150px]">${escapeHtml(currentUser.fullName)}</div>
         </div>
         ${roleBadge}
-        <button onclick="logout()" title="${t('btnLogout')}" class="ml-2 pl-2 border-l border-white/20 text-red-200 hover:text-white">
+        <button onclick="event.stopPropagation(); logout();" title="${t('btnLogout')}" class="ml-2 pl-2 border-l border-white/20 text-red-200 hover:text-white">
           <i data-lucide="log-out" class="w-4 h-4"></i>
         </button>
       </div>
@@ -487,7 +584,8 @@ function renderNavigation() {
   const isAdmin = currentUser && currentUser.role === 'admin';
   const isStudent = currentUser && currentUser.role === 'student';
 
-  const pendingCount = (libraryData.pendingMembers || []).length;
+  const pendingMembersCount = (libraryData.pendingMembers || []).length;
+  const pendingArticlesCount = (libraryData.pendingArticles || []).length;
 
   if (isAdmin) {
     // ADMİN MENÜSÜ
@@ -500,6 +598,19 @@ function renderNavigation() {
         <i data-lucide="book-marked" class="w-4 h-4 mr-1.5"></i>
         <span>${t('tabBooks')}</span>
       </button>
+      <button onclick="switchTab('exam-notes')" id="nav-exam-notes" class="tab-btn flex items-center px-3 py-1.5 rounded-lg text-blue-100 hover:bg-white/10 font-medium">
+        <i data-lucide="graduation-cap" class="w-4 h-4 mr-1.5 text-emerald-300"></i>
+        <span>${t('tabExamNotes')}</span>
+      </button>
+      <button onclick="switchTab('book-requests')" id="nav-book-requests" class="tab-btn flex items-center px-3 py-1.5 rounded-lg text-blue-100 hover:bg-white/10 font-medium">
+        <i data-lucide="bookmark-plus" class="w-4 h-4 mr-1.5 text-emerald-300"></i>
+        <span>${t('tabBookRequests')}</span>
+      </button>
+      <button onclick="switchTab('articles')" id="nav-articles" class="tab-btn flex items-center px-3 py-1.5 rounded-lg text-blue-100 hover:bg-white/10 font-medium">
+        <i data-lucide="feather" class="w-4 h-4 mr-1.5 text-amber-300"></i>
+        <span>${t('tabArticles')}</span>
+        ${pendingArticlesCount > 0 ? `<span class="ml-1.5 px-1.5 py-0.2 text-[10px] bg-amber-500 text-slate-900 font-bold rounded-full">${pendingArticlesCount}</span>` : ''}
+      </button>
       <button onclick="switchTab('loans')" id="nav-loans" class="tab-btn flex items-center px-3 py-1.5 rounded-lg text-blue-100 hover:bg-white/10 font-medium">
         <i data-lucide="arrow-left-right" class="w-4 h-4 mr-1.5"></i>
         <span>${t('tabLoans')}</span>
@@ -511,7 +622,7 @@ function renderNavigation() {
       <button onclick="switchTab('approvals')" id="nav-approvals" class="tab-btn flex items-center px-3 py-1.5 rounded-lg text-blue-100 hover:bg-white/10 font-medium">
         <i data-lucide="shield-alert" class="w-4 h-4 mr-1.5 text-amber-300"></i>
         <span>${t('tabApprovals')}</span>
-        ${pendingCount > 0 ? `<span class="ml-1.5 px-1.5 py-0.2 text-[10px] bg-amber-500 text-slate-900 font-bold rounded-full">${pendingCount}</span>` : ''}
+        ${pendingMembersCount > 0 ? `<span class="ml-1.5 px-1.5 py-0.2 text-[10px] bg-amber-500 text-slate-900 font-bold rounded-full">${pendingMembersCount}</span>` : ''}
       </button>
       <button onclick="switchTab('backup')" id="nav-backup" class="tab-btn flex items-center px-3 py-1.5 rounded-lg text-blue-100 hover:bg-white/10 font-medium">
         <i data-lucide="database" class="w-4 h-4 mr-1.5"></i>
@@ -525,6 +636,18 @@ function renderNavigation() {
         <i data-lucide="book-marked" class="w-4 h-4 mr-1.5"></i>
         <span>${t('tabBooks')}</span>
       </button>
+      <button onclick="switchTab('exam-notes')" id="nav-exam-notes" class="tab-btn flex items-center px-3 py-1.5 rounded-lg text-blue-100 hover:bg-white/10 font-medium">
+        <i data-lucide="graduation-cap" class="w-4 h-4 mr-1.5 text-emerald-300"></i>
+        <span>${t('tabExamNotes')}</span>
+      </button>
+      <button onclick="switchTab('book-requests')" id="nav-book-requests" class="tab-btn flex items-center px-3 py-1.5 rounded-lg text-blue-100 hover:bg-white/10 font-medium">
+        <i data-lucide="bookmark-plus" class="w-4 h-4 mr-1.5 text-emerald-300"></i>
+        <span>${t('tabBookRequests')}</span>
+      </button>
+      <button onclick="switchTab('articles')" id="nav-articles" class="tab-btn flex items-center px-3 py-1.5 rounded-lg text-blue-100 hover:bg-white/10 font-medium">
+        <i data-lucide="feather" class="w-4 h-4 mr-1.5 text-amber-300"></i>
+        <span>${t('tabArticles')}</span>
+      </button>
       <button onclick="switchTab('my-books')" id="nav-my-books" class="tab-btn flex items-center px-3 py-1.5 rounded-lg text-blue-100 hover:bg-white/10 font-medium">
         <i data-lucide="book-open-check" class="w-4 h-4 mr-1.5 text-amber-300"></i>
         <span>${t('tabMyBooks')}</span>
@@ -536,6 +659,18 @@ function renderNavigation() {
       <button onclick="switchTab('books')" id="nav-books" class="tab-btn flex items-center px-3 py-1.5 rounded-lg text-blue-100 hover:bg-white/10 font-medium">
         <i data-lucide="book-marked" class="w-4 h-4 mr-1.5"></i>
         <span>${t('tabBooks')}</span>
+      </button>
+      <button onclick="switchTab('exam-notes')" id="nav-exam-notes" class="tab-btn flex items-center px-3 py-1.5 rounded-lg text-blue-100 hover:bg-white/10 font-medium">
+        <i data-lucide="graduation-cap" class="w-4 h-4 mr-1.5 text-emerald-300"></i>
+        <span>${t('tabExamNotes')}</span>
+      </button>
+      <button onclick="switchTab('book-requests')" id="nav-book-requests" class="tab-btn flex items-center px-3 py-1.5 rounded-lg text-blue-100 hover:bg-white/10 font-medium">
+        <i data-lucide="bookmark-plus" class="w-4 h-4 mr-1.5 text-emerald-300"></i>
+        <span>${t('tabBookRequests')}</span>
+      </button>
+      <button onclick="switchTab('articles')" id="nav-articles" class="tab-btn flex items-center px-3 py-1.5 rounded-lg text-blue-100 hover:bg-white/10 font-medium">
+        <i data-lucide="feather" class="w-4 h-4 mr-1.5 text-amber-300"></i>
+        <span>${t('tabArticles')}</span>
       </button>
     `;
   }
@@ -566,6 +701,9 @@ async function fetchData() {
     }
 
     libraryData = await res.json();
+    if (!libraryData.articles) libraryData.articles = [];
+    if (!libraryData.bookRequests) libraryData.bookRequests = [];
+    if (!libraryData.examNotes) libraryData.examNotes = [];
 
     // Yetkiye göre ekranları doldur
     if (currentUser && currentUser.role === 'admin') {
@@ -575,6 +713,9 @@ async function fetchData() {
       renderApprovals();
     }
     renderBooks();
+    renderBookRequests();
+    renderArticles();
+    renderExamNotes();
     if (currentUser && currentUser.role === 'student') {
       renderMyBooks();
     }
@@ -618,6 +759,10 @@ function switchTab(tabId) {
     activeNav.classList.add('active', 'bg-white/15');
     activeNav.classList.remove('text-blue-100');
   }
+
+  if (tabId === 'articles') renderArticles();
+  if (tabId === 'book-requests') renderBookRequests();
+
   if (window.lucide) lucide.createIcons();
 }
 
@@ -1380,3 +1525,1302 @@ function showToast(message, type = 'success') {
     toast.classList.add('translate-y-20', 'opacity-0');
   }, 3000);
 }
+
+// ================= KULÜP YAZILARI & MAKALE İŞLEMLERİ =================
+
+function handleNewArticleBtnClick() {
+  if (!currentUser) {
+    showToast("Yazı göndermek için lütfen öğrenci veya yönetici hesabınızla giriş yapınız.", "info");
+    openModal('modal-login');
+    return;
+  }
+  openModal('modal-article-add');
+}
+
+function filterArticles() {
+  renderArticles();
+}
+
+function renderArticles() {
+  const container = document.getElementById('articlesGrid');
+  if (!container) return;
+
+  const categoryFilter = document.getElementById('articleCategoryFilter')?.value || 'all';
+  const searchTerm = (document.getElementById('articleSearchInput')?.value || '').toLowerCase().trim();
+
+  let articles = libraryData.articles || [];
+  const isAdmin = currentUser && currentUser.role === 'admin';
+
+  // Admin Bekleyen Bildirim Çubuğu
+  const pendingAlert = document.getElementById('adminArticlesPendingAlert');
+  const pendingText = document.getElementById('pendingArticlesCountText');
+  const pendingArticles = articles.filter(a => a.status === 'pending');
+  if (pendingAlert) {
+    if (isAdmin && pendingArticles.length > 0) {
+      pendingAlert.classList.remove('hidden');
+      if (pendingText) pendingText.textContent = `${pendingArticles.length} yazı onayınızı bekliyor.`;
+    } else {
+      pendingAlert.classList.add('hidden');
+    }
+  }
+
+  // Filtreleme
+  if (categoryFilter !== 'all') {
+    articles = articles.filter(a => a.category === categoryFilter);
+  }
+  if (searchTerm) {
+    articles = articles.filter(a => 
+      (a.title || '').toLowerCase().includes(searchTerm) ||
+      (a.authorName || '').toLowerCase().includes(searchTerm) ||
+      (a.summary || '').toLowerCase().includes(searchTerm)
+    );
+  }
+
+  if (articles.length === 0) {
+    container.innerHTML = `
+      <div class="col-span-full bg-white rounded-2xl p-12 text-center border border-slate-200">
+        <div class="w-16 h-16 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto mb-3">
+          <i data-lucide="feather" class="w-8 h-8"></i>
+        </div>
+        <h3 class="text-base font-bold text-slate-800">Henüz Bu Kriterde Yazı Bulunmuyor</h3>
+        <p class="text-xs text-slate-500 max-w-sm mx-auto mt-1">
+          İlk yazıyı kaleme alarak Marmara SBF fikir köşesini zenginleştirebilirsiniz!
+        </p>
+        <div class="mt-4">
+          <button onclick="handleNewArticleBtnClick()" class="px-4 py-2 bg-indigo-900 hover:bg-indigo-800 text-white rounded-xl text-xs font-semibold shadow-sm inline-flex items-center">
+            <i data-lucide="pen-tool" class="w-3.5 h-3.5 mr-1.5"></i>
+            <span>Yeni Yazı Gönder</span>
+          </button>
+        </div>
+      </div>
+    `;
+    if (window.lucide) lucide.createIcons();
+    return;
+  }
+
+  const categoryColors = {
+    'Siyaset Bilimi': 'bg-blue-100 text-blue-800 border-blue-200',
+    'Uluslararası İlişkiler': 'bg-indigo-100 text-indigo-800 border-indigo-200',
+    'Kamu Yönetimi': 'bg-teal-100 text-teal-800 border-teal-200',
+    'Kitap İncelemesi': 'bg-amber-100 text-amber-800 border-amber-200',
+    'Felsefe & Sosyoloji': 'bg-purple-100 text-purple-800 border-purple-200',
+    'Genel': 'bg-slate-100 text-slate-800 border-slate-200'
+  };
+
+  container.innerHTML = articles.map(art => {
+    const badgeColor = categoryColors[art.category] || categoryColors['Genel'];
+    const dateFormatted = art.createdAt ? new Date(art.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+    const likesCount = (art.likes || []).length;
+    const commentsCount = (art.comments || []).length;
+    const viewsCount = art.readCount || 0;
+    const isAuthor = currentUser && (currentUser.studentNumber === art.authorStudentNumber || currentUser.username === art.authorStudentNumber);
+
+    let statusBadge = '';
+    if (art.status === 'pending') {
+      statusBadge = '<span class="px-2 py-0.5 text-[10px] font-bold bg-amber-100 text-amber-800 rounded border border-amber-200 flex items-center"><i data-lucide="clock" class="w-3 h-3 mr-1"></i> Editör Onayı Bekliyor</span>';
+    } else if (art.status === 'rejected') {
+      statusBadge = '<span class="px-2 py-0.5 text-[10px] font-bold bg-rose-100 text-rose-800 rounded border border-rose-200 flex items-center"><i data-lucide="x-circle" class="w-3 h-3 mr-1"></i> Revizyon / Red</span>';
+    }
+
+    let adminControls = '';
+    if (isAdmin && art.status === 'pending') {
+      adminControls = `
+        <div class="mt-3 pt-3 border-t border-amber-100 bg-amber-50/60 -mx-5 -mb-5 p-3 rounded-b-xl flex items-center justify-between">
+          <span class="text-[11px] font-bold text-amber-900">Editör Kararı:</span>
+          <div class="flex items-center space-x-2">
+            <button onclick="approveArticle('${art.id}', event)" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-bold transition-colors flex items-center">
+              <i data-lucide="check" class="w-3.5 h-3.5 mr-1"></i> Yayınla
+            </button>
+            <button onclick="rejectArticle('${art.id}', event)" class="px-2.5 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded text-xs font-bold transition-colors flex items-center">
+              <i data-lucide="x" class="w-3.5 h-3.5 mr-1"></i> Reddet
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    const deleteBtn = (isAdmin || isAuthor) ? `
+      <button onclick="deleteArticle('${art.id}', event)" title="Yazıyı Sil" class="text-slate-400 hover:text-rose-600 transition-colors p-1">
+        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+      </button>
+    ` : '';
+
+    return `
+      <div onclick="openReadArticleModal('${art.id}')" class="bg-white rounded-xl shadow-xs hover:shadow-md transition-all duration-200 border border-slate-200 p-5 flex flex-col justify-between cursor-pointer group hover:border-indigo-300">
+        <div>
+          <div class="flex items-center justify-between gap-2 mb-2.5">
+            <span class="px-2.5 py-0.5 text-[10px] font-bold rounded-full border ${badgeColor}">
+              ${escapeHtml(art.category)}
+            </span>
+            <div class="flex items-center space-x-1.5">
+              ${statusBadge}
+              ${deleteBtn}
+            </div>
+          </div>
+
+          <h3 class="text-base font-bold text-slate-900 group-hover:text-indigo-900 transition-colors leading-snug line-clamp-2">
+            ${escapeHtml(art.title)}
+          </h3>
+
+          <p class="text-xs text-slate-500 mt-2 line-clamp-3 leading-relaxed">
+            ${escapeHtml(art.summary || art.content.slice(0, 150))}
+          </p>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-100">
+          <div class="flex items-center justify-between text-xs text-slate-500">
+            <div class="flex items-center space-x-1.5 truncate max-w-[170px]">
+              <i data-lucide="user" class="w-3.5 h-3.5 text-indigo-600 shrink-0"></i>
+              <span class="font-medium text-slate-700 truncate">${escapeHtml(art.authorName)}</span>
+            </div>
+            <div class="flex items-center space-x-2.5 text-[11px] text-slate-400 shrink-0">
+              <span class="flex items-center" title="Beğeniler"><i data-lucide="heart" class="w-3 h-3 mr-0.5 text-rose-500"></i> ${likesCount}</span>
+              <span class="flex items-center" title="Yorumlar"><i data-lucide="message-square" class="w-3 h-3 mr-0.5 text-indigo-500"></i> ${commentsCount}</span>
+              <span class="flex items-center" title="Okunma"><i data-lucide="eye" class="w-3 h-3 mr-0.5"></i> ${viewsCount}</span>
+            </div>
+          </div>
+          ${adminControls}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  if (window.lucide) lucide.createIcons();
+}
+
+async function submitArticleForm(e) {
+  e.preventDefault();
+  if (!currentUser || !currentToken) {
+    showToast("Giriş yapmanız gerekmektedir.", "error");
+    return;
+  }
+
+  const title = document.getElementById('article-title').value;
+  const category = document.getElementById('article-category').value;
+  const summary = document.getElementById('article-summary').value;
+  const content = document.getElementById('article-content').value;
+  const usePseudonym = document.getElementById('article-use-pseudonym') ? document.getElementById('article-use-pseudonym').checked : false;
+  const pseudonym = document.getElementById('article-pseudonym') ? document.getElementById('article-pseudonym').value.trim() : '';
+
+  try {
+    const res = await fetch('/api/articles', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${currentToken}`
+      },
+      body: JSON.stringify({ title, category, summary, content, usePseudonym, pseudonym })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Yazı gönderilemedi.');
+
+    closeModal('modal-article-add');
+    document.getElementById('form-article-add').reset();
+    if (document.getElementById('article-use-pseudonym')) document.getElementById('article-use-pseudonym').checked = false;
+    if (document.getElementById('article-pseudonym-container')) document.getElementById('article-pseudonym-container').classList.add('hidden');
+    showToast(data.message || 'Yazınız başarıyla iletildi!', 'success');
+    await fetchData();
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+function toggleArticlePseudonymInput() {
+  const cb = document.getElementById('article-use-pseudonym');
+  const box = document.getElementById('article-pseudonym-container');
+  if (cb && box) {
+    if (cb.checked) box.classList.remove('hidden');
+    else box.classList.add('hidden');
+  }
+}
+
+function handleNewArticleBtnClick(defaultCategory) {
+  if (!currentUser) {
+    showToast("Yazı göndermek için lütfen öğrenci girişi yapınız.", "info");
+    openModal('modal-login');
+    return;
+  }
+  if (defaultCategory && document.getElementById('article-category')) {
+    document.getElementById('article-category').value = defaultCategory;
+  }
+  openModal('modal-article-add');
+}
+
+function openReadArticleModal(id) {
+  const article = (libraryData.articles || []).find(a => a.id === id);
+  if (!article) return;
+
+  activeArticleId = id;
+
+  document.getElementById('read-article-title').textContent = article.title;
+  document.getElementById('read-article-category-badge').textContent = article.category;
+  document.getElementById('read-article-author').textContent = article.authorName;
+  document.getElementById('read-article-department').textContent = article.authorDepartment || 'SBF';
+  document.getElementById('read-article-date').textContent = article.createdAt 
+    ? new Date(article.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }) 
+    : '';
+  document.getElementById('read-article-views').textContent = `${article.readCount || 0} okuma`;
+  document.getElementById('read-article-content').textContent = article.content;
+
+  // Status Badge
+  const statusBadge = document.getElementById('read-article-status-badge');
+  if (statusBadge) {
+    if (article.status === 'published') {
+      statusBadge.textContent = 'Yayında';
+      statusBadge.className = 'px-2 py-0.5 rounded text-[11px] bg-emerald-800 text-emerald-200';
+    } else if (article.status === 'pending') {
+      statusBadge.textContent = 'Editör Masasında (Onay Bekliyor)';
+      statusBadge.className = 'px-2 py-0.5 rounded text-[11px] bg-amber-800 text-amber-200';
+    } else {
+      statusBadge.textContent = 'Reddedildi';
+      statusBadge.className = 'px-2 py-0.5 rounded text-[11px] bg-rose-800 text-rose-200';
+    }
+  }
+
+  // Red gerekçesi
+  const rejBox = document.getElementById('read-article-rejection');
+  const rejText = document.getElementById('read-article-rejection-text');
+  if (article.status === 'rejected' && article.rejectionReason) {
+    rejBox.classList.remove('hidden');
+    rejText.textContent = article.rejectionReason;
+  } else {
+    rejBox.classList.add('hidden');
+  }
+
+  // Like Durumu
+  updateArticleLikeButtonUI(article);
+
+  // Yorumları Yükle & Listele
+  renderArticleComments(article);
+
+  // Admin Butonları
+  const adminActions = document.getElementById('read-article-admin-actions');
+  const isAdmin = currentUser && currentUser.role === 'admin';
+  const isAuthor = currentUser && (currentUser.studentNumber === article.authorStudentNumber || currentUser.username === article.authorStudentNumber);
+
+  let extraBtns = '';
+  if (isAdmin && article.status === 'pending') {
+    extraBtns += `
+      <button onclick="approveArticle('${article.id}'); closeModal('modal-article-read');" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold">Yayınla</button>
+      <button onclick="rejectArticle('${article.id}'); closeModal('modal-article-read');" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-semibold">Reddet</button>
+    `;
+  }
+  if (isAdmin || isAuthor) {
+    extraBtns += `
+      <button onclick="deleteArticle('${article.id}'); closeModal('modal-article-read');" class="px-3 py-1.5 bg-slate-200 hover:bg-rose-100 hover:text-rose-700 text-slate-700 rounded-lg text-xs font-semibold">Sil</button>
+    `;
+  }
+  adminActions.innerHTML = extraBtns + `<button onclick="closeModal('modal-article-read')" class="px-4 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100">Kapat</button>`;
+
+  openModal('modal-article-read');
+
+  // Arka planda görüntülenme sayısını artır
+  fetch(`/api/articles/${id}/view`, { method: 'POST' }).catch(() => {});
+  article.readCount = (article.readCount || 0) + 1;
+  document.getElementById('read-article-views').textContent = `${article.readCount} okuma`;
+
+  if (window.lucide) lucide.createIcons();
+}
+
+function updateArticleLikeButtonUI(article) {
+  const btnLike = document.getElementById('btn-read-article-like');
+  const txtLike = document.getElementById('read-article-like-text');
+  if (!btnLike || !txtLike) return;
+
+  const likes = article.likes || [];
+  const userIdentifier = currentUser ? (currentUser.studentNumber || currentUser.username) : null;
+  const isLiked = userIdentifier && likes.includes(userIdentifier);
+
+  txtLike.textContent = `${likes.length} Beğeni`;
+  if (isLiked) {
+    btnLike.className = "px-3.5 py-1.5 bg-rose-50 border border-rose-300 text-rose-700 rounded-lg text-xs font-bold transition-all flex items-center shadow-xs";
+  } else {
+    btnLike.className = "px-3.5 py-1.5 bg-white border border-slate-300 hover:border-rose-400 text-slate-700 hover:text-rose-600 rounded-lg text-xs font-semibold transition-all flex items-center shadow-xs";
+  }
+}
+
+async function likeActiveArticle() {
+  if (!currentUser || !currentToken) {
+    closeModal('modal-article-read');
+    showToast("Beğenmek için lütfen giriş yapınız.", "info");
+    openModal('modal-login');
+    return;
+  }
+  if (!activeArticleId) return;
+
+  try {
+    const res = await fetch(`/api/articles/${activeArticleId}/like`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${currentToken}` }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Beğenilemedi');
+
+    const article = (libraryData.articles || []).find(a => a.id === activeArticleId);
+    if (article) {
+      const userIdentifier = currentUser.studentNumber || currentUser.username;
+      if (data.liked) {
+        if (!article.likes.includes(userIdentifier)) article.likes.push(userIdentifier);
+      } else {
+        article.likes = article.likes.filter(u => u !== userIdentifier);
+      }
+      updateArticleLikeButtonUI(article);
+      renderArticles();
+    }
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+async function approveArticle(id, event) {
+  if (event) event.stopPropagation();
+  if (!currentToken) return;
+
+  try {
+    const res = await fetch(`/api/articles/${id}/approve`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${currentToken}` }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Onaylanamadı');
+
+    showToast("Yazı onaylandı ve yayına alındı!", "success");
+    await fetchData();
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+async function rejectArticle(id, event) {
+  if (event) event.stopPropagation();
+  if (!currentToken) return;
+
+  const reason = prompt("Öğrenciye iletilecek red / düzeltme gerekçesini giriniz:", "Yayın ilkelerine ve kulüp odağına uygun bulunmadı.");
+  if (reason === null) return;
+
+  try {
+    const res = await fetch(`/api/articles/${id}/reject`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${currentToken}`
+      },
+      body: JSON.stringify({ reason })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Reddedilemedi');
+
+    showToast("Yazı reddedildi.", "info");
+    await fetchData();
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+async function deleteArticle(id, event) {
+  if (event) event.stopPropagation();
+  if (!confirm("Bu yazıyı silmek istediğinize emin misiniz?")) return;
+
+  try {
+    const res = await fetch(`/api/articles/${id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${currentToken}` }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Silinemedi');
+
+    showToast("Yazı silindi.", "success");
+    await fetchData();
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+// ================= İSTEK KİTAP İŞLEMLERİ =================
+
+function handleNewBookRequestBtnClick() {
+  if (!currentUser) {
+    showToast("Kitap talep etmek için lütfen giriş yapınız.", "info");
+    openModal('modal-login');
+    return;
+  }
+  openModal('modal-book-request-add');
+}
+
+function renderBookRequests() {
+  const tbody = document.getElementById('book-requests-table-tbody');
+  if (!tbody) return;
+
+  const requests = libraryData.bookRequests || [];
+  const isAdmin = currentUser && currentUser.role === 'admin';
+  const currentUserId = currentUser ? (currentUser.studentNumber || currentUser.username) : null;
+
+  // İstatistik Sayaçları
+  const statTotal = document.getElementById('stat-total-requests');
+  const statPending = document.getElementById('stat-pending-requests');
+  const statApproved = document.getElementById('stat-approved-requests');
+  const statAcquired = document.getElementById('stat-acquired-requests');
+
+  if (statTotal) statTotal.textContent = requests.length;
+  if (statPending) statPending.textContent = requests.filter(r => r.status === 'pending').length;
+  if (statApproved) statApproved.textContent = requests.filter(r => r.status === 'approved').length;
+  if (statAcquired) statAcquired.textContent = requests.filter(r => r.status === 'acquired').length;
+
+  if (requests.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="7" class="py-12 text-center text-slate-400">
+          <i data-lucide="bookmark" class="w-8 h-8 mx-auto mb-2 text-slate-300"></i>
+          <p class="text-sm font-medium">Henüz bir kitap talebi bulunmuyor.</p>
+          <p class="text-xs text-slate-400 mt-1">İstediğiniz bir eseri kütüphanemize kazandırmak için yukarıdaki butondan talep oluşturabilirsiniz.</p>
+        </td>
+      </tr>
+    `;
+    if (window.lucide) lucide.createIcons();
+    return;
+  }
+
+  const statusConfig = {
+    'pending': { label: 'İnceleniyor', cls: 'bg-amber-100 text-amber-800 border-amber-200' },
+    'approved': { label: 'Temin Ediliyor', cls: 'bg-indigo-100 text-indigo-800 border-indigo-200' },
+    'acquired': { label: 'Kütüphanede', cls: 'bg-emerald-100 text-emerald-800 border-emerald-200' },
+    'rejected': { label: 'Temin Edilemedi', cls: 'bg-rose-100 text-rose-800 border-rose-200' }
+  };
+
+  tbody.innerHTML = requests.map(req => {
+    const votes = req.votes || [];
+    const hasVoted = currentUserId && votes.includes(currentUserId);
+    const voteBtnCls = hasVoted 
+      ? 'bg-emerald-600 text-white font-bold hover:bg-emerald-700' 
+      : 'bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 border border-slate-200';
+
+    const st = statusConfig[req.status] || statusConfig['pending'];
+
+    let adminActionHtml = '';
+    if (isAdmin) {
+      adminActionHtml = `
+        <div class="flex items-center justify-end space-x-1.5">
+          <select onchange="changeBookRequestStatus('${req.id}', this.value)" class="text-[11px] border border-slate-300 rounded px-1.5 py-1 bg-white focus:outline-none">
+            <option value="pending" ${req.status === 'pending' ? 'selected' : ''}>İnceleniyor</option>
+            <option value="approved" ${req.status === 'approved' ? 'selected' : ''}>Temin Ediliyor</option>
+            <option value="acquired" ${req.status === 'acquired' ? 'selected' : ''}>Kütüphanede</option>
+            <option value="rejected" ${req.status === 'rejected' ? 'selected' : ''}>Temin Edilemedi</option>
+          </select>
+          ${req.status !== 'acquired' ? `
+            <button onclick="convertRequestToBook('${req.id}')" title="Kütüphaneye Eser Olarak Ekle" class="p-1 text-emerald-600 hover:text-emerald-800 hover:bg-emerald-50 rounded">
+              <i data-lucide="book-plus" class="w-4 h-4"></i>
+            </button>
+          ` : ''}
+          <button onclick="deleteBookRequest('${req.id}')" title="Talebi Sil" class="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+          </button>
+        </div>
+      `;
+    } else {
+      adminActionHtml = `
+        <button onclick="voteBookRequest('${req.id}')" class="px-2.5 py-1 text-xs rounded-lg transition-all flex items-center space-x-1 ${voteBtnCls} shadow-2xs ml-auto">
+          <i data-lucide="thumbs-up" class="w-3.5 h-3.5"></i>
+          <span>${hasVoted ? 'Destekledin' : 'Destekle'}</span>
+        </button>
+      `;
+    }
+
+    return `
+      <tr class="hover:bg-slate-50/70 transition-colors">
+        <td class="py-3 px-4">
+          <div class="font-bold text-slate-900 leading-snug">${escapeHtml(req.title)}</div>
+          <div class="text-xs text-slate-500">${escapeHtml(req.author)} ${req.publisher ? `• <span class="italic text-slate-400">${escapeHtml(req.publisher)}</span>` : ''}</div>
+          ${req.isbn ? `<div class="text-[10px] text-slate-400 font-mono mt-0.5">ISBN: ${escapeHtml(req.isbn)}</div>` : ''}
+        </td>
+        <td class="py-3 px-4">
+          <span class="px-2 py-0.5 rounded text-xs bg-slate-100 text-slate-700 font-medium">${escapeHtml(req.category || 'Genel')}</span>
+        </td>
+        <td class="py-3 px-4">
+          <div class="font-medium text-slate-800 text-xs">${escapeHtml(req.requestedBy || '-')}</div>
+          <div class="text-[11px] text-slate-400">${req.createdAt || ''}</div>
+        </td>
+        <td class="py-3 px-4 max-w-xs">
+          <p class="text-xs text-slate-600 line-clamp-2" title="${escapeHtml(req.note)}">${escapeHtml(req.note || '-')}</p>
+        </td>
+        <td class="py-3 px-4 text-center">
+          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-800">
+            <i data-lucide="arrow-up" class="w-3 h-3 mr-0.5 text-emerald-600"></i> ${votes.length}
+          </span>
+        </td>
+        <td class="py-3 px-4 text-center whitespace-nowrap min-w-[130px]">
+          <span class="inline-block whitespace-nowrap px-2.5 py-1 rounded-full text-[11px] font-bold border ${st.cls}">
+            ${st.label}
+          </span>
+        </td>
+        <td class="py-3 px-4 text-right whitespace-nowrap">
+          ${adminActionHtml}
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  if (window.lucide) lucide.createIcons();
+}
+
+async function submitBookRequestForm(e) {
+  e.preventDefault();
+  if (!currentUser || !currentToken) {
+    showToast("Kitap talep etmek için lütfen giriş yapınız.", "error");
+    return;
+  }
+
+  const title = document.getElementById('request-title').value;
+  const author = document.getElementById('request-author').value;
+  const category = document.getElementById('request-category').value;
+  const publisher = document.getElementById('request-publisher').value;
+  const isbn = document.getElementById('request-isbn').value;
+  const note = document.getElementById('request-note').value;
+
+  try {
+    const res = await fetch('/api/book-requests', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${currentToken}`
+      },
+      body: JSON.stringify({ title, author, category, publisher, isbn, note })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Talep iletilemedi.');
+
+    closeModal('modal-book-request-add');
+    document.getElementById('form-book-request-add').reset();
+    showToast(data.message || 'Kitap talebiniz başarıyla kaydedildi!', 'success');
+    await fetchData();
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+async function voteBookRequest(id) {
+  if (!currentUser || !currentToken) {
+    showToast("Oy vermek için lütfen giriş yapınız.", "info");
+    openModal('modal-login');
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/book-requests/${id}/vote`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${currentToken}` }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'İşlem başarısız');
+
+    showToast(data.voted ? "Talebe desteğiniz eklendi (+1)!" : "Desteğiniz kaldırıldı.", "success");
+    await fetchData();
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+async function changeBookRequestStatus(id, newStatus) {
+  if (!currentToken || !currentUser || currentUser.role !== 'admin') return;
+
+  try {
+    const res = await fetch(`/api/book-requests/${id}/status`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${currentToken}`
+      },
+      body: JSON.stringify({ status: newStatus })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Güncellenemedi');
+
+    showToast("Talep durumu güncellendi.", "success");
+    await fetchData();
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+async function convertRequestToBook(id) {
+  if (!currentToken || !currentUser || currentUser.role !== 'admin') return;
+
+  const shelf = prompt("Bu eser için raf / yer numarası belirleyiniz:", "SBF-POL-103");
+  if (shelf === null) return;
+
+  try {
+    const res = await fetch(`/api/book-requests/${id}/convert-to-book`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${currentToken}`
+      },
+      body: JSON.stringify({ shelf })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Kütüphaneye aktarılamadı');
+
+    showToast("Eser kütüphane kataloğuna eklendi ve talep karşılandı!", "success");
+    await fetchData();
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+async function deleteBookRequest(id) {
+  if (!currentToken || !currentUser || currentUser.role !== 'admin') return;
+  if (!confirm("Bu kitap talebini silmek istediğinize emin misiniz?")) return;
+
+  try {
+    const res = await fetch(`/api/book-requests/${id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${currentToken}` }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Silinemedi');
+
+    showToast("Talep silindi.", "success");
+    await fetchData();
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+// ================= ÖĞRENCİ YAZISI YORUM SİSTEMİ =================
+
+function renderArticleComments(article) {
+  const container = document.getElementById('read-article-comments-list');
+  const countBadge = document.getElementById('read-article-comments-count');
+  const formBox = document.getElementById('article-comment-form-container');
+  if (!container) return;
+
+  const comments = article.comments || [];
+  if (countBadge) countBadge.textContent = comments.length;
+
+  if (formBox) {
+    if (currentUser) {
+      formBox.innerHTML = `
+        <form id="form-add-article-comment" onsubmit="submitArticleComment(event)" class="space-y-2">
+          <div class="flex items-center justify-between text-xs text-slate-600 font-medium mb-1">
+            <div class="flex items-center space-x-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span><strong>${escapeHtml(currentUser.fullName || currentUser.username)}</strong> olarak yorum yapıyorsun</span>
+            </div>
+            <label class="flex items-center space-x-1.5 text-[11px] text-slate-500 cursor-pointer">
+              <input type="checkbox" id="comment-use-pseudonym" onchange="toggleCommentPseudonymInput()" class="rounded text-indigo-600">
+              <span>Mahlasla Yaz</span>
+            </label>
+          </div>
+          <div id="comment-pseudonym-container" class="hidden mb-1">
+            <input type="text" id="comment-pseudonym" placeholder="Yorumda görünecek takma isim (örn: SBF'li)..." class="w-full text-xs border border-slate-300 rounded p-1.5 bg-slate-50 outline-none focus:border-indigo-500">
+          </div>
+          <div class="relative">
+            <textarea id="article-comment-text" rows="2" required placeholder="Düşünceni, eleştirini veya katkını saygı çerçevesinde paylaş..." class="w-full text-xs p-2.5 rounded-lg border border-slate-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none resize-none bg-white pr-20"></textarea>
+            <button type="submit" class="absolute bottom-2.5 right-2.5 px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-semibold rounded-md shadow-xs transition-colors flex items-center space-x-1">
+              <span>Gönder</span>
+              <i data-lucide="send" class="w-3 h-3"></i>
+            </button>
+          </div>
+        </form>
+      `;
+    } else {
+      formBox.innerHTML = `
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg text-center">
+          <p class="text-xs text-slate-500">Yorum yazmak ve akademik tartışmaya katılmak için <button onclick="closeModal('modal-article-read'); openModal('modal-login');" class="text-indigo-600 font-semibold hover:underline">öğrenci girişi yapın</button>.</p>
+        </div>
+      `;
+    }
+  }
+
+  if (comments.length === 0) {
+    container.innerHTML = `
+      <div class="text-center py-6 text-slate-400">
+        <i data-lucide="message-circle" class="w-6 h-6 mx-auto mb-1 text-slate-300"></i>
+        <p class="text-xs">Henüz yorum yapılmamış. İlk düşünceyi sen paylaş!</p>
+      </div>
+    `;
+    if (window.lucide) lucide.createIcons();
+    return;
+  }
+
+  const isAdmin = currentUser && currentUser.role === 'admin';
+  const currentUserId = currentUser ? (currentUser.studentNumber || currentUser.username) : null;
+
+  container.innerHTML = comments.map(c => {
+    const isCommentAuthor = currentUserId && (currentUserId === c.authorStudentNumber);
+    const canDelete = isAdmin || isCommentAuthor;
+
+    const deleteBtn = canDelete ? `
+      <button onclick="deleteArticleComment('${article.id}', '${c.id}')" title="Yorumu Sil" class="text-slate-400 hover:text-rose-600 p-1 rounded transition-colors">
+        <i data-lucide="trash-2" class="w-3 h-3"></i>
+      </button>
+    ` : '';
+
+    return `
+      <div class="p-3 rounded-lg bg-slate-50 border border-slate-100 flex flex-col space-y-1 text-xs">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <span class="font-bold text-slate-800 text-xs">${escapeHtml(c.authorName)}</span>
+            <span class="text-[10px] text-slate-400 font-normal">• ${escapeHtml(c.authorDepartment || 'SBF')}</span>
+          </div>
+          <div class="flex items-center space-x-1.5">
+            <span class="text-[10px] text-slate-400">${c.createdAt || ''}</span>
+            ${deleteBtn}
+          </div>
+        </div>
+        <p class="text-slate-700 text-xs leading-relaxed mt-1 break-words">${escapeHtml(c.text)}</p>
+      </div>
+    `;
+  }).join('');
+
+  if (window.lucide) lucide.createIcons();
+}
+
+async function submitArticleComment(e) {
+  e.preventDefault();
+  if (!currentUser || !currentToken) {
+    showToast("Yorum yapmak için lütfen giriş yapınız.", "error");
+    return;
+  }
+  if (!activeArticleId) return;
+
+  const textarea = document.getElementById('article-comment-text');
+  if (!textarea) return;
+  const text = textarea.value.trim();
+  if (text.length < 2) {
+    showToast("Yorum en az 2 karakter olmalıdır.", "error");
+    return;
+  }
+
+  const usePseudonym = document.getElementById('comment-use-pseudonym') ? document.getElementById('comment-use-pseudonym').checked : false;
+  const pseudonym = document.getElementById('comment-pseudonym') ? document.getElementById('comment-pseudonym').value.trim() : '';
+
+  try {
+    const res = await fetch(`/api/articles/${activeArticleId}/comments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${currentToken}`
+      },
+      body: JSON.stringify({ text, usePseudonym, pseudonym })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Yorum gönderilemedi.');
+
+    showToast("Yorumunuz eklendi!", "success");
+    textarea.value = '';
+    if (document.getElementById('comment-use-pseudonym')) document.getElementById('comment-use-pseudonym').checked = false;
+    if (document.getElementById('comment-pseudonym-container')) document.getElementById('comment-pseudonym-container').classList.add('hidden');
+
+    const article = (libraryData.articles || []).find(a => a.id === activeArticleId);
+    if (article) {
+      if (!article.comments) article.comments = [];
+      article.comments.push(data.comment);
+      renderArticleComments(article);
+      renderArticles();
+    }
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+function toggleCommentPseudonymInput() {
+  const cb = document.getElementById('comment-use-pseudonym');
+  const box = document.getElementById('comment-pseudonym-container');
+  if (cb && box) {
+    if (cb.checked) box.classList.remove('hidden');
+    else box.classList.add('hidden');
+  }
+}
+
+async function deleteArticleComment(articleId, commentId) {
+  if (!confirm("Bu yorumu silmek istediğinize emin misiniz?")) return;
+  if (!currentToken) return;
+
+  try {
+    const res = await fetch(`/api/articles/${articleId}/comments/${commentId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${currentToken}`
+      }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Yorum silinemedi.');
+
+    showToast("Yorum silindi.", "success");
+    const article = (libraryData.articles || []).find(a => a.id === articleId);
+    if (article && article.comments) {
+      article.comments = article.comments.filter(c => c.id !== commentId);
+      renderArticleComments(article);
+      renderArticles();
+    }
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+// ================= SINAV NOTLARI & DERS KAYNAK HAVUZU =================
+
+let activeExamNoteId = null;
+
+function handleNewExamNoteBtnClick() {
+  if (!currentUser) {
+    showToast("Ders notu paylaşmak için lütfen öğrenci girişi yapınız.", "info");
+    openModal('modal-login');
+    return;
+  }
+  openModal('modal-exam-note-add');
+}
+
+function toggleNotePseudonymInput() {
+  const cb = document.getElementById('note-use-pseudonym');
+  const box = document.getElementById('note-pseudonym-container');
+  if (cb && box) {
+    if (cb.checked) box.classList.remove('hidden');
+    else box.classList.add('hidden');
+  }
+}
+
+function filterExamNotes() {
+  renderExamNotes();
+}
+
+function renderExamNotes() {
+  const grid = document.getElementById('examNotesGrid');
+  const statCount = document.getElementById('stat-total-notes-count');
+  if (!grid) return;
+
+  const notes = libraryData.examNotes || [];
+  if (statCount) statCount.textContent = notes.length;
+
+  const deptFilter = document.getElementById('examNoteDeptFilter')?.value || 'all';
+  const typeFilter = document.getElementById('examNoteTypeFilter')?.value || 'all';
+  const semFilter = document.getElementById('examNoteSemesterFilter')?.value || 'all';
+  const search = (document.getElementById('examNoteSearchInput')?.value || '').trim().toLowerCase();
+
+  const typeConfig = {
+    'Vize Özeti': { bg: 'bg-emerald-100 text-emerald-800 border-emerald-200' },
+    'Final Özeti': { bg: 'bg-indigo-100 text-indigo-800 border-indigo-200' },
+    'Çıkmış Sorular': { bg: 'bg-amber-100 text-amber-800 border-amber-200' },
+    'Ders Notu': { bg: 'bg-blue-100 text-blue-800 border-blue-200' },
+    'Okuma Listesi': { bg: 'bg-purple-100 text-purple-800 border-purple-200' }
+  };
+
+  const filtered = notes.filter(n => {
+    if (deptFilter !== 'all' && n.department && !n.department.includes(deptFilter)) return false;
+    if (typeFilter !== 'all' && n.type !== typeFilter) return false;
+    if (semFilter !== 'all' && n.semester && !n.semester.includes(semFilter)) return false;
+    if (search) {
+      const matchTitle = (n.title || '').toLowerCase().includes(search);
+      const matchCourse = (n.courseName || '').toLowerCase().includes(search);
+      const matchCode = (n.courseCode || '').toLowerCase().includes(search);
+      const matchInst = (n.instructor || '').toLowerCase().includes(search);
+      const matchAuthor = (n.authorName || '').toLowerCase().includes(search);
+      if (!matchTitle && !matchCourse && !matchCode && !matchInst && !matchAuthor) return false;
+    }
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `
+      <div class="col-span-full py-16 text-center text-slate-400 bg-white rounded-2xl border border-slate-200">
+        <i data-lucide="book-open" class="w-10 h-10 mx-auto mb-2 text-slate-300"></i>
+        <h4 class="text-sm font-bold text-slate-700">Aradığınız kriterde ders notu bulunamadı</h4>
+        <p class="text-xs text-slate-400 mt-1 max-w-md mx-auto">
+          İlk notu sen paylaşarak arkadaşlarına yardımcı olabilir ve Not Kahramanı rozetini kapabilirsin!
+        </p>
+      </div>
+    `;
+    if (window.lucide) lucide.createIcons();
+    return;
+  }
+
+  const isAdmin = currentUser && currentUser.role === 'admin';
+  const currentUserId = currentUser ? (currentUser.studentNumber || currentUser.username) : null;
+
+  grid.innerHTML = filtered.map(n => {
+    const isAuthor = currentUserId && (currentUserId === n.authorStudentNumber);
+    const tc = typeConfig[n.type] || { bg: 'bg-slate-100 text-slate-800 border-slate-200' };
+    const helpfulUsers = n.helpfulUsers || [];
+    const hasVoted = currentUserId && helpfulUsers.includes(currentUserId);
+    const helpfulBtnCls = hasVoted ? 'bg-emerald-600 text-white font-bold' : 'bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 border border-slate-200';
+
+    const deleteBtn = (isAdmin || isAuthor) ? `
+      <button onclick="deleteExamNote('${n.id}', event)" title="Notu Sil" class="text-slate-400 hover:text-rose-600 transition-colors p-1">
+        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+      </button>
+    ` : '';
+
+    const driveBtn = n.driveUrl ? `
+      <a href="${escapeHtml(n.driveUrl)}" target="_blank" rel="noopener noreferrer" onclick="trackNoteDownload('${n.id}', event)" class="p-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-semibold flex items-center space-x-1 border border-emerald-200" title="Buluttan İndir / Aç">
+        <i data-lucide="download" class="w-3.5 h-3.5"></i>
+      </a>
+    ` : '';
+
+    return `
+      <div onclick="openReadExamNoteModal('${n.id}')" class="bg-white rounded-xl shadow-xs hover:shadow-md transition-all duration-200 border border-slate-200 p-5 flex flex-col justify-between cursor-pointer group hover:border-emerald-300">
+        <div>
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <div class="flex items-center space-x-1.5">
+              <span class="px-2.5 py-0.5 text-[10px] font-bold rounded-full border ${tc.bg}">
+                ${escapeHtml(n.type || 'Ders Notu')}
+              </span>
+              ${n.courseCode ? `<span class="px-2 py-0.5 text-[10px] font-mono font-bold bg-slate-100 text-slate-600 rounded">${escapeHtml(n.courseCode)}</span>` : ''}
+            </div>
+            ${deleteBtn}
+          </div>
+
+          <h3 class="text-base font-bold text-slate-900 group-hover:text-emerald-900 transition-colors leading-snug line-clamp-2">
+            ${escapeHtml(n.title)}
+          </h3>
+
+          <div class="mt-2 space-y-1 text-xs text-slate-600">
+            <div class="flex items-center space-x-1.5 font-medium text-slate-800">
+              <i data-lucide="book" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
+              <span class="truncate">${escapeHtml(n.courseName)}</span>
+            </div>
+            ${n.instructor ? `
+              <div class="flex items-center space-x-1.5 text-slate-500">
+                <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
+                <span class="truncate">${escapeHtml(n.instructor)}</span>
+              </div>
+            ` : ''}
+          </div>
+
+          <p class="text-xs text-slate-500 mt-2.5 line-clamp-2 leading-relaxed">
+            ${escapeHtml(n.description || n.content.slice(0, 120))}
+          </p>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+          <div class="flex items-center space-x-1.5 truncate max-w-[150px]">
+            <i data-lucide="user" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
+            <span class="font-medium text-slate-700 truncate">${escapeHtml(n.authorName)}</span>
+          </div>
+
+          <div class="flex items-center space-x-2 shrink-0">
+            <button onclick="voteExamNoteHelpful('${n.id}', event)" class="px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center space-x-1 transition-all ${helpfulBtnCls}" title="Faydalı Buldum">
+              <i data-lucide="thumbs-up" class="w-3 h-3"></i>
+              <span>${n.helpfulCount || 0}</span>
+            </button>
+            ${driveBtn}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  if (window.lucide) lucide.createIcons();
+}
+
+function openReadExamNoteModal(id) {
+  const note = (libraryData.examNotes || []).find(n => n.id === id);
+  if (!note) return;
+
+  activeExamNoteId = id;
+
+  document.getElementById('read-note-title').textContent = note.title;
+  document.getElementById('read-note-type-badge').textContent = note.type || 'Ders Notu';
+  document.getElementById('read-note-course-code').textContent = note.courseCode || 'SBF';
+  document.getElementById('read-note-course-name').textContent = note.courseName;
+  document.getElementById('read-note-instructor').textContent = note.instructor || 'Öğretim Üyesi';
+  document.getElementById('read-note-department').textContent = note.department || 'SBF';
+  document.getElementById('read-note-author').textContent = note.authorName;
+
+  const descBox = document.getElementById('read-note-description-box');
+  const descText = document.getElementById('read-note-description');
+  if (note.description) {
+    descBox.classList.remove('hidden');
+    descText.textContent = note.description;
+  } else {
+    descBox.classList.add('hidden');
+  }
+
+  const contentContainer = document.getElementById('read-note-content-container');
+  const contentEl = document.getElementById('read-note-content');
+  if (note.content && note.content.trim().length > 0) {
+    contentContainer.classList.remove('hidden');
+    contentEl.textContent = note.content;
+  } else {
+    contentContainer.classList.add('hidden');
+  }
+
+  const driveBox = document.getElementById('read-note-download-box');
+  const driveLink = document.getElementById('read-note-drive-link');
+  if (note.driveUrl) {
+    driveBox.classList.remove('hidden');
+    driveLink.href = note.driveUrl;
+  } else {
+    driveBox.classList.add('hidden');
+  }
+
+  updateExamNoteHelpfulButtonUI(note);
+
+  const isAdmin = currentUser && currentUser.role === 'admin';
+  const isAuthor = currentUser && (currentUser.studentNumber === note.authorStudentNumber || currentUser.username === note.authorStudentNumber);
+  const actionsEl = document.getElementById('read-note-actions');
+
+  let delBtn = '';
+  if (isAdmin || isAuthor) {
+    delBtn = `<button onclick="deleteExamNote('${note.id}'); closeModal('modal-exam-note-read');" class="px-3 py-1.5 bg-slate-200 hover:bg-rose-100 hover:text-rose-700 text-slate-700 rounded-lg text-xs font-semibold">Sil</button>`;
+  }
+  actionsEl.innerHTML = delBtn + `<button onclick="closeModal('modal-exam-note-read')" class="px-4 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100">Kapat</button>`;
+
+  openModal('modal-exam-note-read');
+  if (window.lucide) lucide.createIcons();
+}
+
+function updateExamNoteHelpfulButtonUI(note) {
+  const btn = document.getElementById('btn-read-note-helpful');
+  const txt = document.getElementById('read-note-helpful-text');
+  if (!btn || !txt) return;
+
+  const helpfulUsers = note.helpfulUsers || [];
+  const currentUserId = currentUser ? (currentUser.studentNumber || currentUser.username) : null;
+  const isHelpful = currentUserId && helpfulUsers.includes(currentUserId);
+
+  txt.textContent = `${note.helpfulCount || 0} Faydalı`;
+  if (isHelpful) {
+    btn.className = "px-3.5 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-bold transition-all flex items-center shadow-xs";
+  } else {
+    btn.className = "px-3.5 py-1.5 bg-white border border-slate-300 text-slate-700 hover:border-emerald-500 hover:text-emerald-700 rounded-lg text-xs font-semibold transition-all flex items-center shadow-xs";
+  }
+}
+
+async function voteActiveExamNoteHelpful() {
+  if (!activeExamNoteId) return;
+  await voteExamNoteHelpful(activeExamNoteId);
+  const note = (libraryData.examNotes || []).find(n => n.id === activeExamNoteId);
+  if (note) updateExamNoteHelpfulButtonUI(note);
+}
+
+async function voteExamNoteHelpful(id, event) {
+  if (event) event.stopPropagation();
+  if (!currentUser || !currentToken) {
+    showToast("Faydalı olarak işaretlemek için lütfen giriş yapınız.", "info");
+    openModal('modal-login');
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/exam-notes/${id}/helpful`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${currentToken}` }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'İşlem başarısız');
+
+    const note = (libraryData.examNotes || []).find(n => n.id === id);
+    if (note) {
+      const userIdentifier = currentUser.studentNumber || currentUser.username;
+      if (!note.helpfulUsers) note.helpfulUsers = [];
+      if (data.voted) {
+        if (!note.helpfulUsers.includes(userIdentifier)) note.helpfulUsers.push(userIdentifier);
+      } else {
+        note.helpfulUsers = note.helpfulUsers.filter(u => u !== userIdentifier);
+      }
+      note.helpfulCount = data.helpfulCount;
+      renderExamNotes();
+    }
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+function trackNoteDownload(id, event) {
+  if (event) event.stopPropagation();
+  fetch(`/api/exam-notes/${id}/download`, { method: 'POST' }).catch(() => {});
+}
+
+async function submitExamNoteForm(e) {
+  e.preventDefault();
+  if (!currentUser || !currentToken) {
+    showToast("Ders notu paylaşmak için lütfen giriş yapınız.", "error");
+    return;
+  }
+
+  const title = document.getElementById('note-title').value;
+  const courseName = document.getElementById('note-course-name').value;
+  const courseCode = document.getElementById('note-course-code').value;
+  const instructor = document.getElementById('note-instructor').value;
+  const department = document.getElementById('note-department').value;
+  const type = document.getElementById('note-type').value;
+  const description = document.getElementById('note-description').value;
+  const content = document.getElementById('note-content').value;
+  const driveUrl = document.getElementById('note-drive-url').value;
+  const usePseudonym = document.getElementById('note-use-pseudonym') ? document.getElementById('note-use-pseudonym').checked : false;
+  const pseudonym = document.getElementById('note-pseudonym') ? document.getElementById('note-pseudonym').value.trim() : '';
+
+  if ((!content || content.trim().length === 0) && (!driveUrl || driveUrl.trim().length === 0)) {
+    showToast("Lütfen ya not özeti metni giriniz ya da bulut indirme linki ekleyiniz.", "error");
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/exam-notes', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${currentToken}`
+      },
+      body: JSON.stringify({
+        title, courseName, courseCode, instructor, department,
+        type, description, content, driveUrl, usePseudonym, pseudonym
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Ders notu kaydedilemedi.');
+
+    closeModal('modal-exam-note-add');
+    document.getElementById('form-exam-note-add').reset();
+    if (document.getElementById('note-use-pseudonym')) document.getElementById('note-use-pseudonym').checked = false;
+    if (document.getElementById('note-pseudonym-container')) document.getElementById('note-pseudonym-container').classList.add('hidden');
+
+    showToast(data.message || 'Ders notunuz başarıyla paylaşıldı!', 'success');
+    await fetchData();
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+async function deleteExamNote(id, event) {
+  if (event) event.stopPropagation();
+  if (!confirm("Bu ders notunu silmek istediğinize emin misiniz?")) return;
+  if (!currentToken) return;
+
+  try {
+    const res = await fetch(`/api/exam-notes/${id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${currentToken}` }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Silinemedi');
+
+    showToast("Ders notu silindi.", "success");
+    await fetchData();
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+// ================= ÖĞRENCİ BAŞARI ROZETLERİ (GAMIFICATION) =================
+
+function openUserProfileModal() {
+  if (!currentUser) {
+    openModal('modal-login');
+    return;
+  }
+
+  document.getElementById('profile-full-name').textContent = currentUser.fullName || currentUser.username;
+  document.getElementById('profile-department').textContent = currentUser.department || 'Marmara SBF';
+
+  const userIdentifier = currentUser.studentNumber || currentUser.username;
+
+  // İstatistikleri Hesapla
+  const loansCount = (libraryData.loans || []).filter(l => l.memberNumber === userIdentifier).length;
+  const articles = (libraryData.articles || []).filter(a => a.authorStudentNumber === userIdentifier);
+  const articlesCount = articles.filter(a => a.status === 'published').length;
+  const notes = (libraryData.examNotes || []).filter(n => n.authorStudentNumber === userIdentifier);
+  const notesCount = notes.length;
+  const totalLikes = articles.reduce((sum, a) => sum + (a.likes || []).length, 0);
+  const helpfulNotesCount = notes.reduce((sum, n) => sum + (n.helpfulCount || 0), 0);
+  const acquiredRequests = (libraryData.bookRequests || []).filter(r => r.studentNumber === userIdentifier && r.status === 'acquired').length;
+
+  document.getElementById('profile-stat-loans').textContent = loansCount;
+  document.getElementById('profile-stat-articles').textContent = articlesCount;
+  document.getElementById('profile-stat-notes').textContent = notesCount;
+
+  // Rozet Listesi Tanımı
+  const badges = [
+    {
+      id: 'badge-explorer',
+      title: 'Kütüphane Kaşifi',
+      icon: 'compass',
+      desc: 'Marmara SBF kütüphane topluluğunun doğrulanmış üyesi.',
+      earned: true,
+      color: 'amber'
+    },
+    {
+      id: 'badge-bookworm',
+      title: 'Kitap Kurdu',
+      icon: 'book-open',
+      desc: 'Kütüphaneden en az 2 kitap ödünç alıp okuyan öğrenci.',
+      earned: loansCount >= 2,
+      color: 'blue'
+    },
+    {
+      id: 'badge-young-author',
+      title: 'Genç Kalem',
+      icon: 'feather',
+      desc: 'Düşünce kürsüsünde en az 1 orijinal yazısı yayınlanan yazar.',
+      earned: articlesCount >= 1,
+      color: 'indigo'
+    },
+    {
+      id: 'badge-idea-architect',
+      title: 'Fikir Mimarı',
+      icon: 'lightbulb',
+      desc: 'Yazıları ve düşünceleri 3+ arkadaşı tarafından beğenilen düşünür.',
+      earned: totalLikes >= 3,
+      color: 'rose'
+    },
+    {
+      id: 'badge-note-hero',
+      title: 'Not Kahramanı',
+      icon: 'graduation-cap',
+      desc: 'Ders notu paylaşarak en az 5 öğrenciye sınav öncesi ışık tutan dayanışmacı.',
+      earned: (notesCount >= 1 && helpfulNotesCount >= 5),
+      color: 'emerald'
+    },
+    {
+      id: 'badge-curator',
+      title: 'Kürsü Küratörü',
+      icon: 'bookmark-check',
+      desc: 'Önerdiği kitap kütüphane veya kulüp arşivine kazandırılan vizyoner.',
+      earned: acquiredRequests >= 1,
+      color: 'purple'
+    }
+  ];
+
+  const earnedCount = badges.filter(b => b.earned).length;
+  document.getElementById('profile-badge-summary').textContent = `${earnedCount} / ${badges.length} Rozet Açık`;
+
+  const grid = document.getElementById('profile-badges-grid');
+  grid.innerHTML = badges.map(b => {
+    if (b.earned) {
+      return `
+        <div class="p-3 rounded-xl bg-gradient-to-br from-white to-slate-50 border border-slate-200 shadow-2xs flex items-start space-x-2.5">
+          <div class="w-8 h-8 rounded-lg bg-${b.color}-100 text-${b.color}-700 flex items-center justify-center shrink-0 shadow-2xs">
+            <i data-lucide="${b.icon}" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <div class="flex items-center space-x-1">
+              <span class="text-xs font-bold text-slate-800">${escapeHtml(b.title)}</span>
+              <i data-lucide="check" class="w-3 h-3 text-emerald-600"></i>
+            </div>
+            <p class="text-[10px] text-slate-500 mt-0.5 leading-snug">${escapeHtml(b.desc)}</p>
+          </div>
+        </div>
+      `;
+    } else {
+      return `
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/60 opacity-60 flex items-start space-x-2.5">
+          <div class="w-8 h-8 rounded-lg bg-slate-200 text-slate-400 flex items-center justify-center shrink-0">
+            <i data-lucide="lock" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <div class="flex items-center space-x-1">
+              <span class="text-xs font-bold text-slate-600">${escapeHtml(b.title)}</span>
+            </div>
+            <p class="text-[10px] text-slate-400 mt-0.5 leading-snug">${escapeHtml(b.desc)}</p>
+          </div>
+        </div>
+      `;
+    }
+  }).join('');
+
+  openModal('modal-user-profile');
+  if (window.lucide) lucide.createIcons();
+}
+
+
+

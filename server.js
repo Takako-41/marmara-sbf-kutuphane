@@ -44,21 +44,37 @@ function requireAdmin(req, res, next) {
   next();
 }
 
+function requireAuth(req, res, next) {
+  const user = getSessionUser(req);
+  if (!user) {
+    return res.status(401).json({ error: 'Bu işlem için sisteme giriş yapmanız gereklidir.' });
+  }
+  req.currentUser = user;
+  next();
+}
+
 // Yardımcı: Veritabanı Oku / Yaz
 function readDatabase() {
   try {
     if (!fs.existsSync(DATA_FILE)) {
-      const initial = { settings: {}, users: [], books: [], members: [], loans: [] };
+      const initial = { settings: {}, users: [], books: [], members: [], loans: [], articles: [], bookRequests: [] };
       fs.writeFileSync(DATA_FILE, JSON.stringify(initial, null, 2), 'utf8');
       return initial;
     }
     const data = fs.readFileSync(DATA_FILE, 'utf8');
     const parsed = JSON.parse(data);
     if (!parsed.users) parsed.users = [];
+    if (!parsed.books) parsed.books = [];
+    if (!parsed.members) parsed.members = [];
+    if (!parsed.loans) parsed.loans = [];
+    if (!parsed.articles) parsed.articles = [];
+    if (!parsed.bookRequests) parsed.bookRequests = [];
+    if (!parsed.examNotes) parsed.examNotes = [];
+    if (!parsed.monthlyTopic) parsed.monthlyTopic = null;
     return parsed;
   } catch (err) {
     console.error('Veritabanı okuma hatası:', err);
-    return { settings: {}, users: [], books: [], members: [], loans: [] };
+    return { settings: {}, users: [], books: [], members: [], loans: [], articles: [], bookRequests: [], examNotes: [], monthlyTopic: null };
   }
 }
 
@@ -213,11 +229,20 @@ app.get('/api/data', (req, res) => {
       studentLoans = db.loans.filter(l => l.memberNumber === user.studentNumber);
     }
 
+    // Makaleler: Herkes yayındakileri görür. Öğrenci kendi bekleyen/reddedilen yazılarını da görür.
+    const visibleArticles = db.articles.filter(a => 
+      a.status === 'published' || (user && a.authorStudentNumber === user.studentNumber)
+    );
+
     return res.json({
       settings: db.settings,
       books: db.books,
       members: [], // Öğrenci ve yabancılar asla diğer üyeleri göremez!
       loans: studentLoans,
+      articles: visibleArticles,
+      bookRequests: db.bookRequests || [],
+      examNotes: db.examNotes || [],
+      monthlyTopic: db.monthlyTopic || null,
       user: user || null
     });
   }
@@ -229,6 +254,11 @@ app.get('/api/data', (req, res) => {
     members: db.members,
     loans: db.loans,
     pendingMembers: db.members.filter(m => m.status === 'pending'),
+    articles: db.articles || [],
+    pendingArticles: (db.articles || []).filter(a => a.status === 'pending'),
+    bookRequests: db.bookRequests || [],
+    examNotes: db.examNotes || [],
+    monthlyTopic: db.monthlyTopic || null,
     user
   });
 });
@@ -455,6 +485,467 @@ app.get('/api/backup', requireAdmin, (req, res) => {
   res.setHeader('Content-disposition', 'attachment; filename=marmara_sbf_kutuphane_yedek.json');
   res.setHeader('Content-type', 'application/json');
   res.send(JSON.stringify(db, null, 2));
+});
+
+// ================= KULÜP YAZILARI & MAKALE API =================
+
+// Tüm Makaleleri Getir
+app.get('/api/articles', (req, res) => {
+  const db = readDatabase();
+  const user = getSessionUser(req);
+  if (user && user.role === 'admin') {
+    return res.json(db.articles || []);
+  }
+  // Misafir veya öğrenci: Yayında olanlar + kendi yazıları
+  const visible = (db.articles || []).filter(a => 
+    a.status === 'published' || (user && a.authorStudentNumber === user.studentNumber)
+  );
+  res.json(visible);
+});
+
+// Yeni Makale Gönder (Giriş Yapmış Öğrenci veya Admin)
+app.post('/api/articles', requireAuth, (req, res) => {
+  const db = readDatabase();
+  const { title, category, summary, content, usePseudonym, pseudonym } = req.body;
+  const user = req.currentUser;
+
+  if (!title || !content) {
+    return res.status(400).json({ error: 'Başlık ve yazı metni zorunludur.' });
+  }
+
+  const cleanTitle = title.trim();
+  const cleanContent = content.trim();
+
+  // Spam ve Gereksiz İçerik Filtresi: Karakter / uzunluk kontrolü
+  if (cleanTitle.length < 5) {
+    return res.status(400).json({ error: 'Yazı başlığı en az 5 karakter olmalıdır.' });
+  }
+  if (cleanContent.length < 50) {
+    return res.status(400).json({ error: 'Yazı metni çok kısa. Akademik ve kulüp içeriği ciddiyeti için en az 50 karakter olmalıdır.' });
+  }
+
+  // Öğrenci için spam sınırı: Onay bekleyen en fazla 3 yazısı olabilir
+  if (user.role !== 'admin') {
+    const pendingCount = (db.articles || []).filter(a => 
+      a.authorStudentNumber === user.studentNumber && a.status === 'pending'
+    ).length;
+    if (pendingCount >= 3) {
+      return res.status(400).json({ 
+        error: 'Şu anda editör onayında bekleyen 3 yazınız var. Yenisini eklemek için lütfen mevcutların değerlendirilmesini bekleyiniz.' 
+      });
+    }
+  }
+
+  const cleanPseudonym = (usePseudonym && pseudonym && pseudonym.trim().length > 0) ? pseudonym.trim() : null;
+  const authorDisplayName = cleanPseudonym || user.fullName;
+
+  const newArticle = {
+    id: 'art_' + crypto.randomUUID().slice(0, 8),
+    title: cleanTitle,
+    category: category ? category.trim() : 'Genel',
+    summary: summary && summary.trim().length > 0 ? summary.trim() : cleanContent.slice(0, 160) + '...',
+    content: cleanContent,
+    authorName: authorDisplayName,
+    authorStudentNumber: user.studentNumber || user.username,
+    authorDepartment: user.department || 'Siyasal Bilgiler',
+    isPseudonym: !!cleanPseudonym,
+    pseudonym: cleanPseudonym,
+    realAuthorName: user.fullName,
+    status: user.role === 'admin' ? 'published' : 'pending', // Admin yazısı anında yayında, öğrenci yazısı editör masasında
+    rejectionReason: null,
+    likes: [],
+    comments: [],
+    readCount: 0,
+    createdAt: new Date().toISOString()
+  };
+
+  if (!db.articles) db.articles = [];
+  db.articles.unshift(newArticle);
+  writeDatabase(db);
+
+  const message = user.role === 'admin' 
+    ? 'Yazı doğrudan yayına alındı.' 
+    : 'Yazınız başarıyla gönderildi! Kulüp editör masası onayından sonra herkes tarafından okunabilecektir.';
+
+  res.status(201).json({ success: true, message, article: newArticle });
+});
+
+// Makale Okunma Sayacı Arttır
+app.post('/api/articles/:id/view', (req, res) => {
+  const db = readDatabase();
+  const article = (db.articles || []).find(a => a.id === req.params.id);
+  if (!article) return res.status(404).json({ error: 'Yazı bulunamadı.' });
+
+  article.readCount = (article.readCount || 0) + 1;
+  writeDatabase(db);
+  res.json({ success: true, readCount: article.readCount });
+});
+
+// Makale Beğen / Beğeniyi Kaldır
+app.post('/api/articles/:id/like', requireAuth, (req, res) => {
+  const db = readDatabase();
+  const article = (db.articles || []).find(a => a.id === req.params.id);
+  if (!article) return res.status(404).json({ error: 'Yazı bulunamadı.' });
+
+  if (!Array.isArray(article.likes)) article.likes = [];
+  const userIdentifier = req.currentUser.studentNumber || req.currentUser.username;
+  const index = article.likes.indexOf(userIdentifier);
+
+  let liked = false;
+  if (index === -1) {
+    article.likes.push(userIdentifier);
+    liked = true;
+  } else {
+    article.likes.splice(index, 1);
+    liked = false;
+  }
+
+  writeDatabase(db);
+  res.json({ success: true, liked, likesCount: article.likes.length });
+});
+
+// Makale Onayla (SADECE ADMİN)
+app.post('/api/articles/:id/approve', requireAdmin, (req, res) => {
+  const db = readDatabase();
+  const article = (db.articles || []).find(a => a.id === req.params.id);
+  if (!article) return res.status(404).json({ error: 'Yazı bulunamadı.' });
+
+  article.status = 'published';
+  article.rejectionReason = null;
+  writeDatabase(db);
+  res.json({ success: true, article });
+});
+
+// Makale Reddet (SADECE ADMİN)
+app.post('/api/articles/:id/reject', requireAdmin, (req, res) => {
+  const db = readDatabase();
+  const article = (db.articles || []).find(a => a.id === req.params.id);
+  if (!article) return res.status(404).json({ error: 'Yazı bulunamadı.' });
+
+  const { reason } = req.body;
+  article.status = 'rejected';
+  article.rejectionReason = reason ? reason.trim() : 'Kulüp yayın ilkelerine uygun bulunmadı.';
+  writeDatabase(db);
+  res.json({ success: true, article });
+});
+
+// Makale Sil (Admin veya Yazarın Kendisi)
+app.delete('/api/articles/:id', requireAuth, (req, res) => {
+  const db = readDatabase();
+  const article = (db.articles || []).find(a => a.id === req.params.id);
+  if (!article) return res.status(404).json({ error: 'Yazı bulunamadı.' });
+
+  const user = req.currentUser;
+  const isAuthor = (user.studentNumber && article.authorStudentNumber === user.studentNumber) || 
+                   (article.authorStudentNumber === user.username);
+
+  if (user.role !== 'admin' && !isAuthor) {
+    return res.status(403).json({ error: 'Yalnızca kendi yazınızı silebilirsiniz.' });
+  }
+
+  db.articles = db.articles.filter(a => a.id !== req.params.id);
+  writeDatabase(db);
+  res.json({ success: true });
+});
+
+// Makaleye Yorum Ekle (Giriş Yapmış Öğrenci veya Admin)
+app.post('/api/articles/:id/comments', requireAuth, (req, res) => {
+  const db = readDatabase();
+  const article = (db.articles || []).find(a => a.id === req.params.id);
+  if (!article) return res.status(404).json({ error: 'Yazı bulunamadı.' });
+
+  const { text, usePseudonym, pseudonym } = req.body;
+  if (!text || text.trim().length < 2) {
+    return res.status(400).json({ error: 'Yorum metni en az 2 karakter olmalıdır.' });
+  }
+
+  const user = req.currentUser;
+  const cleanPseudonym = (usePseudonym && pseudonym && pseudonym.trim().length > 0) ? pseudonym.trim() : null;
+  const authorDisplayName = cleanPseudonym || user.fullName;
+
+  const newComment = {
+    id: 'c_' + crypto.randomUUID().slice(0, 8),
+    authorName: authorDisplayName,
+    authorStudentNumber: user.studentNumber || user.username,
+    authorDepartment: user.department || 'Siyasal Bilgiler',
+    isPseudonym: !!cleanPseudonym,
+    pseudonym: cleanPseudonym,
+    realAuthorName: user.fullName,
+    text: text.trim(),
+    createdAt: new Date().toISOString()
+  };
+
+  if (!Array.isArray(article.comments)) article.comments = [];
+  article.comments.push(newComment);
+  writeDatabase(db);
+
+  res.status(201).json({ success: true, comment: newComment, commentsCount: article.comments.length });
+});
+
+// Makale Yorumunu Sil (Admin veya Yorum Sahibi)
+app.delete('/api/articles/:id/comments/:commentId', requireAuth, (req, res) => {
+  const db = readDatabase();
+  const article = (db.articles || []).find(a => a.id === req.params.id);
+  if (!article) return res.status(404).json({ error: 'Yazı bulunamadı.' });
+
+  if (!Array.isArray(article.comments)) article.comments = [];
+  const commentIndex = article.comments.findIndex(c => c.id === req.params.commentId);
+  if (commentIndex === -1) return res.status(404).json({ error: 'Yorum bulunamadı.' });
+
+  const comment = article.comments[commentIndex];
+  const user = req.currentUser;
+  const isAuthor = (user.studentNumber && comment.authorStudentNumber === user.studentNumber) ||
+                   (comment.authorStudentNumber === user.username);
+
+  if (user.role !== 'admin' && !isAuthor) {
+    return res.status(403).json({ error: 'Yalnızca kendi yorumunuzu silebilirsiniz.' });
+  }
+
+  article.comments.splice(commentIndex, 1);
+  writeDatabase(db);
+  res.json({ success: true });
+});
+
+// ================= İSTEK KİTAP API =================
+
+// İstek Kitapları Getir (Herkese Açık)
+app.get('/api/book-requests', (req, res) => {
+  const db = readDatabase();
+  res.json(db.bookRequests || []);
+});
+
+// Yeni İstek Kitap Ekle (Giriş Yapmış Öğrenci veya Admin)
+app.post('/api/book-requests', requireAuth, (req, res) => {
+  const db = readDatabase();
+  const { title, author, publisher, isbn, category, note } = req.body;
+  const user = req.currentUser;
+
+  if (!title || !author) {
+    return res.status(400).json({ error: 'Kitap adı ve yazar bilgisi zorunludur.' });
+  }
+
+  // Zaten kütüphanede var mı kontrolü
+  const alreadyInLibrary = (db.books || []).some(b => 
+    b.title.toLowerCase().trim() === title.toLowerCase().trim()
+  );
+  if (alreadyInLibrary) {
+    return res.status(400).json({ error: 'Bu eser zaten kütüphane kataloğumuzda mevcuttur! Katalog sekmesinden kontrol edebilirsiniz.' });
+  }
+
+  const userId = user.studentNumber || user.username;
+  const newRequest = {
+    id: 'req_' + crypto.randomUUID().slice(0, 8),
+    title: title.trim(),
+    author: author.trim(),
+    publisher: publisher ? publisher.trim() : '',
+    isbn: isbn ? isbn.trim() : '',
+    category: category ? category.trim() : 'Genel',
+    requestedBy: user.fullName,
+    studentNumber: userId,
+    note: note ? note.trim() : '',
+    votes: [userId], // İsteyen kişi otomatik destekler
+    status: 'pending', // pending (İnceleniyor), approved (Temin Ediliyor), acquired (Kütüphanede), rejected (Temin Edilemedi)
+    createdAt: new Date().toISOString().split('T')[0]
+  };
+
+  if (!db.bookRequests) db.bookRequests = [];
+  db.bookRequests.unshift(newRequest);
+  writeDatabase(db);
+
+  res.status(201).json({ success: true, message: 'Kitap isteğiniz başarıyla kaydedildi.', request: newRequest });
+});
+
+// İstek Kitaba Oy Ver / Desteği Kaldır
+app.post('/api/book-requests/:id/vote', requireAuth, (req, res) => {
+  const db = readDatabase();
+  const request = (db.bookRequests || []).find(r => r.id === req.params.id);
+  if (!request) return res.status(404).json({ error: 'İstek kaydı bulunamadı.' });
+
+  if (!Array.isArray(request.votes)) request.votes = [];
+  const userId = req.currentUser.studentNumber || req.currentUser.username;
+  const index = request.votes.indexOf(userId);
+
+  let voted = false;
+  if (index === -1) {
+    request.votes.push(userId);
+    voted = true;
+  } else {
+    request.votes.splice(index, 1);
+    voted = false;
+  }
+
+  writeDatabase(db);
+  res.json({ success: true, voted, votesCount: request.votes.length });
+});
+
+// İstek Kitap Durumunu Güncelle (SADECE ADMİN)
+app.put('/api/book-requests/:id/status', requireAdmin, (req, res) => {
+  const db = readDatabase();
+  const request = (db.bookRequests || []).find(r => r.id === req.params.id);
+  if (!request) return res.status(404).json({ error: 'İstek kaydı bulunamadı.' });
+
+  const { status } = req.body;
+  const validStatuses = ['pending', 'approved', 'acquired', 'rejected'];
+  if (!validStatuses.includes(status)) {
+    return res.status(400).json({ error: 'Geçersiz durum değeri.' });
+  }
+
+  request.status = status;
+  writeDatabase(db);
+  res.json({ success: true, request });
+});
+
+// İstek Kitabı Doğrudan Kütüphane Kataloğuna Aktar (SADECE ADMİN)
+app.post('/api/book-requests/:id/convert-to-book', requireAdmin, (req, res) => {
+  const db = readDatabase();
+  const request = (db.bookRequests || []).find(r => r.id === req.params.id);
+  if (!request) return res.status(404).json({ error: 'İstek kaydı bulunamadı.' });
+
+  const { shelf } = req.body;
+  const newBook = {
+    id: 'b_' + crypto.randomUUID().slice(0, 8),
+    title: request.title,
+    author: request.author,
+    category: request.category || 'Genel',
+    language: 'Türkçe',
+    shelf: shelf ? shelf.trim() : 'SBF-YENİ',
+    isbn: request.isbn || '',
+    totalCopies: 1,
+    availableCopies: 1,
+    notes: `Öğrenci talebi üzerine kütüphaneye kazandırıldı (Talep: ${request.requestedBy}).`
+  };
+
+  db.books.unshift(newBook);
+  request.status = 'acquired';
+  writeDatabase(db);
+
+  res.json({ success: true, book: newBook, request });
+});
+
+// İstek Kitabı Sil (SADECE ADMİN)
+app.delete('/api/book-requests/:id', requireAdmin, (req, res) => {
+  const db = readDatabase();
+  const reqIndex = (db.bookRequests || []).findIndex(r => r.id === req.params.id);
+  if (reqIndex === -1) return res.status(404).json({ error: 'İstek kaydı bulunamadı.' });
+
+  db.bookRequests.splice(reqIndex, 1);
+  writeDatabase(db);
+  res.json({ success: true });
+});
+
+// ================= DERS NOTU & SINAV KAYNAK HAVUZU API =================
+
+// Tüm Notları Getir (Herkese Açık)
+app.get('/api/exam-notes', (req, res) => {
+  const db = readDatabase();
+  res.json(db.examNotes || []);
+});
+
+// Yeni Ders Notu Ekle (Giriş Yapmış Öğrenci veya Admin)
+app.post('/api/exam-notes', requireAuth, (req, res) => {
+  const db = readDatabase();
+  const { 
+    title, courseName, courseCode, instructor, department, 
+    semester, type, description, content, driveUrl, 
+    usePseudonym, pseudonym 
+  } = req.body;
+  const user = req.currentUser;
+
+  if (!title || !courseName) {
+    return res.status(400).json({ error: 'Not başlığı ve ders adı zorunludur.' });
+  }
+
+  if ((!content || content.trim().length === 0) && (!driveUrl || driveUrl.trim().length === 0)) {
+    return res.status(400).json({ error: 'Öğrencilerin faydalanabilmesi için lütfen not özeti metni girin veya indirme bağlantısı (Drive/Bulut) ekleyin.' });
+  }
+
+  const cleanPseudonym = (usePseudonym && pseudonym && pseudonym.trim().length > 0) ? pseudonym.trim() : null;
+  const authorDisplayName = cleanPseudonym || user.fullName;
+
+  const newNote = {
+    id: 'note_' + crypto.randomUUID().slice(0, 8),
+    title: title.trim(),
+    courseName: courseName.trim(),
+    courseCode: courseCode ? courseCode.trim().toUpperCase() : '',
+    instructor: instructor ? instructor.trim() : '',
+    department: department ? department.trim() : (user.department || 'Siyasal Bilgiler'),
+    semester: semester ? semester.trim() : 'Güz',
+    type: type ? type.trim() : 'Vize Özeti',
+    description: description ? description.trim() : '',
+    content: content ? content.trim() : '',
+    driveUrl: driveUrl ? driveUrl.trim() : '',
+    authorName: authorDisplayName,
+    authorStudentNumber: user.studentNumber || user.username,
+    isPseudonym: !!cleanPseudonym,
+    pseudonym: cleanPseudonym,
+    realAuthorName: user.fullName,
+    helpfulCount: 0,
+    helpfulUsers: [],
+    downloadsCount: 0,
+    createdAt: new Date().toISOString()
+  };
+
+  if (!db.examNotes) db.examNotes = [];
+  db.examNotes.unshift(newNote);
+  writeDatabase(db);
+
+  res.status(201).json({ success: true, message: 'Ders notunuz başarıyla havuzda paylaşıldı!', note: newNote });
+});
+
+// Ders Notuna Faydalı Oyu Ver / Geri Al (Giriş Yapmış Öğrenci veya Admin)
+app.post('/api/exam-notes/:id/helpful', requireAuth, (req, res) => {
+  const db = readDatabase();
+  const note = (db.examNotes || []).find(n => n.id === req.params.id);
+  if (!note) return res.status(404).json({ error: 'Ders notu bulunamadı.' });
+
+  if (!Array.isArray(note.helpfulUsers)) note.helpfulUsers = [];
+  const userIdentifier = req.currentUser.studentNumber || req.currentUser.username;
+  const index = note.helpfulUsers.indexOf(userIdentifier);
+
+  let voted = false;
+  if (index === -1) {
+    note.helpfulUsers.push(userIdentifier);
+    note.helpfulCount = (note.helpfulCount || 0) + 1;
+    voted = true;
+  } else {
+    note.helpfulUsers.splice(index, 1);
+    note.helpfulCount = Math.max(0, (note.helpfulCount || 1) - 1);
+    voted = false;
+  }
+
+  writeDatabase(db);
+  res.json({ success: true, voted, helpfulCount: note.helpfulCount });
+});
+
+// Ders Notu İndirme / Görüntüleme Sayacı Arttır
+app.post('/api/exam-notes/:id/download', (req, res) => {
+  const db = readDatabase();
+  const note = (db.examNotes || []).find(n => n.id === req.params.id);
+  if (!note) return res.status(404).json({ error: 'Ders notu bulunamadı.' });
+
+  note.downloadsCount = (note.downloadsCount || 0) + 1;
+  writeDatabase(db);
+  res.json({ success: true, downloadsCount: note.downloadsCount });
+});
+
+// Ders Notunu Sil (Yazar veya Admin)
+app.delete('/api/exam-notes/:id', requireAuth, (req, res) => {
+  const db = readDatabase();
+  const noteIndex = (db.examNotes || []).findIndex(n => n.id === req.params.id);
+  if (noteIndex === -1) return res.status(404).json({ error: 'Ders notu bulunamadı.' });
+
+  const note = db.examNotes[noteIndex];
+  const user = req.currentUser;
+  const isAuthor = (user.studentNumber && note.authorStudentNumber === user.studentNumber) ||
+                   (note.authorStudentNumber === user.username);
+
+  if (user.role !== 'admin' && !isAuthor) {
+    return res.status(403).json({ error: 'Yalnızca kendi paylaştığınız ders notunu silebilirsiniz.' });
+  }
+
+  db.examNotes.splice(noteIndex, 1);
+  writeDatabase(db);
+  res.json({ success: true, message: 'Ders notu silindi.' });
 });
 
 // Sunucuyu başlat
