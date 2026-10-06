@@ -158,7 +158,8 @@ const I18N = {
     kvkkSafeBadge: "Güvenli Kampüs Ağı",
     kvkkBannerDesc: "SBF Kütüphanesi platformumuzda, oturum güvenliğinizi sağlamak, ödünç geçmişinizi korumak ve dil tercihinizi hatırlamak amacıyla yalnızca zorunlu teknik çerezler kullanılmaktadır. Üçüncü taraf reklam ve ticari izleme çerezi barındırılmaz.",
     btnKvkkPolicy: "Aydınlatma Metni & Haklar",
-    btnKvkkAccept: "Anladım ve Kabul Ediyorum"
+    btnKvkkAccept: "Anladım ve Kabul Ediyorum",
+    tabAdminTeam: "Yönetici Masası"
   },
   fr: {
     facultyTitle: "Université de Marmara",
@@ -317,7 +318,8 @@ const I18N = {
     kvkkSafeBadge: "Réseau Campus Sécurisé",
     kvkkBannerDesc: "Sur notre plateforme, seuls les cookies techniques indispensables sont utilisés pour maintenir votre session et mémoriser la langue. Aucun cookie publicitaire tiers n'est utilisé.",
     btnKvkkPolicy: "Politique de Confidentialité",
-    btnKvkkAccept: "J'accepte et j'ai compris"
+    btnKvkkAccept: "J'accepte et j'ai compris",
+    tabAdminTeam: "Bureau des Admins"
   },
   en: {
     facultyTitle: "Marmara University",
@@ -476,7 +478,8 @@ const I18N = {
     kvkkSafeBadge: "Secure Campus Network",
     kvkkBannerDesc: "On our platform, only strictly necessary functional cookies and local storage are utilized to safeguard your session and remember your language. No third-party tracking or advertising cookies exist.",
     btnKvkkPolicy: "Privacy Policy & Rights",
-    btnKvkkAccept: "I Understand & Accept"
+    btnKvkkAccept: "I Understand & Accept",
+    tabAdminTeam: "Admin Desk"
   }
 };
 
@@ -650,6 +653,11 @@ function renderNavigation() {
         <i data-lucide="database" class="w-4 h-4 mr-1.5"></i>
         <span>${t('tabBackup')}</span>
       </button>
+      <button onclick="switchTab('admin-team')" id="nav-admin-team" class="tab-btn flex items-center px-3 py-1.5 rounded-lg text-blue-100 hover:bg-white/10 font-medium">
+        <i data-lucide="shield-check" class="w-4 h-4 mr-1.5 text-amber-300"></i>
+        <span>${t('tabAdminTeam')}</span>
+        ${(libraryData.adminRequests && libraryData.adminRequests.length > 0) ? `<span class="ml-1.5 px-1.5 py-0.2 text-[10px] bg-rose-500 text-white font-bold rounded-full animate-pulse">${libraryData.adminRequests.length}</span>` : ''}
+      </button>
     `;
   } else if (isStudent) {
     // ÖĞRENCİ MENÜSÜ
@@ -733,6 +741,7 @@ async function fetchData() {
       renderLoans();
       renderMembers();
       renderApprovals();
+      renderAdminTeam();
     }
     renderBooks();
     renderBookRequests();
@@ -759,7 +768,7 @@ function switchTab(tabId) {
   const isAdmin = currentUser && (currentUser.role === 'admin' || currentUser.role === 'founder');
   const isStudent = currentUser && currentUser.role === 'student';
 
-  if (!isAdmin && (tabId === 'dashboard' || tabId === 'loans' || tabId === 'members' || tabId === 'approvals' || tabId === 'backup')) {
+  if (!isAdmin && (tabId === 'dashboard' || tabId === 'loans' || tabId === 'members' || tabId === 'approvals' || tabId === 'backup' || tabId === 'admin-team')) {
     tabId = 'books';
   }
   if (!isStudent && tabId === 'my-books') {
@@ -784,6 +793,7 @@ function switchTab(tabId) {
 
   if (tabId === 'articles') renderArticles();
   if (tabId === 'book-requests') renderBookRequests();
+  if (tabId === 'admin-team') renderAdminTeam();
 
   if (window.lucide) lucide.createIcons();
 }
@@ -2938,6 +2948,16 @@ function acceptKvkkConsent() {
   showToast('KVKK ve Çerez tercihleriniz başarıyla kaydedildi.', 'success');
 }
 
+function resetAndShowKvkk() {
+  localStorage.removeItem('sbf_kvkk_accepted');
+  const banner = document.getElementById('kvkkConsentBanner');
+  if (banner) {
+    banner.classList.remove('hidden');
+    banner.scrollIntoView({ behavior: 'smooth' });
+  }
+  showToast('Çerez bildirim bannerı tekrar açıldı. Tercihlerinizi inceleyebilirsiniz.', 'info');
+}
+
 // ================= KURUCU (FOUNDER) GİZLİ ÇEKİRDEK İŞLEMLERİ =================
 
 async function loadFounderCoreStats() {
@@ -3178,6 +3198,309 @@ async function toggleUserAdminRole(id) {
 
     showToast(data.message, 'success');
     await openFounderAuditModal();
+    await fetchData();
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+// ================= ŞİFRE DEĞİŞTİRME (ÖĞRENCİ & ADMİN GÜVENLİK) =================
+
+async function submitChangePassword(e) {
+  e.preventDefault();
+  if (!currentUser || !currentToken) {
+    showToast('Şifre değiştirmek için giriş yapmış olmalısınız.', 'error');
+    return;
+  }
+
+  const currentPassword = document.getElementById('pw-current').value;
+  const newPassword = document.getElementById('pw-new').value;
+  const confirmPassword = document.getElementById('pw-confirm').value;
+
+  if (newPassword.length < 4) {
+    showToast('Yeni şifreniz en az 4 karakter olmalıdır.', 'error');
+    return;
+  }
+
+  if (newPassword !== confirmPassword) {
+    showToast('Yeni şifreler birbiriyle uyuşmuyor.', 'error');
+    return;
+  }
+
+  if (currentPassword === newPassword) {
+    showToast('Yeni şifreniz mevcut şifrenizle aynı olamaz.', 'error');
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/auth/change-password', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${currentToken}`
+      },
+      body: JSON.stringify({ currentPassword, newPassword, confirmPassword })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Şifre değiştirilemedi.');
+
+    document.getElementById('form-change-password').reset();
+    showToast(data.message || 'Şifreniz başarıyla güncellendi!', 'success');
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+// ================= YÖNETİCİ MASASI & ÇİFT ADMİN ONAY İŞLEMLERİ =================
+
+async function renderAdminTeam() {
+  if (!currentUser || (currentUser.role !== 'admin' && currentUser.role !== 'founder')) return;
+  if (!currentToken) return;
+
+  try {
+    const res = await fetch('/api/admin/team', {
+      headers: { 'Authorization': `Bearer ${currentToken}` }
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+
+    // 1. Bekleyen Talepler (Çift Onay Masası)
+    const pendingCont = document.getElementById('team-pending-requests-container');
+    const badgeEl = document.getElementById('team-pending-count-badge');
+    const reqs = data.pendingRequests || [];
+
+    if (badgeEl) badgeEl.textContent = `${reqs.length} Bekleyen Talep`;
+
+    if (pendingCont) {
+      if (reqs.length === 0) {
+        pendingCont.innerHTML = `
+          <div class="p-4 rounded-xl bg-white/70 border border-amber-200/60 text-center text-xs text-amber-900">
+            <i data-lucide="check-circle" class="w-5 h-5 mx-auto mb-1 text-emerald-600"></i>
+            Şu anda onay bekleyen yönetici işlemi bulunmamaktadır. Tüm kararlar güncel.
+          </div>
+        `;
+      } else {
+        pendingCont.innerHTML = reqs.map(r => {
+          const isCreator = r.requestedBy === data.currentUsername;
+          const hasApproved = (r.approvals || []).includes(data.currentUsername);
+          const approvalsCount = (r.approvals || []).length;
+          const required = r.requiredApprovals || 2;
+          const isCreate = r.type === 'CREATE_ADMIN';
+
+          const targetDesc = isCreate
+            ? `<strong>${escapeHtml(r.targetData.fullName)}</strong> (Kullanıcı Adı: <code class="bg-amber-100 px-1 py-0.5 rounded text-amber-950">${escapeHtml(r.targetData.username)}</code>, E-Posta: ${escapeHtml(r.targetData.email)})`
+            : `<strong>${escapeHtml(r.targetFullName || r.targetUsername)}</strong> (Kullanıcı Adı: <code class="bg-rose-100 px-1 py-0.5 rounded text-rose-950">${escapeHtml(r.targetUsername)}</code>) yöneticilik yetkisinin kaldırılması`;
+
+          return `
+            <div class="p-4 rounded-xl bg-white border border-amber-300 shadow-2xs space-y-3">
+              <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                <div class="flex items-center space-x-2">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${isCreate ? 'bg-blue-100 text-blue-900 border border-blue-200' : 'bg-rose-100 text-rose-900 border border-rose-200'}">
+                    ${isCreate ? '➕ Yeni Yönetici Tanımlama' : '🗑️ Yönetici Silme Talebi'}
+                  </span>
+                  <span class="text-xs text-slate-500 font-mono">${new Date(r.requestedAt).toLocaleString('tr-TR')}</span>
+                </div>
+                <div class="flex items-center space-x-1.5">
+                  <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 flex items-center">
+                    <span class="w-2 h-2 rounded-full bg-amber-500 mr-1.5 animate-ping"></span>
+                    ${approvalsCount}/${required} Yönetici Onayı
+                  </span>
+                </div>
+              </div>
+
+              <div class="text-xs text-slate-700 leading-relaxed">
+                ${targetDesc}
+              </div>
+
+              <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pt-2 border-t border-slate-100 text-xs">
+                <div class="text-slate-500">
+                  Talep Eden: <strong class="text-slate-800">${escapeHtml(r.requestedByName || r.requestedBy)}</strong>
+                  ${(r.approvals && r.approvals.length > 0) ? `<span class="text-slate-400"> (Onay verenler: ${escapeHtml(r.approvals.join(', '))})</span>` : ''}
+                </div>
+                <div class="flex items-center space-x-2">
+                  <button onclick="rejectAdminRequest('${r.id}')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition-colors">
+                    Reddet
+                  </button>
+                  ${(hasApproved && !data.isFounder) 
+                    ? `<span class="px-3 py-1.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-lg text-xs font-bold">✓ Onayınız Verildi (İkinci Admin Bekleniyor)</span>`
+                    : `<button onclick="approveAdminRequest('${r.id}')" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-all shadow-2xs flex items-center">
+                        <i data-lucide="check" class="w-3.5 h-3.5 mr-1"></i>
+                        <span>${data.isFounder ? 'Yetkili Onayla (Kurucu)' : 'Onayla & İzin Ver (2. Onay)'}</span>
+                      </button>`
+                  }
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    // 2. Aktif Yöneticiler Tablosu
+    const tbody = document.getElementById('team-admins-tbody');
+    const countLabel = document.getElementById('team-admin-count-label');
+    const admins = data.admins || [];
+    if (countLabel) countLabel.textContent = `${admins.length} Yönetici`;
+
+    if (tbody) {
+      tbody.innerHTML = '';
+      if (admins.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-400 text-xs">Kayıtlı yönetici bulunamadı.</td></tr>`;
+      } else {
+        admins.forEach(adm => {
+          const isSelf = adm.username === data.currentUsername;
+          const isFounder = adm.role === 'founder' || adm.isImmune;
+          const tr = document.createElement('tr');
+          tr.className = "hover:bg-slate-50/70 transition-colors";
+
+          let actionBtn = '';
+          if (isFounder) {
+            actionBtn = `<span class="px-2 py-0.5 text-[10px] bg-amber-100 text-amber-900 border border-amber-300 rounded-full font-bold">🛡️ Dokunulmaz</span>`;
+          } else if (isSelf) {
+            actionBtn = `<span class="text-[11px] text-slate-400 font-medium">Mevcut Oturum</span>`;
+          } else {
+            actionBtn = `
+              <button onclick="requestRemoveAdmin('${escapeHtml(adm.username)}', '${escapeHtml(adm.fullName)}')" class="px-2.5 py-1 text-[11px] bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg font-semibold transition-colors flex items-center ml-auto">
+                <i data-lucide="user-x" class="w-3.5 h-3.5 mr-1 text-rose-600"></i>
+                <span>Yetkiyi Kaldır</span>
+              </button>
+            `;
+          }
+
+          tr.innerHTML = `
+            <td class="py-3 px-4 font-bold text-slate-900">${escapeHtml(adm.fullName)}</td>
+            <td class="py-3 px-4 font-mono text-xs text-blue-900 font-bold">${escapeHtml(adm.username)}</td>
+            <td class="py-3 px-4 text-xs text-slate-600">${escapeHtml(adm.department || '-')}</td>
+            <td class="py-3 px-4 text-xs text-slate-600 font-mono">${escapeHtml(adm.email || '-')}</td>
+            <td class="py-3 px-4 text-center">
+              <span class="px-2 py-0.5 text-[10px] font-bold rounded-full ${adm.role === 'founder' ? 'bg-amber-400 text-slate-950 font-extrabold' : 'bg-blue-600 text-white'}">
+                ${adm.role === 'founder' ? 'Kurucu (SuperAdmin)' : 'Kütüphane Admini'}
+              </span>
+            </td>
+            <td class="py-3 px-4 text-right">${actionBtn}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+    }
+
+    // 3. Geçmiş Kararlar
+    const pastCont = document.getElementById('team-past-requests-container');
+    const pastReqs = data.pastRequests || [];
+    if (pastCont) {
+      if (pastReqs.length === 0) {
+        pastCont.innerHTML = `<p class="text-slate-400 text-center py-2">Henüz tamamlanmış bir onay geçmişi bulunmuyor.</p>`;
+      } else {
+        pastCont.innerHTML = pastReqs.map(pr => `
+          <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <span class="px-1.5 py-0.5 text-[10px] font-bold rounded ${pr.status === 'approved' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700'}">
+                ${pr.status === 'approved' ? '✓ Onaylandı' : '✕ Reddedildi'}
+              </span>
+              <span class="font-medium text-slate-700">${pr.type === 'CREATE_ADMIN' ? 'Yeni Admin: ' + (pr.targetData ? pr.targetData.fullName : '') : 'Admin Silme: ' + (pr.targetFullName || pr.targetUsername)}</span>
+            </div>
+            <span class="text-[11px] text-slate-400 font-mono">${pr.completedAt ? new Date(pr.completedAt).toLocaleDateString('tr-TR') : '-'}</span>
+          </div>
+        `).join('');
+      }
+    }
+
+    if (window.lucide) lucide.createIcons();
+  } catch (err) {
+    console.error('Admin team render error:', err);
+  }
+}
+
+// Yeni Yönetici Ekleme Formunu Gönder
+async function submitTeamCreateAdmin(e) {
+  e.preventDefault();
+  if (!currentToken) return;
+
+  const username = document.getElementById('team-admin-new-username').value;
+  const password = document.getElementById('team-admin-new-password').value;
+  const fullName = document.getElementById('team-admin-new-fullname').value;
+  const email = document.getElementById('team-admin-new-email').value;
+  const department = document.getElementById('team-admin-new-department').value;
+
+  try {
+    const res = await fetch('/api/admin/team/request-add', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${currentToken}`
+      },
+      body: JSON.stringify({ username, password, fullName, email, department })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Yönetici ekleme işlemi başarısız.');
+
+    closeModal('modal-team-create-admin');
+    document.getElementById('form-team-create-admin').reset();
+    showToast(data.message, 'success');
+    await renderAdminTeam();
+    await fetchData();
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+// Yönetici İşlemini Onayla (2. Admin)
+async function approveAdminRequest(id) {
+  if (!currentToken) return;
+  try {
+    const res = await fetch(`/api/admin/team/requests/${id}/approve`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${currentToken}` }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Onay işlemi başarısız.');
+
+    showToast(data.message, 'success');
+    await renderAdminTeam();
+    await fetchData();
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+// Yönetici Talebini Reddet
+async function rejectAdminRequest(id) {
+  if (!confirm('Bu yönetici işlem talebini reddetmek istediğinize emin misiniz?')) return;
+  if (!currentToken) return;
+  try {
+    const res = await fetch(`/api/admin/team/requests/${id}/reject`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${currentToken}` }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Reddetme işlemi başarısız.');
+
+    showToast(data.message, 'info');
+    await renderAdminTeam();
+    await fetchData();
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+// Yöneticiyi Kaldırmak İçin Çift Onay Talebi Aç
+async function requestRemoveAdmin(username, fullName) {
+  if (!confirm(`"${fullName}" (${username}) yöneticisini sistemden kaldırmak istiyor musunuz?\n\n(Birden fazla yönetici varsa, bu talep ikinci bir yöneticinin onayına sunulacaktır.)`)) return;
+  if (!currentToken) return;
+  try {
+    const res = await fetch('/api/admin/team/request-remove', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${currentToken}`
+      },
+      body: JSON.stringify({ targetUsername: username })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Kaldırma talebi iletilemedi.');
+
+    showToast(data.message, 'success');
+    await renderAdminTeam();
     await fetchData();
   } catch (err) {
     alert(err.message);

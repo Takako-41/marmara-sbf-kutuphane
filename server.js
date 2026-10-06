@@ -106,10 +106,11 @@ function readDatabase() {
     if (!parsed.bookRequests) parsed.bookRequests = [];
     if (!parsed.examNotes) parsed.examNotes = [];
     if (!parsed.monthlyTopic) parsed.monthlyTopic = null;
+    if (!parsed.adminRequests) parsed.adminRequests = [];
     return parsed;
   } catch (err) {
     console.error('Veritabanı okuma hatası:', err);
-    return { settings: {}, users: [], books: [], members: [], loans: [], articles: [], bookRequests: [], examNotes: [], monthlyTopic: null };
+    return { settings: {}, users: [], books: [], members: [], loans: [], articles: [], bookRequests: [], examNotes: [], monthlyTopic: null, adminRequests: [] };
   }
 }
 
@@ -261,6 +262,45 @@ app.post('/api/auth/logout', (req, res) => {
   res.json({ success: true });
 });
 
+// Şifre Değiştir (Giriş Yapmış Tüm Kullanıcılar: Öğrenci, Admin, Kurucu)
+app.post('/api/auth/change-password', requireAuth, (req, res) => {
+  const { currentPassword, newPassword, confirmPassword } = req.body;
+  if (!currentPassword || !newPassword || !confirmPassword) {
+    return res.status(400).json({ error: 'Lütfen tüm alanları eksiksiz doldurunuz.' });
+  }
+
+  const cleanCurrent = String(currentPassword).trim();
+  const cleanNew = String(newPassword).trim();
+  const cleanConfirm = String(confirmPassword).trim();
+
+  if (cleanNew.length < 4) {
+    return res.status(400).json({ error: 'Yeni şifreniz en az 4 karakter uzunluğunda olmalıdır.' });
+  }
+
+  if (cleanNew !== cleanConfirm) {
+    return res.status(400).json({ error: 'Yeni şifreler birbiriyle uyuşmuyor. Lütfen kontrol ediniz.' });
+  }
+
+  if (cleanCurrent === cleanNew) {
+    return res.status(400).json({ error: 'Yeni şifreniz mevcut şifrenizle aynı olamaz.' });
+  }
+
+  const db = readDatabase();
+  const user = db.users.find(u => u.id === req.currentUser.id);
+  if (!user) {
+    return res.status(404).json({ error: 'Kullanıcı hesabı bulunamadı.' });
+  }
+
+  if (String(user.password).trim() !== cleanCurrent) {
+    return res.status(400).json({ error: 'Mevcut şifrenizi hatalı girdiniz.' });
+  }
+
+  user.password = cleanNew;
+  writeDatabase(db);
+
+  res.json({ success: true, message: 'Şifreniz başarıyla güncellendi!' });
+});
+
 // ================= VERİ VE KATALOG API =================
 
 // Verileri Getir (Role Göre Filtrelenmiş / KVKK Korumalı)
@@ -323,6 +363,7 @@ app.get('/api/data', (req, res) => {
     bookRequests: db.bookRequests || [],
     examNotes: db.examNotes || [],
     monthlyTopic: db.monthlyTopic || null,
+    adminRequests: (db.adminRequests || []).filter(r => r.status === 'pending'),
     isFounder: isFounder,
     user
   });
@@ -1049,6 +1090,288 @@ app.delete('/api/exam-notes/:id', requireAuth, (req, res) => {
   db.examNotes.splice(noteIndex, 1);
   writeDatabase(db);
   res.json({ success: true, message: 'Ders notu silindi.' });
+});
+
+// ================= YÖNETİCİ MASASI & ÇİFT ADMİN ONAY SİSTEMİ (DUAL AUTHORIZATION) =================
+
+// Yönetici Listesi ve Bekleyen Admin İşlem Talepleri
+app.get('/api/admin/team', requireAdmin, (req, res) => {
+  const db = readDatabase();
+  const isFounder = req.currentUser.role === 'founder';
+
+  const admins = db.users
+    .filter(u => u.role === 'admin' || (isFounder && u.role === 'founder'))
+    .map(u => ({
+      id: u.id,
+      username: u.username,
+      fullName: u.fullName,
+      email: u.email,
+      department: u.department,
+      role: u.role,
+      isImmune: u.role === 'founder' || !!u.isImmune,
+      registerDate: u.registerDate || '-'
+    }));
+
+  const pendingRequests = (db.adminRequests || []).filter(r => r.status === 'pending');
+  const pastRequests = (db.adminRequests || []).filter(r => r.status !== 'pending').slice(0, 15);
+
+  res.json({
+    admins,
+    pendingRequests,
+    pastRequests,
+    currentUserId: req.currentUser.id,
+    currentUsername: req.currentUser.username,
+    isFounder
+  });
+});
+
+// Yeni Yönetici Ekleme Talebi (Doğrudan veya Çift Onay Kalkanı ile)
+app.post('/api/admin/team/request-add', requireAdmin, (req, res) => {
+  const { username, password, fullName, email, department } = req.body;
+  if (!username || !password || !fullName) {
+    return res.status(400).json({ error: 'Kullanıcı adı, şifre ve ad soyad alanları zorunludur.' });
+  }
+
+  const db = readDatabase();
+  const cleanUsername = username.trim().toLowerCase();
+  const exists = db.users.some(u => u.username.toLowerCase() === cleanUsername);
+  if (exists) {
+    return res.status(400).json({ error: 'Bu kullanıcı adı zaten sistemde kayıtlı.' });
+  }
+
+  // Sistemdeki mevcut aktif standart admin sayısı (kurucu hariç)
+  const existingAdminCount = db.users.filter(u => u.role === 'admin').length;
+  const isFounder = req.currentUser.role === 'founder';
+
+  // Eğer Kurucu ekliyorsa VEYA sistemde onay verebilecek ikinci bir admin henüz yoksa (<= 1 admin):
+  // Doğrudan eklenir!
+  if (isFounder || existingAdminCount <= 1) {
+    const newAdminUser = {
+      id: 'u_' + crypto.randomUUID().slice(0, 8),
+      username: cleanUsername,
+      password: password.trim(),
+      fullName: fullName.trim(),
+      role: 'admin',
+      email: email ? email.trim() : `admin.${cleanUsername}@marmara.edu.tr`,
+      department: department ? department.trim() : 'Kütüphane Yönetim Kurulu',
+      status: 'approved',
+      registerDate: new Date().toISOString().split('T')[0]
+    };
+
+    const newAdminMember = {
+      id: 'm_' + crypto.randomUUID().slice(0, 8),
+      studentNumber: cleanUsername,
+      fullName: fullName.trim(),
+      department: department ? department.trim() : 'Kütüphane Yönetim Kurulu',
+      role: 'Kütüphaneci (Yönetici)',
+      email: email ? email.trim() : `admin.${cleanUsername}@marmara.edu.tr`,
+      phone: '',
+      status: 'approved',
+      registerDate: new Date().toISOString().split('T')[0]
+    };
+
+    db.users.push(newAdminUser);
+    db.members.push(newAdminMember);
+    writeDatabase(db);
+
+    return res.status(201).json({
+      success: true,
+      direct: true,
+      message: 'Yeni Kütüphane Yöneticisi başarıyla tanımlandı ve aktif edildi.',
+      admin: newAdminUser
+    });
+  }
+
+  // Sistemde 2 veya daha fazla admin varsa: ÇİFT ADMİN ONAY MEKANİZMASI DEVREYE GİRER!
+  if (!db.adminRequests) db.adminRequests = [];
+
+  const existingPending = db.adminRequests.find(r => 
+    r.status === 'pending' && 
+    r.type === 'CREATE_ADMIN' && 
+    r.targetData && 
+    r.targetData.username.toLowerCase() === cleanUsername
+  );
+  if (existingPending) {
+    return res.status(400).json({ error: 'Bu kullanıcı adı için onay bekleyen aktif bir yönetici talebi zaten var.' });
+  }
+
+  const requestId = 'req_' + crypto.randomUUID().slice(0, 8);
+  const newRequest = {
+    id: requestId,
+    type: 'CREATE_ADMIN',
+    targetData: {
+      username: cleanUsername,
+      password: password.trim(),
+      fullName: fullName.trim(),
+      email: email ? email.trim() : `admin.${cleanUsername}@marmara.edu.tr`,
+      department: department ? department.trim() : 'Kütüphane Yönetim Kurulu'
+    },
+    requestedBy: req.currentUser.username,
+    requestedByName: req.currentUser.fullName,
+    requestedAt: new Date().toISOString(),
+    approvals: [req.currentUser.username], // 1. Onay: Talep açan admin
+    requiredApprovals: 2,
+    status: 'pending'
+  };
+
+  db.adminRequests.unshift(newRequest);
+  writeDatabase(db);
+
+  res.status(201).json({
+    success: true,
+    direct: false,
+    message: 'Yeni yönetici başvurusu oluşturuldu (1/2 Onay). İşlemin yürürlüğe girmesi için ikinci bir yöneticinin sisteme girip onay vermesi gerekmektedir.',
+    request: newRequest
+  });
+});
+
+// Admin İşlem Talebini Onayla (2. Admin veya Kurucu)
+app.post('/api/admin/team/requests/:id/approve', requireAdmin, (req, res) => {
+  const db = readDatabase();
+  if (!db.adminRequests) db.adminRequests = [];
+
+  const request = db.adminRequests.find(r => r.id === req.params.id && r.status === 'pending');
+  if (!request) return res.status(404).json({ error: 'Bekleyen talep bulunamadı.' });
+
+  const currentUsername = req.currentUser.username;
+  const isFounder = req.currentUser.role === 'founder';
+
+  // Standart admin talep açan kişi ise kendini tekrar onaylayamaz
+  if (!isFounder && request.approvals.includes(currentUsername)) {
+    return res.status(400).json({ error: 'Bu talebi zaten onayladınız. İkinci bir yöneticinin onayı beklenmektedir.' });
+  }
+
+  if (!request.approvals.includes(currentUsername)) {
+    request.approvals.push(currentUsername);
+  }
+
+  // 2 onay tamamlandıysa veya onaylayan Kurucu ise:
+  if (isFounder || request.approvals.length >= request.requiredApprovals) {
+    request.status = 'approved';
+    request.completedAt = new Date().toISOString();
+
+    if (request.type === 'CREATE_ADMIN') {
+      const { username, password, fullName, email, department } = request.targetData;
+      
+      if (!db.users.some(u => u.username.toLowerCase() === username.toLowerCase())) {
+        const newAdminUser = {
+          id: 'u_' + crypto.randomUUID().slice(0, 8),
+          username: username,
+          password: password,
+          fullName: fullName,
+          role: 'admin',
+          email: email,
+          department: department,
+          status: 'approved',
+          registerDate: new Date().toISOString().split('T')[0]
+        };
+
+        const newAdminMember = {
+          id: 'm_' + crypto.randomUUID().slice(0, 8),
+          studentNumber: username,
+          fullName: fullName,
+          department: department,
+          role: 'Kütüphaneci (Yönetici)',
+          email: email,
+          phone: '',
+          status: 'approved',
+          registerDate: new Date().toISOString().split('T')[0]
+        };
+
+        db.users.push(newAdminUser);
+        db.members.push(newAdminMember);
+      }
+    } else if (request.type === 'REMOVE_ADMIN') {
+      const targetUsername = request.targetUsername;
+      const targetIndex = db.users.findIndex(u => u.username === targetUsername);
+      if (targetIndex !== -1 && db.users[targetIndex].role !== 'founder') {
+        db.users.splice(targetIndex, 1);
+        db.members = db.members.filter(m => m.studentNumber !== targetUsername);
+      }
+    }
+
+    writeDatabase(db);
+    return res.json({
+      success: true,
+      completed: true,
+      message: '🎉 Çift admin onayı tamamlandı! Yönetici işlemi başarıyla yürürlüğe girdi.'
+    });
+  }
+
+  writeDatabase(db);
+  res.json({
+    success: true,
+    completed: false,
+    message: `Onayınız kaydedildi (${request.approvals.length}/${request.requiredApprovals}). İkinci admin onayı bekleniyor.`
+  });
+});
+
+// Admin İşlem Talebini Reddet
+app.post('/api/admin/team/requests/:id/reject', requireAdmin, (req, res) => {
+  const db = readDatabase();
+  if (!db.adminRequests) db.adminRequests = [];
+
+  const request = db.adminRequests.find(r => r.id === req.params.id && r.status === 'pending');
+  if (!request) return res.status(404).json({ error: 'Bekleyen talep bulunamadı.' });
+
+  request.status = 'rejected';
+  request.rejectedBy = req.currentUser.username;
+  request.rejectedByName = req.currentUser.fullName;
+  request.rejectedAt = new Date().toISOString();
+
+  writeDatabase(db);
+  res.json({ success: true, message: 'Yönetici işlem talebi reddedildi.' });
+});
+
+// Admin Kaldırma Talebi Aç (veya Kurucu tek başına siler)
+app.post('/api/admin/team/request-remove', requireAdmin, (req, res) => {
+  const { targetUsername } = req.body;
+  if (!targetUsername) return res.status(400).json({ error: 'Hedef kullanıcı belirtilmelidir.' });
+
+  const db = readDatabase();
+  const targetUser = db.users.find(u => u.username === targetUsername);
+  if (!targetUser) return res.status(404).json({ error: 'Yönetici bulunamadı.' });
+
+  if (targetUser.role === 'founder' || targetUser.isImmune) {
+    return res.status(403).json({ error: 'Kurucu hesabı dokunulmazdır ve kaldırılamaz.' });
+  }
+
+  if (targetUser.username === req.currentUser.username) {
+    return res.status(400).json({ error: 'Kendi yöneticilik hesabınızı bu ekrandan kaldıramazsınız.' });
+  }
+
+  const isFounder = req.currentUser.role === 'founder';
+  if (isFounder) {
+    db.users = db.users.filter(u => u.username !== targetUsername);
+    db.members = db.members.filter(m => m.studentNumber !== targetUsername);
+    writeDatabase(db);
+    return res.json({ success: true, direct: true, message: `${targetUser.fullName} yöneticilik hesabı sistemden silindi.` });
+  }
+
+  if (!db.adminRequests) db.adminRequests = [];
+  const requestId = 'req_' + crypto.randomUUID().slice(0, 8);
+  const newRequest = {
+    id: requestId,
+    type: 'REMOVE_ADMIN',
+    targetUsername: targetUser.username,
+    targetFullName: targetUser.fullName,
+    requestedBy: req.currentUser.username,
+    requestedByName: req.currentUser.fullName,
+    requestedAt: new Date().toISOString(),
+    approvals: [req.currentUser.username],
+    requiredApprovals: 2,
+    status: 'pending'
+  };
+
+  db.adminRequests.unshift(newRequest);
+  writeDatabase(db);
+
+  res.status(201).json({
+    success: true,
+    direct: false,
+    message: `${targetUser.fullName} yöneticisini kaldırmak için çift admin onay talebi açıldı (1/2 onay). Başka bir yöneticinin onayı bekleniyor.`,
+    request: newRequest
+  });
 });
 
 // ================= KURUCU (FOUNDER) GİZLİ ÇEKİRDEK API =================
