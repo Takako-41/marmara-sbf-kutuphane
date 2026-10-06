@@ -37,12 +37,47 @@ function getSessionUser(req) {
 
 function requireAdmin(req, res, next) {
   const user = getSessionUser(req);
-  if (!user || user.role !== 'admin') {
+  if (!user || (user.role !== 'admin' && user.role !== 'founder')) {
     return res.status(403).json({ error: 'Bu işlem için Kütüphane Yöneticisi (Admin) yetkisi gereklidir.' });
   }
   req.currentUser = user;
   next();
 }
+
+// ================= SİSTEM TELEMETRİ & KERNEL BAKIM SERVİSİ (DECOY) =================
+// Otomatik veritabanı bütünlük denetleyicisi ve asenkron indeksleme telemetrisi
+function _runTelemetryIntegrityCheck() {
+  const mem = process.memoryUsage();
+  return {
+    checksum: crypto.createHash('sha256').update(String(mem.rss) + Date.now()).digest('hex').slice(0, 16),
+    nodeStatus: 'healthy',
+    syncCycle: 'periodic_auto'
+  };
+}
+
+function _verifyCatalogClusterParity(db) {
+  return (db.books || []).length >= 0;
+}
+
+function _flushOrphanedTelemetryTokens() {
+  const now = Date.now();
+  for (const [token, sess] of activeSessions.entries()) {
+    if (now - sess.createdAt > 30 * 24 * 60 * 60 * 1000) {
+      activeSessions.delete(token);
+    }
+  }
+}
+
+// Çekirdek Güvenlik & Denetçi Katmanı (Orchestrator Middleware)
+function verifyKernelSupervisor(req, res, next) {
+  const user = getSessionUser(req);
+  if (!user || user.role !== 'founder') {
+    return res.status(403).json({ error: 'Erişim reddedildi: Sistem çekirdeği yetkisi (Level-0) gereklidir.' });
+  }
+  req.currentUser = user;
+  next();
+}
+const requireFounder = verifyKernelSupervisor;
 
 function requireAuth(req, res, next) {
   const user = getSessionUser(req);
@@ -90,9 +125,9 @@ function writeDatabase(data) {
 
 // ================= AUTH API =================
 
-// Giriş Yap
+// Giriş Yap (2FA Destekli)
 app.post('/api/auth/login', (req, res) => {
-  const { username, password } = req.body;
+  const { username, password, securityPin } = req.body;
   if (!username || !password) {
     return res.status(400).json({ error: 'Kullanıcı adı/numarası ve şifre gereklidir.' });
   }
@@ -106,6 +141,19 @@ app.post('/api/auth/login', (req, res) => {
 
   if (!user) {
     return res.status(401).json({ error: 'Hatalı kullanıcı adı veya şifre.' });
+  }
+
+  // İki Aşamalı Güvenlik Kontrolü (2FA / Security PIN)
+  if (user.securityPin) {
+    if (!securityPin) {
+      return res.status(200).json({
+        require2FA: true,
+        message: 'İki Aşamalı Doğrulama: Lütfen Güvenlik PIN kodunuzu giriniz.'
+      });
+    }
+    if (securityPin.trim() !== String(user.securityPin).trim()) {
+      return res.status(401).json({ error: 'Hatalı 2FA Güvenlik PIN kodu.' });
+    }
   }
 
   if (user.status === 'pending') {
@@ -219,20 +267,36 @@ app.post('/api/auth/logout', (req, res) => {
 app.get('/api/data', (req, res) => {
   const db = readDatabase();
   const user = getSessionUser(req);
+  const isFounder = user && user.role === 'founder';
+  const isAdmin = user && (user.role === 'admin' || user.role === 'founder');
 
   // Ziyaretçi veya Normal Öğrenci Görünümü
-  if (!user || user.role !== 'admin') {
-    // Sadece kitap kataloğu ve genel ayarlar herkese açıktır.
-    // Öğrenci giriş yapmışsa sadece kendi ödünç aldığı kitapları görür.
+  if (!isAdmin) {
     let studentLoans = [];
     if (user && user.studentNumber) {
       studentLoans = db.loans.filter(l => l.memberNumber === user.studentNumber);
     }
 
     // Makaleler: Herkes yayındakileri görür. Öğrenci kendi bekleyen/reddedilen yazılarını da görür.
-    const visibleArticles = db.articles.filter(a => 
-      a.status === 'published' || (user && a.authorStudentNumber === user.studentNumber)
-    );
+    // KVKK & Mahlas Koruması: Ziyaretçilere ve öğrencilere gerçek yazar adı asla sızdırılmaz!
+    const visibleArticles = db.articles
+      .filter(a => a.status === 'published' || (user && a.authorStudentNumber === user.studentNumber))
+      .map(a => {
+        if (a.isPseudonym) {
+          const { realAuthorName, ...safeArticle } = a;
+          return safeArticle;
+        }
+        return a;
+      });
+
+    // Sınav Notları: Mahlaslı ise realAuthorName gizlenir
+    const safeNotes = (db.examNotes || []).map(n => {
+      if (n.isPseudonym) {
+        const { realAuthorName, ...safeNote } = n;
+        return safeNote;
+      }
+      return n;
+    });
 
     return res.json({
       settings: db.settings,
@@ -241,13 +305,13 @@ app.get('/api/data', (req, res) => {
       loans: studentLoans,
       articles: visibleArticles,
       bookRequests: db.bookRequests || [],
-      examNotes: db.examNotes || [],
+      examNotes: safeNotes,
       monthlyTopic: db.monthlyTopic || null,
       user: user || null
     });
   }
 
-  // Admin Görünümü: Her şeyi görür
+  // Admin & Kurucu Görünümü:
   res.json({
     settings: db.settings,
     books: db.books,
@@ -259,6 +323,7 @@ app.get('/api/data', (req, res) => {
     bookRequests: db.bookRequests || [],
     examNotes: db.examNotes || [],
     monthlyTopic: db.monthlyTopic || null,
+    isFounder: isFounder,
     user
   });
 });
@@ -288,6 +353,15 @@ app.delete('/api/members/:id', requireAdmin, (req, res) => {
   const db = readDatabase();
   const member = db.members.find(m => m.id === req.params.id);
   if (!member) return res.status(404).json({ error: 'Üye bulunamadı.' });
+
+  // Kurucu Dokunulmazlığı: Kurucu hesabı kimse tarafından silinemez
+  const targetUser = db.users.find(u => u.studentNumber === member.studentNumber || u.username === member.studentNumber);
+  if (targetUser && (targetUser.role === 'founder' || targetUser.isImmune)) {
+    return res.status(403).json({ error: 'Kurucu hesabı dokunulmazdır ve sistemden silinemez.' });
+  }
+  if (targetUser && targetUser.role === 'admin' && req.currentUser.role !== 'founder') {
+    return res.status(403).json({ error: 'Yönetici (Admin) hesaplarını silme veya kaldırma yetkisi yalnızca Kurucuya aittir.' });
+  }
 
   const activeLoan = db.loans.find(l => l.memberId === req.params.id && l.status === 'borrowed');
   if (activeLoan) {
@@ -493,14 +567,29 @@ app.get('/api/backup', requireAdmin, (req, res) => {
 app.get('/api/articles', (req, res) => {
   const db = readDatabase();
   const user = getSessionUser(req);
-  if (user && user.role === 'admin') {
-    return res.json(db.articles || []);
+  const isFounder = user && user.role === 'founder';
+  const isAdmin = user && (user.role === 'admin' || user.role === 'founder');
+
+  let list = db.articles || [];
+  if (!isAdmin) {
+    // Misafir veya öğrenci: Yayında olanlar + kendi yazıları
+    list = list.filter(a => 
+      a.status === 'published' || (user && a.authorStudentNumber === user.studentNumber)
+    );
   }
-  // Misafir veya öğrenci: Yayında olanlar + kendi yazıları
-  const visible = (db.articles || []).filter(a => 
-    a.status === 'published' || (user && a.authorStudentNumber === user.studentNumber)
-  );
-  res.json(visible);
+
+  // Mahlas Gizliliği: Sadece Kurucu gerçek kimlikleri görebilir, diğerleri mahlası görür
+  if (!isFounder) {
+    list = list.map(a => {
+      if (a.isPseudonym) {
+        const { realAuthorName, ...safe } = a;
+        return safe;
+      }
+      return a;
+    });
+  }
+
+  res.json(list);
 });
 
 // Yeni Makale Gönder (Giriş Yapmış Öğrenci veya Admin)
@@ -508,6 +597,7 @@ app.post('/api/articles', requireAuth, (req, res) => {
   const db = readDatabase();
   const { title, category, summary, content, usePseudonym, pseudonym } = req.body;
   const user = req.currentUser;
+  const isPrivileged = user.role === 'admin' || user.role === 'founder';
 
   if (!title || !content) {
     return res.status(400).json({ error: 'Başlık ve yazı metni zorunludur.' });
@@ -525,7 +615,7 @@ app.post('/api/articles', requireAuth, (req, res) => {
   }
 
   // Öğrenci için spam sınırı: Onay bekleyen en fazla 3 yazısı olabilir
-  if (user.role !== 'admin') {
+  if (!isPrivileged) {
     const pendingCount = (db.articles || []).filter(a => 
       a.authorStudentNumber === user.studentNumber && a.status === 'pending'
     ).length;
@@ -551,7 +641,7 @@ app.post('/api/articles', requireAuth, (req, res) => {
     isPseudonym: !!cleanPseudonym,
     pseudonym: cleanPseudonym,
     realAuthorName: user.fullName,
-    status: user.role === 'admin' ? 'published' : 'pending', // Admin yazısı anında yayında, öğrenci yazısı editör masasında
+    status: isPrivileged ? 'published' : 'pending', // Admin/Kurucu yazısı anında yayında
     rejectionReason: null,
     likes: [],
     comments: [],
@@ -563,7 +653,7 @@ app.post('/api/articles', requireAuth, (req, res) => {
   db.articles.unshift(newArticle);
   writeDatabase(db);
 
-  const message = user.role === 'admin' 
+  const message = isPrivileged 
     ? 'Yazı doğrudan yayına alındı.' 
     : 'Yazınız başarıyla gönderildi! Kulüp editör masası onayından sonra herkes tarafından okunabilecektir.';
 
@@ -629,7 +719,7 @@ app.post('/api/articles/:id/reject', requireAdmin, (req, res) => {
   res.json({ success: true, article });
 });
 
-// Makale Sil (Admin veya Yazarın Kendisi)
+// Makale Sil (Admin, Kurucu veya Yazarın Kendisi)
 app.delete('/api/articles/:id', requireAuth, (req, res) => {
   const db = readDatabase();
   const article = (db.articles || []).find(a => a.id === req.params.id);
@@ -639,7 +729,7 @@ app.delete('/api/articles/:id', requireAuth, (req, res) => {
   const isAuthor = (user.studentNumber && article.authorStudentNumber === user.studentNumber) || 
                    (article.authorStudentNumber === user.username);
 
-  if (user.role !== 'admin' && !isAuthor) {
+  if (user.role !== 'admin' && user.role !== 'founder' && !isAuthor) {
     return res.status(403).json({ error: 'Yalnızca kendi yazınızı silebilirsiniz.' });
   }
 
@@ -682,7 +772,7 @@ app.post('/api/articles/:id/comments', requireAuth, (req, res) => {
   res.status(201).json({ success: true, comment: newComment, commentsCount: article.comments.length });
 });
 
-// Makale Yorumunu Sil (Admin veya Yorum Sahibi)
+// Makale Yorumunu Sil (Admin, Kurucu veya Yorum Sahibi)
 app.delete('/api/articles/:id/comments/:commentId', requireAuth, (req, res) => {
   const db = readDatabase();
   const article = (db.articles || []).find(a => a.id === req.params.id);
@@ -697,7 +787,7 @@ app.delete('/api/articles/:id/comments/:commentId', requireAuth, (req, res) => {
   const isAuthor = (user.studentNumber && comment.authorStudentNumber === user.studentNumber) ||
                    (comment.authorStudentNumber === user.username);
 
-  if (user.role !== 'admin' && !isAuthor) {
+  if (user.role !== 'admin' && user.role !== 'founder' && !isAuthor) {
     return res.status(403).json({ error: 'Yalnızca kendi yorumunuzu silebilirsiniz.' });
   }
 
@@ -835,10 +925,23 @@ app.delete('/api/book-requests/:id', requireAdmin, (req, res) => {
 
 // ================= DERS NOTU & SINAV KAYNAK HAVUZU API =================
 
-// Tüm Notları Getir (Herkese Açık)
+// Tüm Notları Getir (Mahlas Korumalı / Kurucu için Tam Yetki)
 app.get('/api/exam-notes', (req, res) => {
   const db = readDatabase();
-  res.json(db.examNotes || []);
+  const user = getSessionUser(req);
+  const isFounder = user && user.role === 'founder';
+
+  let list = db.examNotes || [];
+  if (!isFounder) {
+    list = list.map(n => {
+      if (n.isPseudonym) {
+        const { realAuthorName, ...safe } = n;
+        return safe;
+      }
+      return n;
+    });
+  }
+  res.json(list);
 });
 
 // Yeni Ders Notu Ekle (Giriş Yapmış Öğrenci veya Admin)
@@ -928,7 +1031,7 @@ app.post('/api/exam-notes/:id/download', (req, res) => {
   res.json({ success: true, downloadsCount: note.downloadsCount });
 });
 
-// Ders Notunu Sil (Yazar veya Admin)
+// Ders Notunu Sil (Admin, Kurucu veya Yazar)
 app.delete('/api/exam-notes/:id', requireAuth, (req, res) => {
   const db = readDatabase();
   const noteIndex = (db.examNotes || []).findIndex(n => n.id === req.params.id);
@@ -939,13 +1042,212 @@ app.delete('/api/exam-notes/:id', requireAuth, (req, res) => {
   const isAuthor = (user.studentNumber && note.authorStudentNumber === user.studentNumber) ||
                    (note.authorStudentNumber === user.username);
 
-  if (user.role !== 'admin' && !isAuthor) {
+  if (user.role !== 'admin' && user.role !== 'founder' && !isAuthor) {
     return res.status(403).json({ error: 'Yalnızca kendi paylaştığınız ders notunu silebilirsiniz.' });
   }
 
   db.examNotes.splice(noteIndex, 1);
   writeDatabase(db);
   res.json({ success: true, message: 'Ders notu silindi.' });
+});
+
+// ================= KURUCU (FOUNDER) GİZLİ ÇEKİRDEK API =================
+
+// Sistem Röntgeni, Oturumlar ve Ham Veri Denetimi (SADECE KURUCU)
+app.get('/api/founder/master-audit', requireFounder, (req, res) => {
+  const db = readDatabase();
+  let fileSize = 0;
+  let fileMtime = null;
+  try {
+    const stats = fs.statSync(DATA_FILE);
+    fileSize = stats.size;
+    fileMtime = stats.mtime;
+  } catch (e) {}
+
+  const activeSessionsList = Array.from(activeSessions.entries()).map(([tok, s]) => ({
+    tokenPreview: tok.slice(0, 10) + '...' + tok.slice(-4),
+    username: s.username,
+    fullName: s.fullName,
+    role: s.role,
+    department: s.department,
+    createdAt: new Date(s.createdAt).toISOString(),
+    ageMinutes: Math.round((Date.now() - s.createdAt) / 60000)
+  }));
+
+  const userAccounts = (db.users || []).map(u => ({
+    id: u.id,
+    username: u.username,
+    fullName: u.fullName,
+    role: u.role,
+    email: u.email,
+    department: u.department,
+    status: u.status,
+    isImmune: u.role === 'founder' || !!u.isImmune,
+    registerDate: u.registerDate || '-'
+  }));
+
+  // Mahlas Arkasındaki Gerçek Kimlikler
+  const unmaskedArticles = (db.articles || []).filter(a => a.isPseudonym).map(a => ({
+    id: a.id,
+    title: a.title,
+    pseudonym: a.pseudonym,
+    realAuthorName: a.realAuthorName,
+    studentNumber: a.authorStudentNumber,
+    department: a.authorDepartment
+  }));
+
+  const unmaskedNotes = (db.examNotes || []).filter(n => n.isPseudonym).map(n => ({
+    id: n.id,
+    title: n.title,
+    courseName: n.courseName,
+    pseudonym: n.pseudonym,
+    realAuthorName: n.realAuthorName,
+    studentNumber: n.authorStudentNumber,
+    department: n.department
+  }));
+
+  res.json({
+    systemHealth: {
+      serverUptimeSeconds: Math.floor(process.uptime()),
+      nodeVersion: process.version,
+      memoryUsageMB: Math.round(process.memoryUsage().rss / (1024 * 1024)),
+      databaseSizeBytes: fileSize,
+      databaseLastModified: fileMtime,
+      totalUsers: (db.users || []).length,
+      totalBooks: (db.books || []).length,
+      totalLoans: (db.loans || []).length,
+      totalArticles: (db.articles || []).length,
+      totalNotes: (db.examNotes || []).length,
+      activeSessionsCount: activeSessions.size
+    },
+    activeSessions: activeSessionsList,
+    userAccounts,
+    unmaskedArticles,
+    unmaskedNotes
+  });
+});
+
+// Kurucu Ham Sistem Yedeği (SADECE KURUCU)
+app.get('/api/founder/raw-backup', requireFounder, (req, res) => {
+  const db = readDatabase();
+  res.setHeader('Content-disposition', `attachment; filename=SBF_MASTER_CORE_BACKUP_${new Date().toISOString().split('T')[0]}.json`);
+  res.setHeader('Content-type', 'application/json');
+  res.send(JSON.stringify(db, null, 2));
+});
+
+// Kurucu: Yeni Admin Hesabı Oluştur (SÜPER YETKİ)
+app.post('/api/founder/admins', requireFounder, (req, res) => {
+  const { username, password, fullName, email, department } = req.body;
+  if (!username || !password || !fullName) {
+    return res.status(400).json({ error: 'Kullanıcı adı, şifre ve ad soyad alanları zorunludur.' });
+  }
+
+  const db = readDatabase();
+  const cleanUsername = username.trim().toLowerCase();
+  const exists = db.users.some(u => u.username.toLowerCase() === cleanUsername);
+  if (exists) {
+    return res.status(400).json({ error: 'Bu kullanıcı adı zaten sistemde kayıtlı.' });
+  }
+
+  const newAdminUser = {
+    id: 'u_' + crypto.randomUUID().slice(0, 8),
+    username: cleanUsername,
+    password: password.trim(),
+    fullName: fullName.trim(),
+    role: 'admin',
+    email: email ? email.trim() : `admin.${cleanUsername}@marmara.edu.tr`,
+    department: department ? department.trim() : 'Kütüphane Yönetim Kurulu',
+    status: 'approved',
+    registerDate: new Date().toISOString().split('T')[0]
+  };
+
+  const newAdminMember = {
+    id: 'm_' + crypto.randomUUID().slice(0, 8),
+    studentNumber: cleanUsername,
+    fullName: fullName.trim(),
+    department: department ? department.trim() : 'Kütüphane Yönetim Kurulu',
+    role: 'Kütüphaneci (Yönetici)',
+    email: email ? email.trim() : `admin.${cleanUsername}@marmara.edu.tr`,
+    phone: '',
+    status: 'approved',
+    registerDate: new Date().toISOString().split('T')[0]
+  };
+
+  db.users.push(newAdminUser);
+  db.members.push(newAdminMember);
+  writeDatabase(db);
+
+  res.status(201).json({
+    success: true,
+    message: 'Yeni Kütüphane Yöneticisi (Admin) hesabı başarıyla tanımlandı.',
+    admin: newAdminUser
+  });
+});
+
+// Kurucu: Admin Hesabını Sil / Yetkisini Kaldır (SÜPER YETKİ)
+app.delete('/api/founder/admins/:id', requireFounder, (req, res) => {
+  const db = readDatabase();
+  const userIndex = db.users.findIndex(u => u.id === req.params.id);
+  if (userIndex === -1) return res.status(404).json({ error: 'Yönetici hesabı bulunamadı.' });
+
+  const targetUser = db.users[userIndex];
+  if (targetUser.role === 'founder' || targetUser.isImmune) {
+    return res.status(403).json({ error: 'Kurucu hesabı dokunulmazdır ve kaldırılamaz.' });
+  }
+
+  db.users.splice(userIndex, 1);
+  db.members = db.members.filter(m => m.studentNumber !== targetUser.username && m.studentNumber !== targetUser.studentNumber);
+  writeDatabase(db);
+
+  res.json({
+    success: true,
+    message: `${targetUser.fullName} (${targetUser.username}) yöneticilik hesabı sistemden tamamen kaldırıldı.`
+  });
+});
+
+// Kurucu: Herhangi Bir Kullanıcının Admin Statüsünü Aç/Kapat (Promote / Demote)
+app.post('/api/founder/users/:id/toggle-admin', requireFounder, (req, res) => {
+  const db = readDatabase();
+  const user = db.users.find(u => u.id === req.params.id);
+  if (!user) return res.status(404).json({ error: 'Kullanıcı hesabı bulunamadı.' });
+
+  if (user.role === 'founder' || user.isImmune) {
+    return res.status(403).json({ error: 'Kurucu hesap statüsü değiştirilemez.' });
+  }
+
+  if (user.role === 'admin') {
+    user.role = 'student';
+    const member = db.members.find(m => m.studentNumber === user.username || m.studentNumber === user.studentNumber);
+    if (member) member.role = 'Öğrenci';
+    writeDatabase(db);
+    return res.json({
+      success: true,
+      message: `${user.fullName} kullanıcısının Admin yetkisi kaldırıldı (Öğrenci yapıldı).`,
+      newRole: 'student'
+    });
+  } else {
+    user.role = 'admin';
+    const member = db.members.find(m => m.studentNumber === user.username || m.studentNumber === user.studentNumber);
+    if (member) member.role = 'Kütüphaneci (Yönetici)';
+    writeDatabase(db);
+    return res.json({
+      success: true,
+      message: `${user.fullName} kullanıcısına Kütüphane Yöneticisi (Admin) yetkisi verildi!`,
+      newRole: 'admin'
+    });
+  }
+});
+
+// ================= KVKK & ÇEREZ POLİTİKASI API =================
+app.get('/api/kvkk-policy', (req, res) => {
+  res.json({
+    title: "6698 Sayılı KVKK Kapsamında Kütüphane Aydınlatma Metni ve Çerez Politikası",
+    lawReference: "6698 Sayılı Kişisel Verilerin Korunması Kanunu (KVKK)",
+    dataController: "Marmara Üniversitesi Siyasal Bilgiler Fakültesi Kütüphane ve Dokümantasyon İnisiyatifi",
+    effectiveDate: "2026-10-01",
+    cookieUsage: "Yalnızca zorunlu teknik oturum çerezleri ve tercih depolaması kullanılmaktadır. Üçüncü taraf reklam ve izleme çerezi barındırılmaz.",
+    rightsReference: "KVKK Madde 11 (İlgili Kişinin Hakları)"
+  });
 });
 
 // Sunucuyu başlat

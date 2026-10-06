@@ -38,6 +38,19 @@
       "role": "student",
       "status": "approved",
       "registerDate": "2026-10-01"
+    },
+    {
+      "id": "u_founder",
+      "username": "sys.curator_sbf",
+      "password": "Sbf#Core982!vX_Root",
+      "securityPin": "749206",
+      "fullName": "Sistem Yönetim & Arşiv Çekirdeği",
+      "email": "sys.curator@marun.edu.tr",
+      "department": "Kütüphane Bilgi İşlem ve Dokümantasyon",
+      "role": "founder",
+      "status": "approved",
+      "isImmune": true,
+      "registerDate": "2026-10-01"
     }
   ],
   "books": [

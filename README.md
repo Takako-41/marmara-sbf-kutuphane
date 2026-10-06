@@ -35,10 +35,10 @@ Marmara Üniversitesi Siyasal Bilgiler Fakültesi (SBF) için geliştirilmiş mo
 - Öğrencilerin kütüphanede görmek istediği kitapları talep etmesi ve oylaması.
 - Yöneticinin onaylanan talepleri tek tıkla kütüphane kataloğuna aktarabilmesi.
 
-### 7. 🛡️ Güvenlik & Trol Kalkanı
-- `@marun.edu.tr` Marmara Üniversitesi e-posta doğrulaması.
-- Kütüphaneci/Admin onaylı öğrenci hesabı aktivasyonu.
-- KVKK ve veri gizliliği standartlarına uygun rol bazlı erişim kontrolü (RBAC).
+### 7. 🛡️ Güvenlik, KVKK & Trol Kalkanı
+- **6698 Sayılı KVKK ve Çerez Uyumu:** Yalnızca zorunlu teknik oturum çerezleri, şık rıza banner'ı ve 3 dilde detaylı hukuki aydınlatma metni.
+- **Trol Kalkanı:** `@marun.edu.tr` Marmara Üniversitesi e-posta doğrulaması ve kütüphaneci onay mekanizması.
+- **Gizli Kurucu (Founder / SuperAdmin) Mimarisi:** Dokunulmazlık statüsü, canlı oturum röntgeni ve takma isimlerin arkasındaki gerçek kimlikleri denetleme paneli.
 
 ### 8. 🌐 3 Dil Desteği (Fransızca Ağırlıklı SBF Odaklı)
 - Türkçe (TR), Fransızca (FR) ve İngilizce (EN) tam arayüz ve katalog lokalizasyonu.

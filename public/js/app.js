@@ -153,7 +153,12 @@ const I18N = {
     statusApproved: "Temin Ediliyor",
     statusRejected: "Temin Edilemedi",
     tabExamNotes: "Sınav Notları & Havuz",
-    btnShareExamNote: "Ders Notu / Kaynak Paylaş"
+    btnShareExamNote: "Ders Notu / Kaynak Paylaş",
+    kvkkBannerTitle: "6698 Sayılı KVKK ve Çerez (Cookie) Aydınlatma Bildirimi",
+    kvkkSafeBadge: "Güvenli Kampüs Ağı",
+    kvkkBannerDesc: "SBF Kütüphanesi platformumuzda, oturum güvenliğinizi sağlamak, ödünç geçmişinizi korumak ve dil tercihinizi hatırlamak amacıyla yalnızca zorunlu teknik çerezler kullanılmaktadır. Üçüncü taraf reklam ve ticari izleme çerezi barındırılmaz.",
+    btnKvkkPolicy: "Aydınlatma Metni & Haklar",
+    btnKvkkAccept: "Anladım ve Kabul Ediyorum"
   },
   fr: {
     facultyTitle: "Université de Marmara",
@@ -307,7 +312,12 @@ const I18N = {
     statusApproved: "En Acquisition",
     statusRejected: "Non Retenu",
     tabExamNotes: "Notes de Cours & Examens",
-    btnShareExamNote: "Partager une Note de Cours"
+    btnShareExamNote: "Partager une Note de Cours",
+    kvkkBannerTitle: "Notice de Confidentialité et Cookies (KVKK)",
+    kvkkSafeBadge: "Réseau Campus Sécurisé",
+    kvkkBannerDesc: "Sur notre plateforme, seuls les cookies techniques indispensables sont utilisés pour maintenir votre session et mémoriser la langue. Aucun cookie publicitaire tiers n'est utilisé.",
+    btnKvkkPolicy: "Politique de Confidentialité",
+    btnKvkkAccept: "J'accepte et j'ai compris"
   },
   en: {
     facultyTitle: "Marmara University",
@@ -461,7 +471,12 @@ const I18N = {
     statusApproved: "Acquiring",
     statusRejected: "Declined",
     tabExamNotes: "Exam Notes & Hub",
-    btnShareExamNote: "Share Lecture Note"
+    btnShareExamNote: "Share Lecture Note",
+    kvkkBannerTitle: "KVKK Privacy Notice & Cookie Policy",
+    kvkkSafeBadge: "Secure Campus Network",
+    kvkkBannerDesc: "On our platform, only strictly necessary functional cookies and local storage are utilized to safeguard your session and remember your language. No third-party tracking or advertising cookies exist.",
+    btnKvkkPolicy: "Privacy Policy & Rights",
+    btnKvkkAccept: "I Understand & Accept"
   }
 };
 
@@ -472,12 +487,14 @@ let currentToken = localStorage.getItem('sbf_token') || null;
 let libraryData = { settings: {}, books: [], members: [], loans: [], pendingMembers: [], articles: [], bookRequests: [], pendingArticles: [] };
 let activeTab = 'books'; // Varsayılan olarak kitap kataloğu açık
 let activeArticleId = null;
+let founderUnmasked = false; // Kurucu: Mahlasları açık/kapalı gösterme anahtarı
 
 // DOM Yüklendiğinde
 document.addEventListener('DOMContentLoaded', () => {
   setLanguage(currentLang, false);
   renderAuthHeader();
   renderNavigation();
+  checkKvkkConsent();
   fetchData();
 });
 
@@ -514,12 +531,12 @@ function setLanguage(lang, reloadUI = true) {
   renderNavigation();
 
   if (reloadUI) {
-    if (currentUser && currentUser.role === 'admin') renderDashboard();
+    if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'founder')) renderDashboard();
     renderBooks();
     renderBookRequests();
     renderArticles();
     renderExamNotes();
-    if (currentUser && currentUser.role === 'admin') {
+    if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'founder')) {
       renderLoans();
       renderMembers();
       renderApprovals();
@@ -556,13 +573,18 @@ function renderAuthHeader() {
   } else {
     // Giriş Yapmış Kullanıcı Görünümü
     if (guestBar) guestBar.classList.add('hidden');
-    const roleBadge = currentUser.role === 'admin' 
-      ? '<span class="px-1.5 py-0.5 text-[10px] bg-amber-400 text-slate-900 font-bold rounded">Admin</span>'
+    const isFounder = currentUser.role === 'founder';
+    const isAdmin = currentUser.role === 'admin' || isFounder;
+
+    const roleBadge = isAdmin 
+      ? (isFounder 
+          ? '<span class="px-1.5 py-0.5 text-[10px] bg-amber-400 text-slate-900 font-extrabold rounded shadow-xs" title="Kurucu Admin (SuperAdmin)">Admin</span>'
+          : '<span class="px-1.5 py-0.5 text-[10px] bg-amber-400 text-slate-900 font-bold rounded">Admin</span>')
       : '<span class="px-1.5 py-0.5 text-[10px] bg-blue-300 text-blue-950 font-bold rounded">Öğrenci</span>';
 
     container.innerHTML = `
       <div class="flex items-center bg-white/10 hover:bg-white/15 cursor-pointer rounded-lg px-2.5 py-1 border border-white/15 text-xs text-white transition-all group" onclick="openUserProfileModal()" title="Profilim & Başarı Rozetlerim">
-        <i data-lucide="${currentUser.role === 'admin' ? 'shield-check' : 'award'}" class="w-4 h-4 mr-1.5 text-amber-300 group-hover:scale-110 transition-transform"></i>
+        <i data-lucide="${isAdmin ? (isFounder ? 'crown' : 'shield-check') : 'award'}" class="w-4 h-4 mr-1.5 text-amber-300 group-hover:scale-110 transition-transform"></i>
         <div class="mr-2 text-left">
           <div class="font-bold truncate max-w-[110px] sm:max-w-[150px]">${escapeHtml(currentUser.fullName)}</div>
         </div>
@@ -581,7 +603,7 @@ function renderNavigation() {
   const nav = document.getElementById('mainNav');
   nav.innerHTML = '';
 
-  const isAdmin = currentUser && currentUser.role === 'admin';
+  const isAdmin = currentUser && (currentUser.role === 'admin' || currentUser.role === 'founder');
   const isStudent = currentUser && currentUser.role === 'student';
 
   const pendingMembersCount = (libraryData.pendingMembers || []).length;
@@ -706,7 +728,7 @@ async function fetchData() {
     if (!libraryData.examNotes) libraryData.examNotes = [];
 
     // Yetkiye göre ekranları doldur
-    if (currentUser && currentUser.role === 'admin') {
+    if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'founder')) {
       renderDashboard();
       renderLoans();
       renderMembers();
@@ -734,7 +756,7 @@ async function fetchData() {
 // Sekme Değiştirici
 function switchTab(tabId) {
   // Yetki kısıtlamaları
-  const isAdmin = currentUser && currentUser.role === 'admin';
+  const isAdmin = currentUser && (currentUser.role === 'admin' || currentUser.role === 'founder');
   const isStudent = currentUser && currentUser.role === 'student';
 
   if (!isAdmin && (tabId === 'dashboard' || tabId === 'loans' || tabId === 'members' || tabId === 'approvals' || tabId === 'backup')) {
@@ -768,6 +790,8 @@ function switchTab(tabId) {
 
 // ================= GİRİŞ / ÇIKIŞ / KAYIT =================
 
+let pending2faLogin = null;
+
 async function submitLogin(e) {
   e.preventDefault();
   const username = document.getElementById('login-username').value;
@@ -782,23 +806,73 @@ async function submitLogin(e) {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Giriş yapılamadı.');
 
-    currentToken = data.token;
-    currentUser = data.user;
-    localStorage.setItem('sbf_token', currentToken);
-    localStorage.setItem('sbf_user', JSON.stringify(currentUser));
+    // İki Aşamalı Güvenlik (2FA) Doğrulaması Gerekiyor mu?
+    if (data.require2FA) {
+      pending2faLogin = { username, password };
+      closeModal('modal-login');
+      openModal('modal-2fa-verify');
+      setTimeout(() => {
+        const pinInput = document.getElementById('input-2fa-pin');
+        if (pinInput) {
+          pinInput.value = '';
+          pinInput.focus();
+        }
+      }, 150);
+      return;
+    }
 
-    closeModal('modal-login');
-    document.getElementById('form-login').reset();
-    showToast(`Hoş geldiniz, ${currentUser.fullName}!`, 'success');
-
-    // UI Güncelle
-    activeTab = currentUser.role === 'admin' ? 'dashboard' : 'books';
-    renderAuthHeader();
-    renderNavigation();
-    await fetchData();
+    finishUserLogin(data);
   } catch (err) {
     alert(err.message);
   }
+}
+
+async function submit2faVerification(e) {
+  e.preventDefault();
+  if (!pending2faLogin) return;
+
+  const securityPin = document.getElementById('input-2fa-pin').value;
+  if (!securityPin) return;
+
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: pending2faLogin.username,
+        password: pending2faLogin.password,
+        securityPin
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'İki aşamalı doğrulama başarısız.');
+
+    closeModal('modal-2fa-verify');
+    document.getElementById('form-2fa-verify').reset();
+    pending2faLogin = null;
+
+    finishUserLogin(data);
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+async function finishUserLogin(data) {
+  currentToken = data.token;
+  currentUser = data.user;
+  localStorage.setItem('sbf_token', currentToken);
+  localStorage.setItem('sbf_user', JSON.stringify(currentUser));
+
+  closeModal('modal-login');
+  const loginForm = document.getElementById('form-login');
+  if (loginForm) loginForm.reset();
+  showToast(`Hoş geldiniz, ${currentUser.fullName}!`, 'success');
+
+  // UI Güncelle
+  activeTab = (currentUser.role === 'admin' || currentUser.role === 'founder') ? 'dashboard' : 'books';
+  renderAuthHeader();
+  renderNavigation();
+  await fetchData();
 }
 
 async function submitRegister(e) {
@@ -1097,6 +1171,17 @@ function renderDashboard() {
     `;
     tbody.appendChild(tr);
   });
+
+  // Kurucu Özel Paneli Kontrolü & Canlı İstatistikler
+  const founderPanel = document.getElementById('founder-core-panel');
+  if (founderPanel) {
+    if (currentUser && currentUser.role === 'founder') {
+      founderPanel.classList.remove('hidden');
+      loadFounderCoreStats();
+    } else {
+      founderPanel.classList.add('hidden');
+    }
+  }
 }
 
 // ================= ÖDÜNÇ VE İADE - SADECE ADMİN =================
@@ -1257,7 +1342,7 @@ function closeModal(id) {
 }
 
 function openIssueModal(preselectedBookId = null) {
-  if (!currentUser || currentUser.role !== 'admin') {
+  if (!currentUser || (currentUser.role !== 'admin' && currentUser.role !== 'founder')) {
     alert("Bu işlem sadece Kütüphane Yöneticisi (Admin) tarafından yapılabilir.");
     return;
   }
@@ -1340,7 +1425,7 @@ async function returnBook(loanId) {
 }
 
 function openBookModal(bookId = null) {
-  if (!currentUser || currentUser.role !== 'admin') {
+  if (!currentUser || (currentUser.role !== 'admin' && currentUser.role !== 'founder')) {
     alert("Kitap ekleme ve düzenleme yetkisi sadece Admin'e aittir.");
     return;
   }
@@ -1425,7 +1510,7 @@ async function deleteBook(id) {
 }
 
 function openMemberModal(memberId = null) {
-  if (!currentUser || currentUser.role !== 'admin') {
+  if (!currentUser || (currentUser.role !== 'admin' && currentUser.role !== 'founder')) {
     alert("Üye yönetimi sadece Admin'e aittir.");
     return;
   }
@@ -1504,8 +1589,8 @@ async function deleteMember(id) {
 }
 
 function downloadBackup() {
-  if (!currentToken || !currentUser || currentUser.role !== 'admin') {
-    alert("Yedek indirme yetkisi sadece Admin'dedir.");
+  if (!currentToken || !currentUser || (currentUser.role !== 'admin' && currentUser.role !== 'founder')) {
+    alert("Yedek indirme yetkisi sadece Admin ve Kurucu'dadır.");
     return;
   }
   window.location.href = `/api/backup?token=${currentToken}`;
@@ -1669,9 +1754,10 @@ function renderArticles() {
 
         <div class="mt-4 pt-3 border-t border-slate-100">
           <div class="flex items-center justify-between text-xs text-slate-500">
-            <div class="flex items-center space-x-1.5 truncate max-w-[170px]">
+            <div class="flex items-center space-x-1.5 truncate max-w-[210px]">
               <i data-lucide="user" class="w-3.5 h-3.5 text-indigo-600 shrink-0"></i>
               <span class="font-medium text-slate-700 truncate">${escapeHtml(art.authorName)}</span>
+              ${(currentUser && currentUser.role === 'founder' && founderUnmasked && art.isPseudonym && art.realAuthorName) ? `<span class="text-[10px] text-amber-700 font-bold bg-amber-100 px-1.5 py-0.5 rounded border border-amber-300 ml-1 shrink-0" title="Gerçek: ${escapeHtml(art.realAuthorName)}">👁️ ${escapeHtml(art.realAuthorName)}</span>` : ''}
             </div>
             <div class="flex items-center space-x-2.5 text-[11px] text-slate-400 shrink-0">
               <span class="flex items-center" title="Beğeniler"><i data-lucide="heart" class="w-3 h-3 mr-0.5 text-rose-500"></i> ${likesCount}</span>
@@ -1754,7 +1840,11 @@ function openReadArticleModal(id) {
 
   document.getElementById('read-article-title').textContent = article.title;
   document.getElementById('read-article-category-badge').textContent = article.category;
-  document.getElementById('read-article-author').textContent = article.authorName;
+  let authorDisplayText = article.authorName;
+  if (currentUser && currentUser.role === 'founder' && founderUnmasked && article.isPseudonym && article.realAuthorName) {
+    authorDisplayText = `${article.authorName} [👁️ Gerçek Yazar: ${article.realAuthorName} - No: ${article.authorStudentNumber || '-'}]`;
+  }
+  document.getElementById('read-article-author').textContent = authorDisplayText;
   document.getElementById('read-article-department').textContent = article.authorDepartment || 'SBF';
   document.getElementById('read-article-date').textContent = article.createdAt 
     ? new Date(article.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }) 
@@ -2492,9 +2582,10 @@ function renderExamNotes() {
         </div>
 
         <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-          <div class="flex items-center space-x-1.5 truncate max-w-[150px]">
+          <div class="flex items-center space-x-1.5 truncate max-w-[210px]">
             <i data-lucide="user" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
             <span class="font-medium text-slate-700 truncate">${escapeHtml(n.authorName)}</span>
+            ${(currentUser && currentUser.role === 'founder' && founderUnmasked && n.isPseudonym && n.realAuthorName) ? `<span class="text-[10px] text-amber-700 font-bold bg-amber-100 px-1.5 py-0.5 rounded border border-amber-300 ml-1 shrink-0" title="Gerçek: ${escapeHtml(n.realAuthorName)}">👁️ ${escapeHtml(n.realAuthorName)}</span>` : ''}
           </div>
 
           <div class="flex items-center space-x-2 shrink-0">
@@ -2524,7 +2615,11 @@ function openReadExamNoteModal(id) {
   document.getElementById('read-note-course-name').textContent = note.courseName;
   document.getElementById('read-note-instructor').textContent = note.instructor || 'Öğretim Üyesi';
   document.getElementById('read-note-department').textContent = note.department || 'SBF';
-  document.getElementById('read-note-author').textContent = note.authorName;
+  let noteAuthorText = note.authorName;
+  if (currentUser && currentUser.role === 'founder' && founderUnmasked && note.isPseudonym && note.realAuthorName) {
+    noteAuthorText = `${note.authorName} [👁️ Gerçek Yazar: ${note.realAuthorName} - No: ${note.authorStudentNumber || '-'}]`;
+  }
+  document.getElementById('read-note-author').textContent = noteAuthorText;
 
   const descBox = document.getElementById('read-note-description-box');
   const descText = document.getElementById('read-note-description');
@@ -2820,6 +2915,273 @@ function openUserProfileModal() {
 
   openModal('modal-user-profile');
   if (window.lucide) lucide.createIcons();
+}
+
+// ================= KVKK & ÇEREZ YÖNETİMİ =================
+
+function checkKvkkConsent() {
+  const isAccepted = localStorage.getItem('sbf_kvkk_accepted');
+  const banner = document.getElementById('kvkkConsentBanner');
+  if (banner) {
+    if (!isAccepted) {
+      banner.classList.remove('hidden');
+    } else {
+      banner.classList.add('hidden');
+    }
+  }
+}
+
+function acceptKvkkConsent() {
+  localStorage.setItem('sbf_kvkk_accepted', 'true');
+  const banner = document.getElementById('kvkkConsentBanner');
+  if (banner) banner.classList.add('hidden');
+  showToast('KVKK ve Çerez tercihleriniz başarıyla kaydedildi.', 'success');
+}
+
+// ================= KURUCU (FOUNDER) GİZLİ ÇEKİRDEK İŞLEMLERİ =================
+
+async function loadFounderCoreStats() {
+  if (!currentToken || !currentUser || currentUser.role !== 'founder') return;
+  try {
+    const res = await fetch('/api/founder/master-audit', {
+      headers: { 'Authorization': `Bearer ${currentToken}` }
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+
+    const sessEl = document.getElementById('founder-stat-sessions');
+    const pseudoEl = document.getElementById('founder-stat-pseudonyms');
+    const dbSizeEl = document.getElementById('founder-stat-dbsize');
+
+    if (sessEl) sessEl.textContent = `${data.activeSessions.length} Canlı Oturum`;
+    const totalPseudos = (data.unmaskedArticles || []).length + (data.unmaskedNotes || []).length;
+    if (pseudoEl) pseudoEl.textContent = `${totalPseudos} Mahlas Kayıtlı`;
+    if (dbSizeEl) dbSizeEl.textContent = `${Math.round(data.systemHealth.databaseSizeBytes / 1024)} KB (Sağlam)`;
+  } catch (e) {
+    console.error('Founder stat error:', e);
+  }
+}
+
+function toggleUnmaskAllPseudonyms() {
+  if (!currentUser || currentUser.role !== 'founder') return;
+  founderUnmasked = !founderUnmasked;
+  const btnText = document.getElementById('founderUnmaskToggleText');
+  const btn = document.getElementById('btnFounderUnmaskToggle');
+  if (btnText && btn) {
+    if (founderUnmasked) {
+      btnText.textContent = "Mahlasları Gizle (Normal Görünüm)";
+      btn.className = "px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-xs font-bold transition-all shadow-sm flex items-center";
+      showToast("👁️ Kurucu Modu: Mahlasların arkasındaki gerçek kimlikler açıldı!", "success");
+    } else {
+      btnText.textContent = "Mahlasları & Gerçek Kimlikleri Aç";
+      btn.className = "px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center";
+      showToast("Mahlaslar standart görünümüne döndü.", "info");
+    }
+  }
+  renderArticles();
+  renderExamNotes();
+}
+
+async function openFounderAuditModal() {
+  if (!currentToken || !currentUser || currentUser.role !== 'founder') {
+    alert("Bu denetim konsolu yalnızca Kurucu yetkisi ile görüntülenebilir.");
+    return;
+  }
+  try {
+    const res = await fetch('/api/founder/master-audit', {
+      headers: { 'Authorization': `Bearer ${currentToken}` }
+    });
+    if (!res.ok) throw new Error("Audit verisi alınamadı");
+    const data = await res.json();
+
+    // Sağlık kartları
+    const uptimeMin = Math.floor(data.systemHealth.serverUptimeSeconds / 60);
+    const upEl = document.getElementById('audit-uptime');
+    const ramEl = document.getElementById('audit-ram');
+    const sessCountEl = document.getElementById('audit-active-sessions');
+    const dbSizeEl = document.getElementById('audit-dbsize');
+
+    if (upEl) upEl.textContent = `${uptimeMin} dk (${data.systemHealth.serverUptimeSeconds}s)`;
+    if (ramEl) ramEl.textContent = `${data.systemHealth.memoryUsageMB} MB`;
+    if (sessCountEl) sessCountEl.textContent = `${data.activeSessions.length} Oturum`;
+    if (dbSizeEl) dbSizeEl.textContent = `${Math.round(data.systemHealth.databaseSizeBytes / 1024)} KB`;
+
+    // 1. Canlı Oturumlar Tablosu
+    const sessTbody = document.getElementById('audit-sessions-tbody');
+    if (sessTbody) {
+      sessTbody.innerHTML = '';
+      if (data.activeSessions.length === 0) {
+        sessTbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-slate-500">Aktif oturum kaydı bulunamadı.</td></tr>`;
+      } else {
+        data.activeSessions.forEach(s => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td class="py-2.5 px-3 font-bold text-white">${escapeHtml(s.fullName)} <span class="text-slate-400">(${escapeHtml(s.username)})</span></td>
+            <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${s.role === 'founder' ? 'bg-amber-400 text-slate-950' : (s.role === 'admin' ? 'bg-blue-600 text-white' : 'bg-slate-700 text-slate-200')}">${escapeHtml(s.role)}</span></td>
+            <td class="py-2.5 px-3 text-emerald-400 font-mono">${s.ageMinutes} dk önce</td>
+            <td class="py-2.5 px-3 text-slate-400">${escapeHtml(s.department || '-')}</td>
+            <td class="py-2.5 px-3 text-right font-mono text-[10px] text-amber-300">${s.tokenPreview}</td>
+          `;
+          sessTbody.appendChild(tr);
+        });
+      }
+    }
+
+    // 2. Mahlas Eşleştirme Tablosu
+    const unmaskTbody = document.getElementById('audit-unmask-tbody');
+    if (unmaskTbody) {
+      unmaskTbody.innerHTML = '';
+      const allUnmasked = [
+        ...data.unmaskedArticles.map(a => ({ type: 'Makale', title: a.title, ...a })),
+        ...data.unmaskedNotes.map(n => ({ type: 'Sınav Notu', title: n.title, ...n }))
+      ];
+      if (allUnmasked.length === 0) {
+        unmaskTbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-slate-500">Şu an sistemde mahlas kullanan eser bulunmuyor.</td></tr>`;
+      } else {
+        allUnmasked.forEach(u => {
+          const tr = document.createElement('tr');
+          tr.className = "hover:bg-white/5";
+          tr.innerHTML = `
+            <td class="py-2.5 px-3"><span class="px-1.5 py-0.5 rounded text-[10px] ${u.type === 'Makale' ? 'bg-indigo-900/80 text-indigo-200' : 'bg-emerald-900/80 text-emerald-200'}">${u.type}</span> <span class="font-medium text-slate-300 ml-1">${escapeHtml(u.title)}</span></td>
+            <td class="py-2.5 px-3 font-semibold text-slate-300 font-mono">${escapeHtml(u.pseudonym)}</td>
+            <td class="py-2.5 px-3 font-bold text-amber-300">${escapeHtml(u.realAuthorName)}</td>
+            <td class="py-2.5 px-3 font-mono text-slate-300">${escapeHtml(u.studentNumber)}</td>
+            <td class="py-2.5 px-3 text-slate-400">${escapeHtml(u.department || '-')}</td>
+          `;
+          unmaskTbody.appendChild(tr);
+        });
+      }
+    }
+
+    // 3. Kullanıcı Hesapları Tablosu & Hızlı Yetkilendirme
+    const usersTbody = document.getElementById('audit-users-tbody');
+    if (usersTbody) {
+      usersTbody.innerHTML = '';
+      data.userAccounts.forEach(u => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-white/5";
+        const isImmune = u.isImmune || u.role === 'founder';
+        const roleBtn = isImmune
+          ? '<span class="px-2 py-0.5 text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-full font-bold">🛡️ Dokunulmaz</span>'
+          : (u.role === 'admin'
+              ? `<button onclick="toggleUserAdminRole('${u.id}')" class="px-2 py-0.5 text-[10px] bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 rounded font-bold border border-amber-500/30 transition-colors">Adminliği Al</button>`
+              : `<button onclick="toggleUserAdminRole('${u.id}')" class="px-2 py-0.5 text-[10px] bg-blue-500/20 hover:bg-blue-500/40 text-blue-300 rounded font-bold border border-blue-500/30 transition-colors">+ Admin Yap</button>`);
+
+        tr.innerHTML = `
+          <td class="py-2 px-3 font-mono font-bold text-slate-200">${escapeHtml(u.username)}</td>
+          <td class="py-2 px-3 font-semibold text-white">${escapeHtml(u.fullName)}</td>
+          <td class="py-2 px-3"><span class="px-1.5 py-0.5 text-[10px] rounded ${u.role === 'founder' ? 'bg-amber-400 text-slate-950 font-bold' : (u.role === 'admin' ? 'bg-blue-600 text-white' : 'bg-slate-700 text-slate-200')}">${escapeHtml(u.role)}</span></td>
+          <td class="py-2 px-3 text-slate-400 text-[10px] font-mono">${escapeHtml(u.email || '-')}</td>
+          <td class="py-2 px-3 text-right">${roleBtn}</td>
+        `;
+        usersTbody.appendChild(tr);
+      });
+    }
+
+    // 4. Admin Yönetim Masası Tablosu
+    const adminsTbody = document.getElementById('audit-admins-tbody');
+    if (adminsTbody) {
+      adminsTbody.innerHTML = '';
+      const adminAccounts = data.userAccounts.filter(u => u.role === 'admin');
+      if (adminAccounts.length === 0) {
+        adminsTbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-slate-500">Şu anda kayıtlı standart admin bulunmamaktadır.</td></tr>`;
+      } else {
+        adminAccounts.forEach(adm => {
+          const tr = document.createElement('tr');
+          tr.className = "hover:bg-white/5";
+          tr.innerHTML = `
+            <td class="py-2 px-3 font-mono font-bold text-amber-300">${escapeHtml(adm.username)}</td>
+            <td class="py-2 px-3 font-semibold text-white">${escapeHtml(adm.fullName)}</td>
+            <td class="py-2 px-3 text-slate-300 font-mono text-[10px]">${escapeHtml(adm.email || '-')}</td>
+            <td class="py-2 px-3"><span class="px-1.5 py-0.5 text-[10px] rounded bg-blue-600 text-white font-bold">Kütüphane Admini</span></td>
+            <td class="py-2 px-3 text-right space-x-1.5 whitespace-nowrap">
+              <button onclick="toggleUserAdminRole('${adm.id}')" title="Admin yetkisini kaldırıp öğrenci yap" class="px-2 py-1 text-[10px] bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 rounded font-semibold border border-amber-500/30 transition-all">
+                Yetkiyi Geri Al
+              </button>
+              <button onclick="deleteAdminAccount('${adm.id}', '${escapeHtml(adm.fullName)}')" title="Admin hesabını tamamen sil" class="px-2 py-1 text-[10px] bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 rounded font-semibold border border-rose-500/30 transition-all">
+                Hesabı Sil
+              </button>
+            </td>
+          `;
+          adminsTbody.appendChild(tr);
+        });
+      }
+    }
+
+    openModal('modal-founder-audit');
+    if (window.lucide) lucide.createIcons();
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+// Kurucu: Yeni Admin Tanımla
+async function submitCreateAdmin(e) {
+  e.preventDefault();
+  const username = document.getElementById('admin-new-username').value;
+  const password = document.getElementById('admin-new-password').value;
+  const fullName = document.getElementById('admin-new-fullname').value;
+  const email = document.getElementById('admin-new-email').value;
+  const department = document.getElementById('admin-new-department').value;
+
+  try {
+    const res = await fetch('/api/founder/admins', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${currentToken}`
+      },
+      body: JSON.stringify({ username, password, fullName, email, department })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Admin hesabı oluşturulamadı.');
+
+    closeModal('modal-create-admin');
+    document.getElementById('form-create-admin').reset();
+    showToast(data.message, 'success');
+    await openFounderAuditModal();
+    await fetchData();
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+// Kurucu: Admin Hesabını Sil
+async function deleteAdminAccount(id, name) {
+  if (!confirm(`"${name}" yöneticisinin hesabını sistemden kalıcı olarak silmek istediğinize emin misiniz?`)) return;
+
+  try {
+    const res = await fetch(`/api/founder/admins/${id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${currentToken}` }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Yönetici silinemedi.');
+
+    showToast(data.message, 'info');
+    await openFounderAuditModal();
+    await fetchData();
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+// Kurucu: Kullanıcının Rolünü Admin / Öğrenci Arasında Değiştir (Promote/Demote)
+async function toggleUserAdminRole(id) {
+  try {
+    const res = await fetch(`/api/founder/users/${id}/toggle-admin`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${currentToken}` }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'İşlem başarısız.');
+
+    showToast(data.message, 'success');
+    await openFounderAuditModal();
+    await fetchData();
+  } catch (err) {
+    alert(err.message);
+  }
 }
 
 
