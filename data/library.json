@@ -17,13 +17,13 @@
       "status": "approved"
     },
     {
-      "id": "u_selin",
+      "id": "u_ali_candan",
       "username": "120210045",
       "password": "123",
-      "fullName": "Selin Aydın",
+      "fullName": "Ali Candan",
       "role": "student",
       "studentNumber": "120210045",
-      "email": "selin.aydin@marun.edu.tr",
+      "email": "ali.candan@marun.edu.tr",
       "department": "Siyaset Bilimi ve Kamu Yönetimi (Fransızca)",
       "status": "approved"
     },
@@ -143,10 +143,10 @@
     {
       "id": "m1",
       "studentNumber": "120210045",
-      "fullName": "Selin Aydın",
+      "fullName": "Ali Candan",
       "department": "Siyaset Bilimi ve Kamu Yönetimi (Fransızca)",
       "role": "Öğrenci",
-      "email": "selin.aydin@marun.edu.tr",
+      "email": "ali.candan@marun.edu.tr",
       "phone": "0532 100 00 01",
       "status": "approved"
     },
@@ -178,7 +178,7 @@
       "bookId": "b1",
       "bookTitle": "Les Régimes Politiques",
       "memberId": "m1",
-      "memberName": "Selin Aydın",
+      "memberName": "Ali Candan",
       "memberNumber": "120210045",
       "issueDate": "2026-09-20",
       "dueDate": "2026-10-05",
@@ -228,7 +228,7 @@
       "comments": [
         {
           "id": "c_1",
-          "authorName": "Selin Aydın",
+          "authorName": "Ali Candan",
           "authorStudentNumber": "120210045",
           "authorDepartment": "Siyaset Bilimi ve Kamu Yönetimi (Fransızca)",
           "text": "Harika bir değerlendirme olmuş Tarık. Özellikle Aron'un meşruiyet ve ideolojik çatışma vurgusu günümüz küresel siyasetinde realizmin salt askeri determinizmine çok dengeli bir panzehir sunuyor.",
@@ -244,7 +244,7 @@
       "category": "Kamu Yönetimi",
       "summary": "Weberian ideal tip bürokrasiden dijital yönetişime geçişte şeffaflık, liyakat ve hız ilkelerinin yeniden yorumlanması.",
       "content": "Max Weber'in tanımladığı hiyerarşik ve kurala dayalı bürokrasi modeli, 20. yüzyılın sanayi toplumları için bir rasyonalite ve istikrar kalesiydi. Ancak dijital kamu hizmetleri ve açık veri çağında bürokrasinin hızı ve vatandaş odaklılığı temel öncelik haline gelmiştir.\n\nKamu yönetiminde algoritmik karar destek sistemlerinin ve e-devlet entegrasyonlarının artması, bürokratik hantallığı azaltırken liyakat ve şeffaflık denetimini daha da kritik kılmaktadır.",
-      "authorName": "Selin Aydın",
+      "authorName": "Ali Candan",
       "authorStudentNumber": "120210045",
       "authorDepartment": "Siyaset Bilimi ve Kamu Yönetimi (Fransızca)",
       "status": "published",
@@ -271,7 +271,7 @@
       "category": "Siyaset Bilimi",
       "summary": "Maurice Duverger'nin kavramsallaştırdığı yarı-başkanlık sisteminin yürütme organı üzerindeki çift başlılık (bicephalous) dinamikleri.",
       "content": "Fransa'da 1958 Anayasası ile kurulan Beşinci Cumhuriyet, Charles de Gaulle'ün güçlü yürütme arayışının bir ürünüdür. Duverger'nin 'Les Régimes Politiques' eserinde işaret ettiği üzere cumhurbaşkanı ile başbakan arasındaki 'cohabitation' (birlikte yaşama) dönemleri sistemin krizlere karşı esnekliğini test etmiştir.",
-      "authorName": "Selin Aydın",
+      "authorName": "Ali Candan",
       "authorStudentNumber": "120210045",
       "authorDepartment": "Siyaset Bilimi ve Kamu Yönetimi (Fransızca)",
       "status": "pending",
@@ -307,7 +307,7 @@
       "publisher": "Gallimard",
       "isbn": "978-2070729685",
       "category": "Felsefe & Sosyoloji",
-      "requestedBy": "Selin Aydın",
+      "requestedBy": "Ali Candan",
       "studentNumber": "120210045",
       "note": "İktidar, gözetim ve modern kurumların analizi için Fransızca orijinal baskısı kütüphanemiz Fransızca bölümüne çok yakışacaktır.",
       "votes": [
@@ -370,7 +370,7 @@
       "description": "Devletin kurucu unsurları, tanıma teorileri (bildirici vs. kurucu) ve Lotus Davası (Türkiye-Fransa) analiz metni.",
       "content": "### 1. Uluslararası Adalet Divanı Statüsü Madde 38 (Hukukun Kaynakları):\n1. Uluslararası Andlaşmalar\n2. Uluslararası Teamül (Örf ve Adet Hukuku - Maddi unsur: Genel uygulama, Manevi unsur: Opinio Juris)\n3. Hukukun Genel İlkeleri\n4. Yardımcı Kaynaklar (Yargı kararları ve doktrin)\n\n### 2. Lotus Davası (1927 - PCIJ / Türkiye - Fransa):\n- Temel İlke: Egemen devletler açıkça yasaklanmadıkça serbesttir (Lotus Prensibi).\n- Olay: Bozkurt ve Lotus gemilerinin açık denizde çarpışması sonrası Türkiye'nin yargı yetkisi kullanması kabul edilmiştir.",
       "driveUrl": "https://drive.google.com/open?id=sbf_uli305_lotus",
-      "authorName": "Selin Aydın",
+      "authorName": "Ali Candan",
       "authorStudentNumber": "120210045",
       "isPseudonym": false,
       "pseudonym": null,
