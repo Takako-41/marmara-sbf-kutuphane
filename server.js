@@ -529,7 +529,29 @@ app.post('/api/members', requireAdmin, (req, res) => {
   res.status(201).json(newMember);
 });
 
-// Kitap Ödünç Ver (SADECE ADMİN)
+// Kitap Dinamik Talep ve Tahsis Süresi Hesaplama (Yoğunluk Algoritması)
+function calculateDynamicLoanDays(book, member, db) {
+  const total = book.totalCopies || 1;
+  const available = book.availableCopies !== undefined ? book.availableCopies : 1;
+  const pastLoans = (db.loans || []).filter(l => l.bookId === book.id).length;
+
+  // Kritik Talep: Tek nüsha veya son nüsha kalmış ve geçmişte talep görmüş (1-2 Gün)
+  if (total === 1 || (available === 1 && total > 1 && pastLoans >= 2)) {
+    return { days: 1, demandLevel: 'critical', demandLabel: 'Kritik Talep (1-2 Gün)' };
+  }
+  // Yüksek Talep: Rafta tek kopya kalmış veya stok %50'nin altına düşmüş (3 Gün)
+  if (available === 1 || (available / total <= 0.5) || pastLoans >= 3) {
+    return { days: 3, demandLevel: 'high', demandLabel: 'Yüksek Talep (3 Gün)' };
+  }
+  // Orta Talep: Bazı kopyalar ödünçte (5 Gün)
+  if (available < total) {
+    return { days: 5, demandLevel: 'moderate', demandLabel: 'Orta Talep (5 Gün)' };
+  }
+  // Normal / Standart Talep: Tüm kopyalar rafta (Max 8 Gün)
+  return { days: 8, demandLevel: 'normal', demandLabel: 'Normal Talep (8 Gün)' };
+}
+
+// Kitap Ödünç Ver (SADECE ADMİN) - DİNAMİK VE YOĞUNLUĞA GÖRE TAHSİS SİSTEMİ
 app.post('/api/loans/issue', requireAdmin, (req, res) => {
   const db = readDatabase();
   const { bookId, memberId, loanDays } = req.body;
@@ -548,10 +570,28 @@ app.post('/api/loans/issue', requireAdmin, (req, res) => {
     return res.status(400).json({ error: 'Bu kitaptan rafta uygun kopya kalmadı.' });
   }
 
-  const days = parseInt(loanDays) || (member.role === 'Öğretim Üyesi' ? 30 : 15);
+  const isAcademic = member.role === 'Öğretim Üyesi' || member.role === 'Araştırma Görevlisi' || member.role === 'faculty' || member.role === 'researcher';
+  const dynamicDemand = calculateDynamicLoanDays(book, member, db);
+
+  let days = parseInt(loanDays, 10);
+  let isSameDay = false;
+
+  if (loanDays === 0 || loanDays === '0' || loanDays === 'same-day') {
+    // Akademisyenlere veya özel duruma "Aynı Gün Tahsis" (Günübirlik - Gün sonu teslim)
+    days = 0;
+    isSameDay = true;
+  } else if (isNaN(days) || days < 1) {
+    days = dynamicDemand.days; // Dinamik otomatik öneri
+  } else {
+    // Sınır: Min 1 Gün, Max 8 Gün tahsis tavanı!
+    days = Math.max(1, Math.min(8, days));
+  }
+
   const now = new Date();
   const dueDate = new Date();
-  dueDate.setDate(now.getDate() + days);
+  if (days > 0) {
+    dueDate.setDate(now.getDate() + days);
+  }
 
   const newLoan = {
     id: 'l_' + crypto.randomUUID().slice(0, 8),
@@ -562,6 +602,9 @@ app.post('/api/loans/issue', requireAdmin, (req, res) => {
     memberNumber: member.studentNumber,
     issueDate: now.toISOString().split('T')[0],
     dueDate: dueDate.toISOString().split('T')[0],
+    loanDays: days,
+    isSameDay: isSameDay,
+    demandLevel: dynamicDemand.demandLevel,
     status: 'borrowed',
     returnDate: null
   };
