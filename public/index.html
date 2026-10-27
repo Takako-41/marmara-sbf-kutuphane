@@ -8,6 +8,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- SheetJS (Excel .xlsx/.xls/.csv okuma ve dışa aktarma) -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
@@ -214,6 +216,11 @@
               <option value="Türkçe">Türkçe 🇹🇷</option>
               <option value="English">English 🇬🇧</option>
             </select>
+            <!-- Toplu Kitap Yükleme Butonu (Excel/CSV) SADECE ADMİNDE görünür -->
+            <button id="btnAdminBatchImport" onclick="openBatchImportModal()" class="hidden flex items-center px-3.5 py-2 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg text-sm font-medium transition-colors shadow-sm">
+              <i data-lucide="file-spreadsheet" class="w-4 h-4 mr-1.5"></i>
+              <span>Excel/CSV Toplu Yükle</span>
+            </button>
             <!-- Kitap Ekle Butonu SADECE ADMİNDE görünür -->
             <button id="btnAdminAddBook" onclick="openBookModal()" class="hidden flex items-center px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg text-sm font-medium transition-colors shadow-sm">
               <i data-lucide="plus" class="w-4 h-4 mr-1.5"></i>
@@ -918,28 +925,65 @@
           <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1" data-i18n="lblSelectMember">
             Öğrenci / Akademisyen Seçin *
           </label>
-          <select id="issue-member-select" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5 bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"></select>
+          <select id="issue-member-select" required onchange="onIssueMemberChange()" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"></select>
         </div>
         <div>
           <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1" data-i18n="lblSelectBook">
             Kitap Seçin (Yalnızca Rafta Olanlar) *
           </label>
-          <select id="issue-book-select" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5 bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"></select>
+          <select id="issue-book-select" required onchange="onIssueBookChange()" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"></select>
         </div>
-        <div>
-          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1" data-i18n="lblLoanDuration">
-            Ödünç Süresi (Gün)
-          </label>
-          <div class="flex gap-3">
-            <label class="flex items-center text-sm">
-              <input type="radio" name="loanDaysRadio" value="15" checked class="text-blue-600 focus:ring-blue-500 mr-1.5">
-              <span data-i18n="opt15Days">15 Gün (Öğrenci)</span>
-            </label>
-            <label class="flex items-center text-sm">
-              <input type="radio" name="loanDaysRadio" value="30" class="text-blue-600 focus:ring-blue-500 mr-1.5">
-              <span data-i18n="opt30Days">30 Gün (Akademisyen)</span>
-            </label>
+
+        <!-- Akıllı Dinamik Süre ve Yoğunluk Analiz Kartı -->
+        <div id="issue-demand-card" class="hidden rounded-xl p-3 border text-xs space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="font-bold flex items-center" id="issue-demand-title">
+              <i data-lucide="zap" class="w-3.5 h-3.5 mr-1 text-amber-500"></i>
+              Dinamik Tahsis Analizi
+            </span>
+            <span id="issue-demand-badge" class="px-2 py-0.5 rounded font-bold text-[10px]">Öneri: 7 Gün</span>
           </div>
+          <p id="issue-demand-desc" class="text-slate-600 text-[11px] leading-relaxed">
+            Kitap yoğunluğuna göre dinamik ödünç süresi hesaplandı.
+          </p>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+              Ödünç Süresi (Gün) * <span class="text-slate-400 font-normal lowercase">(Maksimum 7 gün)</span>
+            </label>
+            <span class="text-[11px] text-blue-700 font-bold" id="issue-selected-days-label">Seçilen: 7 Gün (Tavan Süre)</span>
+          </div>
+
+          <!-- Hızlı Seçim Butonları -->
+          <div class="grid grid-cols-3 sm:grid-cols-6 gap-2 mb-2">
+            <button type="button" onclick="selectLoanDays(0)" class="btn-loan-day py-2 rounded-lg border text-xs font-bold text-center transition-all bg-purple-50 text-purple-900 border-purple-200 hover:bg-purple-100" data-days="0" title="Aynı gün içinde teslim (Ders/seminer içi)">
+              Günübirlik
+            </button>
+            <button type="button" onclick="selectLoanDays(1)" class="btn-loan-day py-2 rounded-lg border text-xs font-semibold text-center transition-all bg-white text-slate-700 border-slate-200 hover:bg-slate-50" data-days="1">
+              1 Gün
+            </button>
+            <button type="button" onclick="selectLoanDays(2)" class="btn-loan-day py-2 rounded-lg border text-xs font-semibold text-center transition-all bg-white text-slate-700 border-slate-200 hover:bg-slate-50" data-days="2">
+              2 Gün
+            </button>
+            <button type="button" onclick="selectLoanDays(3)" class="btn-loan-day py-2 rounded-lg border text-xs font-semibold text-center transition-all bg-white text-slate-700 border-slate-200 hover:bg-slate-50" data-days="3">
+              3 Gün
+            </button>
+            <button type="button" onclick="selectLoanDays(5)" class="btn-loan-day py-2 rounded-lg border text-xs font-semibold text-center transition-all bg-white text-slate-700 border-slate-200 hover:bg-slate-50" data-days="5">
+              5 Gün
+            </button>
+            <button type="button" onclick="selectLoanDays(7)" class="btn-loan-day py-2 rounded-lg border text-xs font-bold text-center transition-all bg-blue-900 text-white border-blue-900 shadow-sm" data-days="7" title="Tüm üyeler için yasal üst sınır">
+              7 Gün (Max)
+            </button>
+          </div>
+
+          <!-- Gizli input ve bilgilendirme -->
+          <input type="hidden" id="issue-loan-days-input" value="7">
+          <p class="text-[11px] text-slate-500 flex items-center">
+            <i data-lucide="info" class="w-3.5 h-3.5 mr-1 text-blue-600 shrink-0"></i>
+            <span>Hem akademisyenler hem öğrenciler için kütüphanemizde üst sınır <strong>7 gündür</strong>.</span>
+          </p>
         </div>
 
         <div class="pt-4 border-t border-slate-100 flex justify-end space-x-2">
@@ -1011,6 +1055,134 @@
           <button type="submit" class="px-5 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg text-sm font-semibold transition-colors" data-i18n="btnSave">Kaydet</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- MODAL: EXCEL / CSV TOPLU KİTAP YÜKLEME (SADECE ADMİN) -->
+  <div id="modal-batch-import" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden border border-slate-200 max-h-[92vh] flex flex-col">
+      <!-- Modal Başlık -->
+      <div class="bg-gradient-to-r from-emerald-900 via-teal-900 to-slate-900 px-6 py-4 text-white flex justify-between items-center shrink-0">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-300">
+            <i data-lucide="file-spreadsheet" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <span>Excel & CSV Toplu Kitap Yükleme</span>
+              <span class="text-[10px] bg-emerald-400/20 text-emerald-300 border border-emerald-400/30 px-2 py-0.5 rounded font-mono">Fakülte Envanteri</span>
+            </h3>
+            <p class="text-xs text-emerald-200/80">Okulun Excel veya CSV kitap listesini tek tıkla kütüphane veri tabanına aktarın.</p>
+          </div>
+        </div>
+        <button onclick="closeModal('modal-batch-import')" class="text-white/80 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Modal Gövdesi -->
+      <div class="p-6 overflow-y-auto space-y-4">
+        <!-- 1. Şablon İndirme ve Rehber Kartı -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2.5">
+          <div class="flex flex-col sm:row sm:items-center justify-between gap-2">
+            <div>
+              <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center">
+                <i data-lucide="download" class="w-3.5 h-3.5 mr-1.5 text-blue-700"></i>
+                Hazır Şablon Dosyaları
+              </h4>
+              <p class="text-[11px] text-slate-500 mt-0.5">Sütun başlıklarının uyumlu olması için örnek şablonu indirip doldurabilirsiniz:</p>
+            </div>
+            <div class="flex items-center space-x-2 shrink-0">
+              <button type="button" onclick="downloadBatchTemplate('xlsx')" class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg text-xs font-bold transition-all shadow-xs flex items-center">
+                <i data-lucide="sheet" class="w-3.5 h-3.5 mr-1"></i>
+                <span>Excel (.xlsx)</span>
+              </button>
+              <button type="button" onclick="downloadBatchTemplate('csv')" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-xs font-bold transition-all shadow-xs flex items-center">
+                <i data-lucide="file-text" class="w-3.5 h-3.5 mr-1"></i>
+                <span>CSV (.csv)</span>
+              </button>
+            </div>
+          </div>
+          <div class="text-[11px] text-slate-600 bg-white border border-slate-200/80 rounded-lg p-2.5 leading-relaxed">
+            <strong class="text-slate-800">Desteklenen Sütunlar:</strong> 
+            <span class="font-mono text-emerald-800 bg-emerald-50 px-1 py-0.5 rounded">Başlık / Kitap Adı *</span>, 
+            <span class="font-mono text-emerald-800 bg-emerald-50 px-1 py-0.5 rounded">Yazar *</span>, 
+            <span class="font-mono text-slate-700">Kategori</span>, 
+            <span class="font-mono text-slate-700">Dil (TR/FR/EN)</span>, 
+            <span class="font-mono text-slate-700">Raf / Konum</span>, 
+            <span class="font-mono text-slate-700">ISBN</span>, 
+            <span class="font-mono text-slate-700">Adet / Kopya</span>, 
+            <span class="font-mono text-slate-700">Notlar</span>
+          </div>
+        </div>
+
+        <!-- 2. Dosya Yükleme / Sürükle Bırak Alanı -->
+        <div>
+          <input type="file" id="batch-file-input" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleBatchFileSelect(event)">
+          <div id="batch-dropzone" onclick="document.getElementById('batch-file-input').click()" class="border-2 border-dashed border-slate-300 hover:border-emerald-500 rounded-2xl p-6 text-center cursor-pointer transition-all bg-slate-50/50 hover:bg-emerald-50/30 group">
+            <div class="w-12 h-12 mx-auto mb-3 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <i data-lucide="upload-cloud" class="w-6 h-6"></i>
+            </div>
+            <p class="text-sm font-bold text-slate-800">
+              Excel (.xlsx, .xls) veya CSV dosyanızı buraya sürükleyin ya da <span class="text-emerald-700 underline">gözatın</span>
+            </p>
+            <p class="text-xs text-slate-500 mt-1">UTF-8 ve Windows-1254 Türkçe karakter kodlamaları otomatik algılanır.</p>
+          </div>
+        </div>
+
+        <!-- 3. Önizleme ve Doğrulama Alanı -->
+        <div id="batch-preview-container" class="hidden space-y-3">
+          <div class="flex items-center justify-between bg-emerald-50 border border-emerald-200 px-3.5 py-2.5 rounded-xl text-xs">
+            <div class="flex items-center space-x-2 text-emerald-900 font-semibold">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i>
+              <span id="batch-preview-filename">dosya.xlsx</span>
+              <span id="batch-preview-count" class="bg-emerald-200/80 text-emerald-900 px-2 py-0.5 rounded-full font-bold text-[11px]">0 Kitap Okundu</span>
+            </div>
+            <button type="button" onclick="clearBatchPreview()" class="text-slate-500 hover:text-rose-600 text-[11px] font-medium flex items-center">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5 mr-1"></i>
+              Temizle
+            </button>
+          </div>
+
+          <!-- Tablo Önizlemesi -->
+          <div class="border border-slate-200 rounded-xl overflow-hidden max-h-56 overflow-y-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-100 text-slate-700 sticky top-0 border-b border-slate-200">
+                <tr>
+                  <th class="px-3 py-2 font-semibold">#</th>
+                  <th class="px-3 py-2 font-semibold">Kitap Adı</th>
+                  <th class="px-3 py-2 font-semibold">Yazar</th>
+                  <th class="px-3 py-2 font-semibold">Kategori</th>
+                  <th class="px-3 py-2 font-semibold">Dil</th>
+                  <th class="px-3 py-2 font-semibold">Adet</th>
+                  <th class="px-3 py-2 font-semibold">Raf</th>
+                </tr>
+              </thead>
+              <tbody id="batch-preview-tbody" class="divide-y divide-slate-100 text-slate-700 font-normal">
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Bilgi Notu -->
+        <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 flex items-start space-x-2">
+          <i data-lucide="info" class="w-4 h-4 text-amber-600 shrink-0 mt-0.5"></i>
+          <div>
+            <strong>Envanter Kuralları:</strong> Yüklenen tüm kitaplar için sistem otomatik olarak <em>Maksimum 7 Günlük Dinamik Ödünç Süresi</em> ve <em>Akıllı Talep İndeksi</em> tanımlayacaktır. Aynı kitap ismi ve yazar tekrar bulunursa kopya sayısı mevcut kaydın üzerine eklenir.
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Altbilgi -->
+      <div class="bg-slate-50 px-6 py-4 border-t border-slate-200 flex justify-between items-center shrink-0">
+        <button type="button" onclick="closeModal('modal-batch-import')" class="px-4 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-white transition-colors">
+          İptal
+        </button>
+        <button type="button" id="btn-submit-batch-import" onclick="submitBatchBooksImport()" disabled class="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-600 disabled:bg-slate-300 disabled:cursor-not-allowed text-white rounded-lg text-xs font-bold transition-all shadow-sm flex items-center">
+          <i data-lucide="upload" class="w-4 h-4 mr-1.5"></i>
+          <span id="btn-submit-batch-text">İçeri Aktarımı Başlat</span>
+        </button>
+      </div>
     </div>
   </div>
 

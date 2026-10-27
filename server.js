@@ -389,6 +389,66 @@ app.post('/api/books', requireAdmin, (req, res) => {
   res.status(201).json(newBook);
 });
 
+// Excel / CSV ile Toplu Kitap Yükleme (SADECE ADMİN)
+app.post('/api/books/batch', requireAdmin, (req, res) => {
+  const db = readDatabase();
+  const { books } = req.body;
+
+  if (!Array.isArray(books) || books.length === 0) {
+    return res.status(400).json({ error: 'Yüklenecek kitap listesi bulunamadı veya boş.' });
+  }
+
+  let addedCount = 0;
+  const newBooks = [];
+
+  for (const b of books) {
+    const rawTitle = b.title || b['Kitap Adı'] || b['Eser Adı'] || b['Başlık'] || b['Title'] || b['kitap_adi'] || '';
+    const rawAuthor = b.author || b['Yazar'] || b['Yazar Adı'] || b['Author'] || b['yazar'] || '';
+
+    const title = String(rawTitle).trim();
+    const author = String(rawAuthor).trim();
+    if (!title || !author) continue;
+
+    const rawCopies = b.totalCopies || b['Adet'] || b['Kopya'] || b['Miktar'] || b['total_copies'] || 1;
+    const copies = Math.max(1, parseInt(rawCopies, 10) || 1);
+
+    const category = String(b.category || b['Kategori'] || b['Disiplin'] || b['Tür'] || b['Category'] || 'Genel').trim();
+    const language = String(b.language || b['Dil'] || b['Language'] || 'Türkçe').trim();
+    const shelf = String(b.shelf || b['Raf'] || b['Raf Kodu'] || b['Yer No'] || b['Shelf'] || '-').trim();
+    const isbn = String(b.isbn || b['ISBN'] || '').trim();
+    const notes = String(b.notes || b['Notlar'] || b['Açıklama'] || b['Notes'] || '').trim();
+
+    const bookObj = {
+      id: 'b_' + crypto.randomUUID().slice(0, 8),
+      title,
+      author,
+      category,
+      language,
+      shelf,
+      isbn,
+      totalCopies: copies,
+      availableCopies: copies,
+      notes
+    };
+
+    newBooks.push(bookObj);
+    addedCount++;
+  }
+
+  if (addedCount === 0) {
+    return res.status(400).json({ error: 'Yüklenen tabloda geçerli kitap kaydı (Başlık ve Yazar içeren satır) bulunamadı.' });
+  }
+
+  db.books = [...newBooks, ...db.books];
+  writeDatabase(db);
+
+  res.status(201).json({
+    success: true,
+    count: addedCount,
+    message: `🎉 Toplam ${addedCount} adet kitap başarıyla kütüphane kataloğuna eklendi!`
+  });
+});
+
 // Kitap Güncelle (SADECE ADMİN)
 app.put('/api/books/:id', requireAdmin, (req, res) => {
   const db = readDatabase();
@@ -475,7 +535,7 @@ app.post('/api/members', requireAdmin, (req, res) => {
   res.status(201).json(newMember);
 });
 
-// Kitap Dinamik Talep ve Tahsis Süresi Hesaplama (Yoğunluk Algoritması)
+// Kitap Dinamik Talep ve Tahsis Süresi Hesaplama (Yoğunluk Algoritması - MAX 7 GÜN)
 function calculateDynamicLoanDays(book, member, db) {
   const total = book.totalCopies || 1;
   const available = book.availableCopies !== undefined ? book.availableCopies : 1;
@@ -483,7 +543,7 @@ function calculateDynamicLoanDays(book, member, db) {
 
   // Kritik Talep: Tek nüsha veya son nüsha kalmış ve geçmişte talep görmüş (1-2 Gün)
   if (total === 1 || (available === 1 && total > 1 && pastLoans >= 2)) {
-    return { days: 1, demandLevel: 'critical', demandLabel: 'Kritik Talep (1-2 Gün)' };
+    return { days: 2, demandLevel: 'critical', demandLabel: 'Kritik Talep (1-2 Gün)' };
   }
   // Yüksek Talep: Rafta tek kopya kalmış veya stok %50'nin altına düşmüş (3 Gün)
   if (available === 1 || (available / total <= 0.5) || pastLoans >= 3) {
@@ -493,11 +553,11 @@ function calculateDynamicLoanDays(book, member, db) {
   if (available < total) {
     return { days: 5, demandLevel: 'moderate', demandLabel: 'Orta Talep (5 Gün)' };
   }
-  // Normal / Standart Talep: Tüm kopyalar rafta (Max 8 Gün)
-  return { days: 8, demandLevel: 'normal', demandLabel: 'Normal Talep (8 Gün)' };
+  // Normal / Standart Talep: Tüm kopyalar rafta (Hem Öğrenci Hem Akademisyen için Maksimum 7 Gün)
+  return { days: 7, demandLevel: 'normal', demandLabel: 'Normal Talep (Max 7 Gün)' };
 }
 
-// Kitap Ödünç Ver (SADECE ADMİN) - DİNAMİK VE YOĞUNLUĞA GÖRE TAHSİS SİSTEMİ
+// Kitap Ödünç Ver (SADECE ADMİN) - DİNAMİK VE YOĞUNLUĞA GÖRE TAHSİS SİSTEMİ (MAX 7 GÜN)
 app.post('/api/loans/issue', requireAdmin, (req, res) => {
   const db = readDatabase();
   const { bookId, memberId, loanDays } = req.body;
@@ -516,21 +576,20 @@ app.post('/api/loans/issue', requireAdmin, (req, res) => {
     return res.status(400).json({ error: 'Bu kitaptan rafta uygun kopya kalmadı.' });
   }
 
-  const isAcademic = member.role === 'Öğretim Üyesi' || member.role === 'Araştırma Görevlisi' || member.role === 'faculty' || member.role === 'researcher';
   const dynamicDemand = calculateDynamicLoanDays(book, member, db);
 
   let days = parseInt(loanDays, 10);
   let isSameDay = false;
 
   if (loanDays === 0 || loanDays === '0' || loanDays === 'same-day') {
-    // Akademisyenlere veya özel duruma "Aynı Gün Tahsis" (Günübirlik - Gün sonu teslim)
+    // Akademisyen veya öğrencilere "Aynı Gün Tahsis" (Günübirlik - Gün sonu teslim)
     days = 0;
     isSameDay = true;
   } else if (isNaN(days) || days < 1) {
-    days = dynamicDemand.days; // Dinamik otomatik öneri
+    days = dynamicDemand.days; // Dinamik otomatik öneri (Max 7)
   } else {
-    // Sınır: Min 1 Gün, Max 8 Gün tahsis tavanı!
-    days = Math.max(1, Math.min(8, days));
+    // Sınır: Hem öğrenci hem akademisyen için Min 1 Gün, Maksimum 7 Gün tavanı!
+    days = Math.max(1, Math.min(7, days));
   }
 
   const now = new Date();

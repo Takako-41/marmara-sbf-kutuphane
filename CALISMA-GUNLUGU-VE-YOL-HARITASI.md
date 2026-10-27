@@ -239,3 +239,43 @@ git push origin main
 4. **Tam Demokratik Yönetim:**
    - Yönetici ekleme ve yetki kaldırma süreçleri istisnasız 4-Eyes Principle prensibine (Çift Admin Onayı) bağlandı. Hiçbir tekil kullanıcının sistemi tek taraflı domine etme veya kalıcı arka kapı bırakma imtiyazı kalmadı.
 
+---
+
+## 📌 Çalışma Oturumu: 27 Ekim 2026 (Excel/CSV Toplu Kitap Yükleme & Kesin 7 Gün Dinamik Ödünç Kuralı)
+- **Geliştirici:** Tarık Özşentürk & Antigravity Pair-Programming
+- **Odak Alanı:** Fakülte envanterinin Excel veya CSV dosyasından toplu sisteme aktarılması ve ödünç süresinin hem öğrenciler hem akademisyenler için istisnasız **maksimum 7 gün** (dinamik ve günübirlik seçenekli) olarak kesinleştirilmesi.
+- **Durum:** ✅ Başarıyla Tamamlandı ve Test Edildi
+
+### Hayata Geçirilen Özellikler:
+
+1. **Excel & CSV Toplu Kitap Yükleme Sistemi (Fakülte Envanteri Entegrasyonu):**
+   - **Frontend:**
+     - Kitap Kataloğu yönetim çubuğuna yalnızca adminlerin görebildiği yeşil renkli **"Excel/CSV Toplu Yükle"** butonu (`#btnAdminBatchImport`) ve kapsamlı yükleme modalı (`#modal-batch-import`) eklendi.
+     - **SheetJS (xlsx 0.18.5) CDN Entegrasyonu:** `.xlsx` ve `.xls` dosyaları doğrudan istemci tarafında taranarak satırlara dökülür.
+     - **Akıllı CSV Ayrıştırıcı:** Ayraçları (noktalı virgül `;`, virgül `,` veya sekme `\t`) otomatik sezerek UTF-8 ve Windows-1254 Türkçe karakter kodlamalarını çözer.
+     - **Örnek Şablon İndirme:** Yöneticilerin hata yapmaması için tek tıkla **Excel Şablonu (.xlsx)** ve **CSV Şablonu (.csv)** üretip indiren `downloadBatchTemplate()` fonksiyonu sağlandı.
+     - **Esnek Sütun Haritalandırma:** Fakültenin Excel listesindeki olası tüm başlık alternatiflerini tanır:
+       - *Başlık:* `Kitap Adı`, `Eser Adı`, `Kitap`, `Başlık`, `Title`
+       - *Yazar:* `Yazar`, `Yazarı`, `Author`, `Müellif`
+       - *Kategori:* `Kategori`, `Tür`, `Disiplin`, `Alan`
+       - *Dil:* `Dil`, `Language` (Türkçe, Français, English standartlaştırılır)
+       - *Raf:* `Raf`, `Konum`, `Yer No`, `Shelf`
+       - *Adet:* `Adet`, `Kopya Sayısı`, `Miktar`, `TotalCopies` (Varsayılan 1)
+     - **Canlı Önizleme Tablosu:** Yükleme öncesinde ilk 50 kitabı tablo halinde gösterir, toplam kitap sayısını doğrular ve onay butonuyla backend'e fırlatır.
+   - **Backend (`POST /api/books/batch`):**
+     - Sadece aktif admin oturumuyla çalışır (`verifyToken` + `req.user.role === 'admin'`).
+     - Gelen kitap dizisini doğrular; mevcut kütüphanede aynı isim ve yazara sahip kitap varsa kopya adedini (`totalCopies` ve `availableCopies`) otomatik artırır.
+     - Yeni kitaplar için benzersiz ID, kategori, dil ve raf bilgileriyle envantere kaydeder.
+     - `data/library.json` veritabanına tek seferde atomic olarak kaydeder.
+
+2. **Kesin ve Eşit Dinamik Ödünç Süresi: Kesinlikle Maksimum 7 Gün (Öğrenci & Hoca):**
+   - **Kural:** Kütüphanedeki hiçbir üye (öğrenci, araştırma görevlisi veya profesör/akademisyen) için ödünç alma süresi **7 günü geçemez**.
+   - **Backend Denetimi:** `server.js` içindeki `calculateDynamicLoanDays()` ve `POST /api/loans/issue` rotalarında üst tavan hard-ceiling olarak **7 gün** ile mühürlendi. 7 günden fazla gelen her istek otomatik olarak 7 güne indirilir veya reddedilir.
+   - **Dinamik Yoğunluk Mantığı:**
+     - *Kritik Talep (Rafta 1 kopya veya %25 altı stok):* Dinamik öneri **2-3 Gün**.
+     - *Orta Talep (Rafta 2 kopya veya %50 altı stok):* Dinamik öneri **5 Gün**.
+     - *Dengeli Envanter:* Standart **7 Gün (Yasal Tavan Süre)**.
+   - **Günübirlik Seçenek (0 Gün):** Fakülte içi seminer veya derste kullanım için kitap gün sonu teslim edilmek üzere "Günübirlik" olarak da verilebilir.
+   - **Arayüz:** Hızlı seçim butonları (0 Günübirlik, 1G, 2G, 3G, 5G, 7G Max) ile tam etkileşimli ödünç verme kartı. Eski 15/30 günlük statik seçenekler tamamen tasfiye edildi.
+
+

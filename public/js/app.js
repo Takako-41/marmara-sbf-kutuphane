@@ -701,11 +701,17 @@ function renderNavigation() {
     `;
   }
 
-  // Kitap ekleme butonunu sadece admine göster
+  // Kitap ekleme ve toplu yükleme butonlarını sadece admine göster
   const btnAdminAdd = document.getElementById('btnAdminAddBook');
   if (btnAdminAdd) {
     if (isAdmin) btnAdminAdd.classList.remove('hidden');
     else btnAdminAdd.classList.add('hidden');
+  }
+
+  const btnAdminBatch = document.getElementById('btnAdminBatchImport');
+  if (btnAdminBatch) {
+    if (isAdmin) btnAdminBatch.classList.remove('hidden');
+    else btnAdminBatch.classList.add('hidden');
   }
 
   // Aktif sekmeyi işaretle
@@ -1031,6 +1037,11 @@ function renderBooks(filteredList = null) {
         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${b.availableCopies > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
           ${b.availableCopies} / ${b.totalCopies}
         </span>
+        <div class="mt-1">
+          <span class="inline-block text-[10px] font-semibold ${b.availableCopies === 0 ? 'text-rose-500' : (b.availableCopies === 1 && b.totalCopies > 1 ? 'text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded' : 'text-slate-500')}">
+            ${b.availableCopies === 0 ? 'Tükendi' : (b.availableCopies === 1 && b.totalCopies > 1 ? '⚡ 2-3 Gün (Kritik)' : (b.availableCopies <= 2 ? '⚡ 5 Gün' : 'Max 7 Gün'))}
+          </span>
+        </div>
       </td>
       ${isAdmin ? `
         <td class="py-3 px-4 text-right space-x-1 whitespace-nowrap admin-col-action">
@@ -1289,6 +1300,102 @@ function closeModal(id) {
   if (el) el.classList.add('hidden');
 }
 
+let currentSelectedLoanDays = 7;
+
+function selectLoanDays(days) {
+  currentSelectedLoanDays = parseInt(days, 10);
+  if (isNaN(currentSelectedLoanDays)) currentSelectedLoanDays = 7;
+  if (currentSelectedLoanDays > 7) currentSelectedLoanDays = 7;
+  if (currentSelectedLoanDays < 0) currentSelectedLoanDays = 0;
+
+  const hiddenInput = document.getElementById('issue-loan-days-input');
+  if (hiddenInput) hiddenInput.value = currentSelectedLoanDays;
+
+  const lbl = document.getElementById('issue-selected-days-label');
+  if (lbl) {
+    if (currentSelectedLoanDays === 0) {
+      lbl.textContent = 'Seçilen: Günübirlik (Akşam Teslim)';
+    } else if (currentSelectedLoanDays === 7) {
+      lbl.textContent = 'Seçilen: 7 Gün (Tavan Süre)';
+    } else {
+      lbl.textContent = `Seçilen: ${currentSelectedLoanDays} Gün`;
+    }
+  }
+
+  // Buton stillerini güncelle
+  document.querySelectorAll('.btn-loan-day').forEach(btn => {
+    const btnDays = parseInt(btn.getAttribute('data-days'), 10);
+    if (btnDays === currentSelectedLoanDays) {
+      btn.className = 'btn-loan-day py-2 rounded-lg border text-xs font-bold text-center transition-all bg-blue-900 text-white border-blue-900 shadow-sm';
+    } else if (btnDays === 0) {
+      btn.className = 'btn-loan-day py-2 rounded-lg border text-xs font-bold text-center transition-all bg-purple-50 text-purple-900 border-purple-200 hover:bg-purple-100';
+    } else {
+      btn.className = 'btn-loan-day py-2 rounded-lg border text-xs font-semibold text-center transition-all bg-white text-slate-700 border-slate-200 hover:bg-slate-50';
+    }
+  });
+}
+
+function onIssueBookChange() {
+  const bookSelect = document.getElementById('issue-book-select');
+  const card = document.getElementById('issue-demand-card');
+  const badge = document.getElementById('issue-demand-badge');
+  const desc = document.getElementById('issue-demand-desc');
+  if (!bookSelect || !card) return;
+
+  const bookId = bookSelect.value;
+  if (!bookId) {
+    card.classList.add('hidden');
+    return;
+  }
+
+  const book = (libraryData.books || []).find(b => b.id === bookId);
+  if (!book) {
+    card.classList.add('hidden');
+    return;
+  }
+
+  card.classList.remove('hidden');
+  const total = parseInt(book.totalCopies) || 1;
+  const avail = parseInt(book.availableCopies);
+  const ratio = avail / total;
+
+  if (ratio <= 0.25 || avail === 1) {
+    card.className = 'rounded-xl p-3 border text-xs space-y-1 bg-rose-50 border-rose-200 text-rose-900';
+    if (badge) {
+      badge.className = 'px-2 py-0.5 rounded font-bold text-[10px] bg-rose-200 text-rose-900';
+      badge.textContent = 'Öneri: 2-3 Gün (Kritik Stok)';
+    }
+    if (desc) {
+      desc.textContent = `Bu kitaptan son ${avail} kopya kaldı (${avail}/${total}). Diğer araştırmacıların erişimi için dinamik sistem 2-3 gün önermektedir (Maksimum 7 gün seçebilirsiniz).`;
+    }
+    selectLoanDays(3);
+  } else if (ratio <= 0.50 || avail <= 2) {
+    card.className = 'rounded-xl p-3 border text-xs space-y-1 bg-amber-50 border-amber-200 text-amber-900';
+    if (badge) {
+      badge.className = 'px-2 py-0.5 rounded font-bold text-[10px] bg-amber-200 text-amber-900';
+      badge.textContent = 'Öneri: 5 Gün (Orta Yoğunluk)';
+    }
+    if (desc) {
+      desc.textContent = `Stokta ${avail}/${total} adet mevcut. Dinamik tahsis 5 gün önermektedir (Maksimum 7 gün seçebilirsiniz).`;
+    }
+    selectLoanDays(5);
+  } else {
+    card.className = 'rounded-xl p-3 border text-xs space-y-1 bg-blue-50 border-blue-200 text-blue-900';
+    if (badge) {
+      badge.className = 'px-2 py-0.5 rounded font-bold text-[10px] bg-blue-200 text-blue-900';
+      badge.textContent = 'Öneri: 7 Gün (Tavan Süre)';
+    }
+    if (desc) {
+      desc.textContent = `Kütüphane stoğu dengeli (${avail}/${total} adet). Hem öğrenciler hem akademisyenler için yasal maksimum süre 7 gündür.`;
+    }
+    selectLoanDays(7);
+  }
+}
+
+function onIssueMemberChange() {
+  onIssueBookChange();
+}
+
 function openIssueModal(preselectedBookId = null) {
   if (!currentUser || currentUser.role !== 'admin') {
     alert("Bu işlem sadece Kütüphane Yöneticisi (Admin) tarafından yapılabilir.");
@@ -1317,6 +1424,15 @@ function openIssueModal(preselectedBookId = null) {
     bookSelect.appendChild(opt);
   });
 
+  selectLoanDays(7);
+
+  if (preselectedBookId) {
+    onIssueBookChange();
+  } else {
+    const card = document.getElementById('issue-demand-card');
+    if (card) card.classList.add('hidden');
+  }
+
   openModal('modal-issue');
 }
 
@@ -1328,7 +1444,7 @@ async function submitIssueLoan(e) {
   e.preventDefault();
   const memberId = document.getElementById('issue-member-select').value;
   const bookId = document.getElementById('issue-book-select').value;
-  const loanDays = document.querySelector('input[name="loanDaysRadio"]:checked').value;
+  const loanDays = currentSelectedLoanDays !== undefined ? currentSelectedLoanDays : 7;
 
   try {
     const res = await fetch('/api/loans/issue', {
@@ -3183,6 +3299,369 @@ async function requestRemoveAdmin(username, fullName) {
     await fetchData();
   } catch (err) {
     alert(err.message);
+  }
+}
+
+// ================= EXCEL & CSV TOPLU KİTAP YÜKLEME =================
+let batchParsedBooks = [];
+
+function openBatchImportModal() {
+  if (!currentUser || currentUser.role !== 'admin') {
+    alert("Bu işlem sadece Kütüphane Yöneticisi (Admin) tarafından yapılabilir.");
+    return;
+  }
+  clearBatchPreview();
+  openModal('modal-batch-import');
+}
+
+function clearBatchPreview() {
+  const fi = document.getElementById('batch-file-input');
+  if (fi) fi.value = '';
+  batchParsedBooks = [];
+  const previewBox = document.getElementById('batch-preview-container');
+  if (previewBox) previewBox.classList.add('hidden');
+  const tbody = document.getElementById('batch-preview-tbody');
+  if (tbody) tbody.innerHTML = '';
+  const btnSubmit = document.getElementById('btn-submit-batch-import');
+  if (btnSubmit) btnSubmit.disabled = true;
+  const btnText = document.getElementById('btn-submit-batch-text');
+  if (btnText) btnText.textContent = 'İçeri Aktarımı Başlat';
+}
+
+// Şablon İndirme Fonksiyonu (Excel veya CSV)
+function downloadBatchTemplate(format) {
+  const templateData = [
+    {
+      "Kitap Adı": "Siyaset Bilimine Giriş",
+      "Yazar": "Münci Kapani",
+      "Kategori": "Siyaset Bilimi",
+      "Dil": "Türkçe",
+      "Raf": "A-12",
+      "ISBN": "9789752204561",
+      "Adet": 3,
+      "Notlar": "SBF Lisans Temel Kaynak"
+    },
+    {
+      "Kitap Adı": "Introduction à la Science Politique",
+      "Yazar": "Philippe Braud",
+      "Kategori": "Siyaset Bilimi",
+      "Dil": "Français",
+      "Raf": "B-04",
+      "ISBN": "9782275034874",
+      "Adet": 2,
+      "Notlar": "Fransızca Kamu Yönetimi Ders Kitabı"
+    },
+    {
+      "Kitap Adı": "Politics Among Nations",
+      "Yazar": "Hans Morgenthau",
+      "Kategori": "Uluslararası İlişkiler",
+      "Dil": "English",
+      "Raf": "C-08",
+      "ISBN": "9780072895391",
+      "Adet": 2,
+      "Notlar": "Uluslararası İlişkiler Klasik Metin"
+    },
+    {
+      "Kitap Adı": "Kamu Yönetimi ve Bürokrasi",
+      "Yazar": "Metin Heper",
+      "Kategori": "Kamu Yönetimi",
+      "Dil": "Türkçe",
+      "Raf": "A-05",
+      "ISBN": "9789754707892",
+      "Adet": 4,
+      "Notlar": "Marmara SBF Envanteri"
+    }
+  ];
+
+  if (format === 'xlsx' && typeof XLSX !== 'undefined') {
+    const ws = XLSX.utils.json_to_sheet(templateData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Kitaplar");
+    XLSX.writeFile(wb, "Marmara_SBF_Kitap_Yukleme_Sablonu.xlsx");
+  } else {
+    // CSV Şablonu (UTF-8 BOM ile Excel uyumlu)
+    const headers = ["Kitap Adı", "Yazar", "Kategori", "Dil", "Raf", "ISBN", "Adet", "Notlar"];
+    const rows = templateData.map(d => [
+      `"${d["Kitap Adı"]}"`,
+      `"${d["Yazar"]}"`,
+      `"${d["Kategori"]}"`,
+      `"${d["Dil"]}"`,
+      `"${d["Raf"]}"`,
+      `"${d["ISBN"]}"`,
+      d["Adet"],
+      `"${d["Notlar"]}"`
+    ].join(';'));
+    
+    const csvContent = "\uFEFF" + [headers.join(';'), ...rows].join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = "Marmara_SBF_Kitap_Yukleme_Sablonu.csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+}
+
+// Dosya Seçildiğinde Çalışan Okuyucu
+function handleBatchFileSelect(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+
+  const fileName = file.name;
+  const ext = fileName.split('.').pop().toLowerCase();
+
+  if (!['xlsx', 'xls', 'csv'].includes(ext)) {
+    alert("Lütfen yalnızca Excel (.xlsx, .xls) veya CSV (.csv) dosyası seçin.");
+    return;
+  }
+
+  const reader = new FileReader();
+
+  if (ext === 'xlsx' || ext === 'xls') {
+    reader.onload = function(e) {
+      try {
+        if (typeof XLSX === 'undefined') {
+          throw new Error("SheetJS kütüphanesi yüklenemedi. Sayfayı yenileyip tekrar deneyin.");
+        }
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+        const rawJson = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+        processBatchRawRows(rawJson, fileName);
+      } catch (err) {
+        console.error("Excel okuma hatası:", err);
+        alert("Excel dosyası okunurken hata oluştu: " + err.message);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  } else {
+    // CSV Dosyası
+    reader.onload = function(e) {
+      try {
+        const text = e.target.result;
+        const rows = parseCSVContent(text);
+        processBatchRawRows(rows, fileName);
+      } catch (err) {
+        console.error("CSV okuma hatası:", err);
+        alert("CSV dosyası okunurken hata oluştu: " + err.message);
+      }
+    };
+    reader.readAsText(file, 'utf-8');
+  }
+}
+
+// Kolon Haritalandırma ve Satır Normalizasyonu
+function processBatchRawRows(rows, fileName) {
+  if (!rows || rows.length === 0) {
+    alert("Seçilen dosyada veri satırı bulunamadı.");
+    return;
+  }
+
+  const normalized = [];
+
+  for (const row of rows) {
+    const keys = Object.keys(row);
+    if (keys.length === 0) continue;
+
+    const findVal = (possibleKeys) => {
+      for (const k of keys) {
+        const cleanK = k.toString().trim().toLowerCase()
+          .replace(/[_\-\s]+/g, ' ')
+          .replace(/ı/g, 'i').replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's').replace(/ö/g, 'o').replace(/ç/g, 'c');
+        for (const pk of possibleKeys) {
+          const cleanPk = pk.trim().toLowerCase()
+            .replace(/[_\-\s]+/g, ' ')
+            .replace(/ı/g, 'i').replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's').replace(/ö/g, 'o').replace(/ç/g, 'c');
+          if (cleanK === cleanPk || cleanK.includes(cleanPk)) {
+            return row[k];
+          }
+        }
+      }
+      return '';
+    };
+
+    const title = (findVal(['kitap adi', 'kitap', 'baslik', 'title', 'eser adi', 'eser', 'kitabin adi']) || '').toString().trim();
+    const author = (findVal(['yazar', 'author', 'yazari', 'muellif']) || '').toString().trim();
+
+    // En az başlık veya yazar olmalı
+    if (!title && !author) continue;
+
+    let category = (findVal(['kategori', 'category', 'tur', 'disiplin', 'alan']) || 'Genel').toString().trim();
+    let language = (findVal(['dil', 'language', 'lang']) || 'Türkçe').toString().trim();
+    const shelf = (findVal(['raf', 'konum', 'shelf', 'dolap', 'yer no', 'yer', 'cote']) || 'A-01').toString().trim();
+    const isbn = (findVal(['isbn', 'barkod']) || '').toString().trim();
+    const rawCopies = findVal(['adet', 'kopya', 'miktar', 'sayi', 'kopya sayisi', 'copies', 'totalcopies']);
+    let totalCopies = parseInt(rawCopies, 10);
+    if (isNaN(totalCopies) || totalCopies < 1) totalCopies = 1;
+    const notes = (findVal(['not', 'notlar', 'aciklama', 'notes', 'description']) || '').toString().trim();
+
+    // Dil standardizasyonu
+    const langLower = language.toLowerCase();
+    if (langLower.includes('fr') || langLower.includes('fra')) language = 'Français';
+    else if (langLower.includes('en') || langLower.includes('ing')) language = 'English';
+    else language = 'Türkçe';
+
+    normalized.push({
+      title: title || 'İsimsiz Eser',
+      author: author || 'Belirtilmedi',
+      category: category || 'Genel',
+      language,
+      shelf: shelf || 'A-01',
+      isbn,
+      totalCopies,
+      notes
+    });
+  }
+
+  if (normalized.length === 0) {
+    alert("Dosyada geçerli kitap kaydı (Kitap Adı veya Yazar) bulunamadı. Lütfen şablonu inceleyin.");
+    return;
+  }
+
+  batchParsedBooks = normalized;
+
+  // Önizleme Alanını Güncelle
+  const previewBox = document.getElementById('batch-preview-container');
+  const countEl = document.getElementById('batch-preview-count');
+  const nameEl = document.getElementById('batch-preview-filename');
+  const tbody = document.getElementById('batch-preview-tbody');
+  const btnSubmit = document.getElementById('btn-submit-batch-import');
+
+  if (previewBox) previewBox.classList.remove('hidden');
+  if (nameEl) nameEl.textContent = fileName;
+  if (countEl) countEl.textContent = `${normalized.length} Kitap Okundu`;
+
+  if (tbody) {
+    tbody.innerHTML = '';
+    const displayRows = normalized.slice(0, 50);
+    displayRows.forEach((b, idx) => {
+      const tr = document.createElement('tr');
+      tr.className = "hover:bg-slate-50";
+      tr.innerHTML = `
+        <td class="px-3 py-1.5 font-mono text-[11px] text-slate-400">${idx + 1}</td>
+        <td class="px-3 py-1.5 font-bold text-slate-900">${escapeHtml(b.title)}</td>
+        <td class="px-3 py-1.5 text-slate-700">${escapeHtml(b.author)}</td>
+        <td class="px-3 py-1.5"><span class="px-1.5 py-0.5 rounded bg-slate-100 text-[10px] text-slate-700">${escapeHtml(b.category)}</span></td>
+        <td class="px-3 py-1.5 text-[11px]">${escapeHtml(b.language)}</td>
+        <td class="px-3 py-1.5 text-center font-bold text-blue-900">${b.totalCopies}</td>
+        <td class="px-3 py-1.5 font-mono text-[11px] text-slate-600">${escapeHtml(b.shelf)}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    if (normalized.length > 50) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td colspan="7" class="px-3 py-2 text-center text-xs text-slate-500 bg-slate-50 italic">... ve ${normalized.length - 50} kitap daha (Tümü yüklenecektir) ...</td>`;
+      tbody.appendChild(tr);
+    }
+  }
+
+  if (btnSubmit) {
+    btnSubmit.disabled = false;
+    const btnText = document.getElementById('btn-submit-batch-text');
+    if (btnText) btnText.textContent = `${normalized.length} Kitabı Sisteme Aktar`;
+  }
+
+  if (window.lucide) lucide.createIcons();
+}
+
+// Basit ve Güvenilir CSV Ayrıştırıcı
+function parseCSVContent(text) {
+  const lines = text.split(/\r\n|\n|\r/).filter(l => l.trim().length > 0);
+  if (lines.length < 2) return [];
+
+  const firstLine = lines[0];
+  let delimiter = ';';
+  const semiCount = (firstLine.match(/;/g) || []).length;
+  const commaCount = (firstLine.match(/,/g) || []).length;
+  const tabCount = (firstLine.match(/\t/g) || []).length;
+  if (tabCount > semiCount && tabCount > commaCount) delimiter = '\t';
+  else if (commaCount > semiCount) delimiter = ',';
+
+  function splitLine(line, delim) {
+    const result = [];
+    let current = '';
+    let inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+      if (char === '"' || char === "'") {
+        if (inQuotes && line[i + 1] === char) {
+          current += char;
+          i++;
+        } else {
+          inQuotes = !inQuotes;
+        }
+      } else if (char === delim && !inQuotes) {
+        result.push(current.trim());
+        current = '';
+      } else {
+        current += char;
+      }
+    }
+    result.push(current.trim());
+    return result;
+  }
+
+  const headers = splitLine(lines[0], delimiter).map(h => h.replace(/^["']|["']$/g, '').trim());
+  const rows = [];
+
+  for (let i = 1; i < lines.length; i++) {
+    const values = splitLine(lines[i], delimiter);
+    const obj = {};
+    headers.forEach((h, idx) => {
+      let val = values[idx] || '';
+      val = val.replace(/^["']|["']$/g, '').trim();
+      obj[h] = val;
+    });
+    rows.push(obj);
+  }
+
+  return rows;
+}
+
+// Toplu Kitapları Backend'e Gönder
+async function submitBatchBooksImport() {
+  if (!batchParsedBooks || batchParsedBooks.length === 0) {
+    alert("Yüklenecek kitap bulunamadı.");
+    return;
+  }
+
+  if (!currentUser || currentUser.role !== 'admin') {
+    alert("Yalnızca yönetici bu işlemi yapabilir.");
+    return;
+  }
+
+  const btnSubmit = document.getElementById('btn-submit-batch-import');
+  const btnText = document.getElementById('btn-submit-batch-text');
+  if (btnSubmit) btnSubmit.disabled = true;
+  if (btnText) btnText.textContent = "Yükleniyor, lütfen bekleyin...";
+
+  try {
+    const res = await fetch('/api/books/batch', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${currentToken}`
+      },
+      body: JSON.stringify({ books: batchParsedBooks })
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Toplu kitap yükleme başarısız.");
+
+    closeModal('modal-batch-import');
+    showToast(`${data.insertedCount} yeni kitap eklendi, ${data.updatedCount} kitap stoğu güncellendi!`, 'success');
+    await fetchData();
+  } catch (err) {
+    console.error("Toplu kitap yükleme hatası:", err);
+    alert("Hata: " + err.message);
+  } finally {
+    if (btnSubmit) btnSubmit.disabled = false;
+    if (btnText) btnText.textContent = "İçeri Aktarımı Başlat";
   }
 }
 
