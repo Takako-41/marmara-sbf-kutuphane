@@ -1,0 +1,15 @@
+{
+  "name": "marmara-sbf-kutuphane",
+  "version": "1.0.0",
+  "description": "Marmara Üniversitesi Siyasal Bilgiler Fakültesi Kütüphane Yönetim Sistemi (TR/FR/EN)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": ["library", "marmara", "sbf", "kutuphane", "multilingual"],
+  "author": "Marmara SBF",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
